@@ -12,26 +12,21 @@ def read_transcript(transcript_file: Path) -> str:
         return f.read()
 
 def process_transcript(transcript_text: str) -> str:
-    """Process a transcript using Mistral to generate a summary."""
-    prompt = f"""Please provide a concise summary of the following transcript. 
-Focus on the main topics, key points, and any action items or decisions mentioned.
-Keep the summary clear and well-structured.
+    """Process a transcript using TinyLlama to generate a summary."""
+    prompt = f"""Summarize this transcript concisely:
 
-Transcript:
 {transcript_text}
 
-Please structure the summary as follows:
-1. Main Topics
-2. Key Points
-3. Action Items/Decisions (if any)
-4. Additional Notes (if relevant)
-
-Summary:"""
+Format the summary as:
+- Topics:
+- Key Points:
+- Actions:
+- Notes:"""
     
-    # Use Ollama with Mistral model to generate the summary
+    # Use Ollama with TinyLlama model to generate the summary
     try:
         print("  Generating summary...")
-        response = ollama.chat(model='mistral', messages=[
+        response = ollama.chat(model='tinyllama', messages=[
             {
                 'role': 'user',
                 'content': prompt
