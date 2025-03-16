@@ -3,6 +3,7 @@
 import os
 import sys
 from pathlib import Path
+import ollama
 
 def read_transcript(transcript_file: Path) -> str:
     """Read the content of a transcript file."""
@@ -11,8 +12,24 @@ def read_transcript(transcript_file: Path) -> str:
 
 def process_transcript(transcript_text: str) -> str:
     """Process a transcript using LLaMA to generate a summary."""
-    # TODO: Implement LLaMA processing
-    pass
+    prompt = f"""Please provide a concise summary of the following transcript. 
+Focus on the main topics, key points, and any action items or decisions mentioned.
+Keep the summary clear and well-structured.
+
+Transcript:
+{transcript_text}
+
+Summary:"""
+    
+    # Use Ollama to generate the summary
+    response = ollama.chat(model='llama2', messages=[
+        {
+            'role': 'user',
+            'content': prompt
+        }
+    ])
+    
+    return response['message']['content']
 
 def save_summary(summary: str, output_file: Path) -> None:
     """Save the summary to a file."""
@@ -34,13 +51,17 @@ def main():
         transcript_text = read_transcript(transcript_file)
         
         # Generate summary
-        summary = process_transcript(transcript_text)
-        
-        # Save summary
-        summary_file = summary_dir / f"{transcript_file.stem}_summary.txt"
-        save_summary(summary, summary_file)
-        
-        print(f"Summary saved to {summary_file}")
+        try:
+            summary = process_transcript(transcript_text)
+            
+            # Save summary
+            summary_file = summary_dir / f"{transcript_file.stem}_summary.txt"
+            save_summary(summary, summary_file)
+            
+            print(f"Summary saved to {summary_file}")
+        except Exception as e:
+            print(f"Error processing {transcript_file.name}: {str(e)}")
+            continue
 
 if __name__ == "__main__":
     main() 
