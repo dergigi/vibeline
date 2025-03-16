@@ -1,0 +1,11 @@
+# Python virtual environment
+vibenv/
+
+# Voice memo files
+VoiceMemos/*.m4a
+VoiceMemos/transcripts/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class 
