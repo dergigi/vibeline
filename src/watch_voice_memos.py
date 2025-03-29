@@ -65,10 +65,16 @@ class VoiceMemoHandler(FileSystemEventHandler):
             elif file_path.parent == self.transcript_dir and file_path.suffix.lower() == '.txt':
                 print(f"\nTranscript deleted: {file_path.name}")
                 print("  Note: Corresponding summary file remains unchanged")
+                # Reprocess voice memos to regenerate the transcript
+                print("  Regenerating transcript...")
+                self.process_voice_memo()
             
             # Handle deleted summary
             elif file_path.parent == self.summary_dir and file_path.suffix.lower() == '.txt':
                 print(f"\nSummary deleted: {file_path.name}")
+                # Regenerate the summary
+                print("  Regenerating summary...")
+                self.process_transcript()
 
     def process_voice_memo(self):
         """Run the voice memo processing script"""
