@@ -39,6 +39,9 @@ def process_transcript(transcript_text: str) -> str:
         }
     ])
     
+    # Debug print
+    print("Response structure:", response)
+    
     # Extract the content from the response
     return response['message']['content'].strip()
 
