@@ -8,9 +8,10 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
 class VoiceMemoHandler(FileSystemEventHandler):
-    def __init__(self, voice_memo_dir: Path, transcript_dir: Path):
+    def __init__(self, voice_memo_dir: Path, transcript_dir: Path, summary_dir: Path):
         self.voice_memo_dir = voice_memo_dir
         self.transcript_dir = transcript_dir
+        self.summary_dir = summary_dir
         self.processing_lock = False
         self.base_dir = Path(__file__).parent.parent
 
@@ -47,6 +48,40 @@ class VoiceMemoHandler(FileSystemEventHandler):
             elif file_path.parent == self.transcript_dir and file_path.suffix.lower() == '.txt':
                 print(f"\nTranscript modified: {file_path.name}")
                 self.process_transcript()
+
+    def on_deleted(self, event):
+        if self.processing_lock:
+            return
+
+        if not event.is_directory:
+            file_path = Path(event.src_path)
+            
+            # Handle deleted voice memo
+            if file_path.parent == self.voice_memo_dir and file_path.suffix.lower() == '.m4a':
+                print(f"\nVoice memo deleted: {file_path.name}")
+                # Delete corresponding transcript and summary if they exist
+                transcript_file = self.transcript_dir / f"{file_path.stem}.txt"
+                summary_file = self.summary_dir / f"{file_path.stem}_summary.txt"
+                
+                if transcript_file.exists():
+                    transcript_file.unlink()
+                    print(f"  Deleted corresponding transcript: {transcript_file.name}")
+                if summary_file.exists():
+                    summary_file.unlink()
+                    print(f"  Deleted corresponding summary: {summary_file.name}")
+            
+            # Handle deleted transcript
+            elif file_path.parent == self.transcript_dir and file_path.suffix.lower() == '.txt':
+                print(f"\nTranscript deleted: {file_path.name}")
+                # Delete corresponding summary if it exists
+                summary_file = self.summary_dir / f"{file_path.stem}_summary.txt"
+                if summary_file.exists():
+                    summary_file.unlink()
+                    print(f"  Deleted corresponding summary: {summary_file.name}")
+            
+            # Handle deleted summary
+            elif file_path.parent == self.summary_dir and file_path.suffix.lower() == '.txt':
+                print(f"\nSummary deleted: {file_path.name}")
 
     def process_voice_memo(self):
         """Run the voice memo processing script"""
@@ -87,6 +122,7 @@ def main():
     base_dir = Path(__file__).parent.parent
     voice_memo_dir = base_dir / "VoiceMemos"
     transcript_dir = voice_memo_dir / "transcripts"
+    summary_dir = voice_memo_dir / "summaries"
 
     # Verify directories exist
     if not voice_memo_dir.exists():
@@ -95,20 +131,25 @@ def main():
     if not transcript_dir.exists():
         print(f"Error: {transcript_dir} directory does not exist")
         sys.exit(1)
+    if not summary_dir.exists():
+        print(f"Error: {summary_dir} directory does not exist")
+        sys.exit(1)
 
     # Set up event handler and observer
-    event_handler = VoiceMemoHandler(voice_memo_dir, transcript_dir)
+    event_handler = VoiceMemoHandler(voice_memo_dir, transcript_dir, summary_dir)
     observer = Observer()
     
-    # Watch both directories
+    # Watch all directories
     observer.schedule(event_handler, str(voice_memo_dir), recursive=False)
     observer.schedule(event_handler, str(transcript_dir), recursive=False)
+    observer.schedule(event_handler, str(summary_dir), recursive=False)
     
     # Start the observer
     observer.start()
     print(f"\nWatching for changes in:")
     print(f"- Voice memos: {voice_memo_dir}")
     print(f"- Transcripts: {transcript_dir}")
+    print(f"- Summaries: {summary_dir}")
     print("\nPress Ctrl+C to stop...")
 
     try:
