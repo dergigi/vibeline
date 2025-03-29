@@ -16,10 +16,12 @@ def load_prompt_template(transcript_text: str) -> str:
     prompt_dir = Path("prompts")
     
     # Check transcript content to determine appropriate prompt
-    if "idea" in transcript_text.lower() and "app" in transcript_text.lower():
-        prompt_file = prompt_dir / "idea_app.md"
-    elif "blog post" in transcript_text.lower():
+    if "write" in transcript_text.lower() and "blog post" in transcript_text.lower():
+        # "I want to write a blog post"
         prompt_file = prompt_dir / "blog_post.md"
+    elif "idea" in transcript_text.lower() and "app" in transcript_text.lower():
+        # "I have an idea for an app"
+        prompt_file = prompt_dir / "idea_app.md"
     else:
         prompt_file = prompt_dir / "default.md"
     
