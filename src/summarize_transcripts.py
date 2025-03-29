@@ -15,9 +15,11 @@ def load_prompt_template(transcript_text: str) -> str:
     """Load the appropriate prompt template based on transcript content."""
     prompt_dir = Path("prompts")
     
-    # Check if transcript contains app-related content
+    # Check transcript content to determine appropriate prompt
     if "idea" in transcript_text.lower() and "app" in transcript_text.lower():
         prompt_file = prompt_dir / "idea_app.md"
+    elif "blog post" in transcript_text.lower():
+        prompt_file = prompt_dir / "blog_post.md"
     else:
         prompt_file = prompt_dir / "default.md"
     
