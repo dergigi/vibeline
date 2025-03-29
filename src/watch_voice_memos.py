@@ -59,25 +59,12 @@ class VoiceMemoHandler(FileSystemEventHandler):
             # Handle deleted voice memo
             if file_path.parent == self.voice_memo_dir and file_path.suffix.lower() == '.m4a':
                 print(f"\nVoice memo deleted: {file_path.name}")
-                # Delete corresponding transcript and summary if they exist
-                transcript_file = self.transcript_dir / f"{file_path.stem}.txt"
-                summary_file = self.summary_dir / f"{file_path.stem}_summary.txt"
-                
-                if transcript_file.exists():
-                    transcript_file.unlink()
-                    print(f"  Deleted corresponding transcript: {transcript_file.name}")
-                if summary_file.exists():
-                    summary_file.unlink()
-                    print(f"  Deleted corresponding summary: {summary_file.name}")
+                print("  Note: Corresponding transcript and summary files remain unchanged")
             
             # Handle deleted transcript
             elif file_path.parent == self.transcript_dir and file_path.suffix.lower() == '.txt':
                 print(f"\nTranscript deleted: {file_path.name}")
-                # Delete corresponding summary if it exists
-                summary_file = self.summary_dir / f"{file_path.stem}_summary.txt"
-                if summary_file.exists():
-                    summary_file.unlink()
-                    print(f"  Deleted corresponding summary: {summary_file.name}")
+                print("  Note: Corresponding summary file remains unchanged")
             
             # Handle deleted summary
             elif file_path.parent == self.summary_dir and file_path.suffix.lower() == '.txt':
