@@ -2,10 +2,12 @@
 vibenv/
 
 # Voice memo files
-VoiceMemos/*.m4a
-VoiceMemos/transcripts/
+VoiceMemos/*
 
 # Python cache files
 __pycache__/
 *.py[cod]
 *$py.class 
+
+# macOS stuff
+.DS_Store
