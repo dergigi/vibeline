@@ -53,7 +53,7 @@ class VoiceMemoHandler(FileSystemEventHandler):
         try:
             self.processing_lock = True
             print("Processing voice memo...")
-            result = subprocess.run([str(self.base_dir / 'process_voice_memos.sh')], 
+            result = subprocess.run([str(self.base_dir / 'src' / 'process_voice_memos.sh')], 
                                  capture_output=True, 
                                  text=True)
             if result.returncode == 0:
