@@ -10,16 +10,26 @@ def read_transcript(transcript_file: Path) -> str:
     with open(transcript_file, 'r', encoding='utf-8') as f:
         return f.read()
 
+def load_prompt_template(transcript_text: str) -> str:
+    """Load the appropriate prompt template based on transcript content."""
+    prompt_dir = Path("prompts")
+    
+    # Check if transcript contains app-related content
+    if "idea" in transcript_text.lower() and "app" in transcript_text.lower():
+        prompt_file = prompt_dir / "idea_app.md"
+    else:
+        prompt_file = prompt_dir / "default.md"
+    
+    with open(prompt_file, 'r', encoding='utf-8') as f:
+        return f.read()
+
 def process_transcript(transcript_text: str) -> str:
     """Process a transcript using LLaMA to generate a summary."""
-    prompt = f"""Please provide a concise summary of the following transcript. 
-Focus on the main topics, key points, and any action items or decisions mentioned.
-Keep the summary clear and well-structured.
-
-Transcript:
-{transcript_text}
-
-Summary:"""
+    # Load the appropriate prompt template
+    prompt_template = load_prompt_template(transcript_text)
+    
+    # Format the prompt with the transcript
+    prompt = prompt_template.format(transcript=transcript_text)
     
     # Use Ollama to generate the summary
     response = ollama.chat(model='llama2', messages=[
