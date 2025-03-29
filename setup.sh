@@ -12,6 +12,6 @@ source vibenv/bin/activate
 
 # Install requirements
 echo "Installing requirements..."
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 
 echo "Setup complete! Virtual environment is activated and requirements are installed." 
