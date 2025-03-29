@@ -1,0 +1,9 @@
+# Core dependencies
+requests>=2.31.0
+python-dotenv>=1.0.0
+ollama>=0.1.6
+
+# Development dependencies
+pytest>=7.4.0
+black>=23.7.0
+flake8>=6.1.0 
