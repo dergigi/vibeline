@@ -12,5 +12,7 @@ Action items:
 - [ ] ...
 ```
 
+If there are no action items or TODOs mentioned, ommit the "action items" section.
+
 Transcript:
 {transcript}
