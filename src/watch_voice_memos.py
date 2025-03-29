@@ -12,6 +12,7 @@ class VoiceMemoHandler(FileSystemEventHandler):
         self.voice_memo_dir = voice_memo_dir
         self.transcript_dir = transcript_dir
         self.processing_lock = False
+        self.base_dir = Path(__file__).parent.parent
 
     def on_created(self, event):
         if self.processing_lock:
@@ -30,12 +31,29 @@ class VoiceMemoHandler(FileSystemEventHandler):
                 print(f"\nNew transcript detected: {file_path.name}")
                 self.process_transcript()
 
+    def on_modified(self, event):
+        if self.processing_lock:
+            return
+
+        if not event.is_directory:
+            file_path = Path(event.src_path)
+            
+            # Handle modified voice memo
+            if file_path.parent == self.voice_memo_dir and file_path.suffix.lower() == '.m4a':
+                print(f"\nVoice memo modified: {file_path.name}")
+                self.process_voice_memo()
+            
+            # Handle modified transcript
+            elif file_path.parent == self.transcript_dir and file_path.suffix.lower() == '.txt':
+                print(f"\nTranscript modified: {file_path.name}")
+                self.process_transcript()
+
     def process_voice_memo(self):
         """Run the voice memo processing script"""
         try:
             self.processing_lock = True
             print("Processing voice memo...")
-            result = subprocess.run(['./process_voice_memos.sh'], 
+            result = subprocess.run([str(self.base_dir / 'process_voice_memos.sh')], 
                                  capture_output=True, 
                                  text=True)
             if result.returncode == 0:
@@ -52,7 +70,7 @@ class VoiceMemoHandler(FileSystemEventHandler):
         try:
             self.processing_lock = True
             print("Processing transcript...")
-            result = subprocess.run(['python', 'src/summarize_transcripts.py'],
+            result = subprocess.run(['python', str(self.base_dir / 'src' / 'summarize_transcripts.py')],
                                  capture_output=True,
                                  text=True)
             if result.returncode == 0:
@@ -66,7 +84,8 @@ class VoiceMemoHandler(FileSystemEventHandler):
 
 def main():
     # Set up directory paths
-    voice_memo_dir = Path("VoiceMemos")
+    base_dir = Path(__file__).parent.parent
+    voice_memo_dir = base_dir / "VoiceMemos"
     transcript_dir = voice_memo_dir / "transcripts"
 
     # Verify directories exist
