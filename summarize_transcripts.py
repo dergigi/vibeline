@@ -39,7 +39,8 @@ def process_transcript(transcript_text: str) -> str:
         }
     ])
     
-    return response['message']['content']
+    # Extract the content from the response
+    return response['message']['content'].strip()
 
 def save_summary(summary: str, output_file: Path) -> None:
     """Save the summary to a file."""
