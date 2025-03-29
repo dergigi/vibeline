@@ -51,6 +51,10 @@ def save_summary(summary: str, output_file: Path) -> None:
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write(summary)
 
+def count_words(text: str) -> int:
+    """Count the number of words in a text string."""
+    return len(text.split())
+
 def main():
     transcript_dir = Path("VoiceMemos/transcripts")
     summary_dir = Path("VoiceMemos/summaries")
@@ -77,7 +81,13 @@ def main():
         try:
             # Read transcript
             transcript_text = read_transcript(transcript_file)
-            print(f"  Read transcript ({len(transcript_text)} characters)")
+            word_count = count_words(transcript_text)
+            print(f"  Read transcript ({len(transcript_text)} characters, {word_count} words)")
+            
+            # Skip if transcript is too short
+            if word_count <= 210:
+                print("  Transcript is too short (≤210 words), skipping summary creation")
+                continue
             
             # Generate summary
             summary = process_transcript(transcript_text)
