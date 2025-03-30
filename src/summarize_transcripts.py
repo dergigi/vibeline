@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 import ollama
 import time
+import re
 
 def read_transcript(transcript_file: Path) -> str:
     """Read the content of a transcript file."""
@@ -15,11 +16,14 @@ def load_prompt_template(transcript_text: str) -> str:
     """Load the appropriate prompt template based on transcript content."""
     prompt_dir = Path("prompts")
     
-    # Check transcript content to determine appropriate prompt
-    if "blog post" in transcript_text.lower():
+    # Convert to lowercase for case-insensitive matching
+    text = transcript_text.lower()
+    
+    # Check transcript content to determine appropriate prompt using regex word boundaries
+    if re.search(r'\bblog post\b', text):
         # "I want to write a blog post"
         prompt_file = prompt_dir / "blog_post.md"
-    elif "idea" in transcript_text.lower() and "app" in transcript_text.lower():
+    elif re.search(r'\bidea\b', text) and re.search(r'\bapp\b', text):
         # "I have an idea for an app"
         prompt_file = prompt_dir / "idea_app.md"
     else:
