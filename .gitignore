@@ -1,8 +1,8 @@
 # Python virtual environment
 vibenv/
 
-# Voice memo files
-VoiceMemos/*
+# Voice memo folder
+VoiceMemos
 
 # Python cache files
 __pycache__/
