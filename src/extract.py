@@ -20,8 +20,8 @@ def determine_content_types(transcript_text: str) -> list[str]:
 
 def generate_additional_content(content_type: str, transcript_text: str, summary_text: str) -> str:
     """Generate additional content based on the content type."""
-    prompt_dir = Path("prompts")
-    with open(prompt_dir / f"{content_type}.md", 'r', encoding='utf-8') as f:
+    plugin_dir = Path("plugins")
+    with open(plugin_dir / f"{content_type}.md", 'r', encoding='utf-8') as f:
         prompt_template = f.read()
     
     prompt = prompt_template.format(transcript=transcript_text, summary=summary_text)
