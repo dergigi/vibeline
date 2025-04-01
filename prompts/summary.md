@@ -1,6 +1,4 @@
-Please provide a concise summary of the following transcript. Focus on the main points and key takeaways. Keep the summary clear and well-structured.
+Please provide a short, 2-3 sentence summary of the following transcript. The summary should never be longer than a single paragraph. 
 
 Transcript:
 {transcript}
-
-Summary: 
