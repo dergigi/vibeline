@@ -16,44 +16,41 @@ def load_plugins() -> dict[str, str]:
     for plugin_file in plugin_dir.glob("*.md"):
         plugin_name = plugin_file.stem
         if plugin_name != "summary":  # Skip the summary plugin as it's used differently
+            # Keep the full plugin name including all suffixes
             plugins[plugin_name] = plugin_file.read_text(encoding='utf-8')
     
     return plugins
 
-def determine_content_types(text: str, available_plugins: List[str]) -> List[str]:
-    """Determine what types of content to generate based on the transcript text."""
-    content_types = []
+def determine_active_plugins(text: str, available_plugins: List[str]) -> List[str]:
+    """Determine which plugins should be run on this transcript."""
+    active_plugins = []
     
     # First, add all .all plugins
     for plugin_name in available_plugins:
-        if plugin_name.endswith('.all'):
-            # Remove the .all suffix for the actual plugin name
-            content_types.append(plugin_name[:-4])
+        if '.all' in plugin_name:
+            # Remove all suffixes for the base name
+            base_name = plugin_name.split('.')[0]
+            active_plugins.append(base_name)
     
     # Then check for each plugin's content type
     for plugin_name in available_plugins:
-        # Skip .all plugins as they're already added
-        if plugin_name.endswith('.all'):
-            continue
-            
         # Convert plugin name to search pattern (e.g., "blog_post" -> "blog post")
         search_pattern = plugin_name.replace('_', ' ')
         
-        # Check if this is an "or" plugin (has .or.md suffix)
-        is_or_plugin = plugin_name.endswith('.or')
-        if is_or_plugin:
-            # Remove the .or suffix for the actual plugin name
-            plugin_name = plugin_name[:-3]
+        # Check if this is an "or" plugin
+        if '.or' in plugin_name:
+            # Get base name without suffixes
+            base_name = plugin_name.split('.')[0]
             # For or plugins, check if any of the words match
-            words = search_pattern[:-3].split()  # Remove .or from search pattern
+            words = base_name.split('_')
             if any(re.search(r'\b' + word + r'\b', text.lower()) for word in words):
-                content_types.append(plugin_name)
+                active_plugins.append(base_name)
         else:
             # For regular plugins, check for the exact pattern
             if re.search(r'\b' + search_pattern + r'\b', text.lower()):
-                content_types.append(plugin_name)
+                active_plugins.append(plugin_name)
     
-    return content_types
+    return active_plugins
 
 def generate_additional_content(content_type: str, transcript_text: str, summary_text: str, plugins: dict[str, str]) -> str:
     """Generate additional content based on the content type."""
@@ -92,12 +89,8 @@ def main():
     
     # Create output directories for each plugin
     for plugin_name in plugins.keys():
-        # Get base name without suffixes for directory name
-        base_name = plugin_name
-        if base_name.endswith('.all'):
-            base_name = base_name[:-4]
-        if base_name.endswith('.or'):
-            base_name = base_name[:-3]
+        # Get base name without any suffixes
+        base_name = plugin_name.split('.')[0]
         output_dir = voice_memo_dir / f"{base_name}s"  # Pluralize the plugin name
         output_dir.mkdir(parents=True, exist_ok=True)
         # Store with base name as key
@@ -117,23 +110,23 @@ def main():
         with open(summary_file, 'r', encoding='utf-8') as f:
             summary_text = f.read()
     
-    # Determine content types and generate content if needed
-    content_types = determine_content_types(transcript_text, list(plugins.keys()))
-    if "default" not in content_types:
-        for content_type in content_types:
-            print(f"  Generating {content_type} content...")
-            additional_content = generate_additional_content(content_type, transcript_text, summary_text, plugins)
+    # Determine which plugins to run
+    active_plugins = determine_active_plugins(transcript_text, list(plugins.keys()))
+    if active_plugins:
+        for plugin_name in active_plugins:
+            print(f"  Running {plugin_name} plugin...")
+            additional_content = generate_additional_content(plugin_name, transcript_text, summary_text, plugins)
             
             # Save to appropriate directory with timestamp
             timestamp = time.strftime("%Y%m%d_%H%M%S")
             filename = input_file.stem
-            output_file = output_dirs[content_type] / f"{filename}_{timestamp}.md"
+            output_file = output_dirs[plugin_name] / f"{filename}_{timestamp}.md"
             
             with open(output_file, 'w', encoding='utf-8') as f:
                 f.write(additional_content)
             print(f"  Content saved to: {output_file}")
     else:
-        print("  No content types detected for available plugins")
+        print("  No matching plugins found for this transcript")
     
     print("----------------------------------------")
 
@@ -153,7 +146,7 @@ if __name__ == "__main__":
             print(f"\nTesting {test_file}:")
             with open(test_file, 'r') as f:
                 text = f.read()
-            content_types = determine_content_types(text, available_plugins)
+            content_types = determine_active_plugins(text, available_plugins)
             print(f"Detected content types: {content_types}")
     else:
         # Normal mode
