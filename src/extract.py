@@ -14,7 +14,7 @@ def determine_content_types(transcript_text: str) -> list[str]:
     if re.search(r'\bblog post\b', text) or re.search(r'\bdraft\b', text):
         content_types.append("blog_post")
     if re.search(r'\bidea\b', text) and re.search(r'\bapp\b', text):
-        content_types.append("idea_app")
+        content_types.append("app_idea")
     
     return content_types if content_types else ["default"]
 
@@ -45,12 +45,12 @@ def main():
     
     # Set up directory paths
     voice_memo_dir = Path("VoiceMemos")
-    draft_dir = voice_memo_dir / "drafts"
-    prompt_dir = voice_memo_dir / "prompts"
+    blog_posts_dir = voice_memo_dir / "blog_posts"
+    app_ideas_dir = voice_memo_dir / "app_ideas"
     
     # Create output directories if they don't exist
-    draft_dir.mkdir(parents=True, exist_ok=True)
-    prompt_dir.mkdir(parents=True, exist_ok=True)
+    blog_posts_dir.mkdir(parents=True, exist_ok=True)
+    app_ideas_dir.mkdir(parents=True, exist_ok=True)
     
     print(f"Processing transcript: {input_file}")
     print("Extracting content...")
@@ -77,9 +77,9 @@ def main():
             timestamp = time.strftime("%Y%m%d_%H%M%S")
             filename = input_file.stem
             if content_type == "blog_post":
-                output_file = draft_dir / f"{filename}_{timestamp}.md"
-            else:  # idea_app
-                output_file = prompt_dir / f"{filename}_{timestamp}.md"
+                output_file = blog_posts_dir / f"{filename}_{timestamp}.md"
+            else:  # app_idea
+                output_file = app_ideas_dir / f"{filename}_{timestamp}.md"
             
             with open(output_file, 'w', encoding='utf-8') as f:
                 f.write(additional_content)
