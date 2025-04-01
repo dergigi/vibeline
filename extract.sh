@@ -19,7 +19,7 @@ fi
 source vibenv/bin/activate
 
 # Run the Python script
-python extract.py "$input_file"
+python src/extract.py "$input_file"
 
 # Deactivate the virtual environment
 deactivate 
