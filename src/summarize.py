@@ -13,13 +13,17 @@ load_dotenv()
 OLLAMA_MODEL = os.getenv("OLLAMA_SUMMARIZE_MODEL", "llama2")
 VOICE_MEMOS_DIR = os.getenv("VOICE_MEMOS_DIR", "VoiceMemos")
 
+def load_summary_plugin() -> str:
+    """Load the summary plugin template."""
+    plugin_dir = Path("plugins")
+    with open(plugin_dir / "summary.all.md", 'r', encoding='utf-8') as f:
+        return f.read()
+
 def generate_summary(transcript_text: str) -> str:
     """Generate a summary of the transcript."""
-    plugin_dir = Path("plugins")
-    with open(plugin_dir / "summary.md", 'r', encoding='utf-8') as f:
-        prompt_template = f.read()
-    
+    prompt_template = load_summary_plugin()
     prompt = prompt_template.format(transcript=transcript_text)
+    
     response = ollama.chat(model=OLLAMA_MODEL, messages=[
         {
             'role': 'user',
@@ -40,7 +44,7 @@ def main():
     
     # Set up directory paths
     voice_memo_dir = Path(VOICE_MEMOS_DIR)
-    summary_dir = voice_memo_dir / "summaries"
+    summary_dir = voice_memo_dir / "summarys"  # Using the same convention as other plugins
     summary_dir.mkdir(parents=True, exist_ok=True)
     
     # Get the filename without the path and extension

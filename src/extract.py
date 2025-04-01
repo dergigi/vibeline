@@ -38,8 +38,7 @@ def load_plugins() -> dict[str, str]:
     # Load all .md files from plugins directory
     for plugin_file in plugin_dir.glob("*.md"):
         plugin_name = plugin_file.stem
-        if plugin_name != "summary":  # Skip the summary plugin as it's used differently
-            plugins[plugin_name] = read_file(plugin_file)
+        plugins[plugin_name] = read_file(plugin_file)
     
     return plugins
 
