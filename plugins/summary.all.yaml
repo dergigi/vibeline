@@ -4,8 +4,7 @@ model: llama2  # Optional, falls back to OLLAMA_MODEL from .env
 type: or  # and, or
 run: always  # always, matching
 prompt: |
-  Please provide a concise summary of the following transcript. 
-  Focus on the main points and key takeaways.
+  Please provide a short, 2-3 sentence summary of the following transcript. The summary should never be longer than a single paragraph. 
 
   Transcript:
   {transcript} 
