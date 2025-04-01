@@ -1,10 +1,16 @@
-Please analyze this transcript about an app idea and provide a structured prompt that can be easily understood by an LLM that can code, focusing on:
-1. The core app concept and its main purpose
-2. Key features and functionality discussed
-3. Any technical considerations or implementation details
-4. A step-by-step implementation plan that can be followed by a junior developer to build the app
+Based on the following transcript and its summary, create a detailed app idea specification. The specification should include:
+1. App name and tagline
+2. Problem statement
+3. Target audience
+4. Key features
+5. Technical considerations
+6. User flow
+7. Potential challenges
 
 Transcript:
 {transcript}
 
-Prompt: 
+Summary:
+{summary}
+
+App Idea Specification: 
