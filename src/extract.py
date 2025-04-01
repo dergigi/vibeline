@@ -83,7 +83,9 @@ def main():
     
     # Create output directories for each plugin
     for plugin_name in plugins.keys():
-        output_dir = voice_memo_dir / f"{plugin_name}s"  # Pluralize the plugin name
+        # Remove .or suffix if present for directory name
+        dir_name = plugin_name[:-3] if plugin_name.endswith('.or') else plugin_name
+        output_dir = voice_memo_dir / f"{dir_name}s"  # Pluralize the plugin name
         output_dir.mkdir(parents=True, exist_ok=True)
         output_dirs[plugin_name] = output_dir
     
