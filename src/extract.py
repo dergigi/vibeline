@@ -7,8 +7,9 @@ import os
 from pathlib import Path
 import time
 import inflect
-from typing import List
+from typing import List, Dict
 from dotenv import load_dotenv
+from plugin_manager import PluginManager, Plugin
 
 # Load environment variables
 load_dotenv()
@@ -20,65 +21,36 @@ p = inflect.engine()
 OLLAMA_MODEL = os.getenv("OLLAMA_EXTRACT_MODEL", "llama2")
 VOICE_MEMOS_DIR = os.getenv("VOICE_MEMOS_DIR", "VoiceMemos")
 
-def get_base_name(plugin_name: str) -> str:
-    """Get the base name of a plugin without any suffixes."""
-    return plugin_name.split('.')[0]
-
-def read_file(file_path: Path) -> str:
-    """Read text from a file."""
-    with open(file_path, 'r', encoding='utf-8') as f:
-        return f.read()
-
-def write_file(file_path: Path, content: str) -> None:
-    """Write text to a file."""
-    with open(file_path, 'w', encoding='utf-8') as f:
-        f.write(content)
-
-def load_plugins() -> dict[str, str]:
-    """Load all plugins from the plugins directory."""
-    plugin_dir = Path("plugins")
-    plugins = {}
-    
-    # Load all .md files from plugins directory
-    for plugin_file in plugin_dir.glob("*.md"):
-        plugin_name = plugin_file.stem
-        plugins[plugin_name] = read_file(plugin_file)
-    
-    return plugins
-
-def determine_active_plugins(text: str, available_plugins: List[str]) -> List[str]:
+def determine_active_plugins(text: str, plugins: Dict[str, Plugin]) -> List[str]:
     """Determine which plugins should be run on this transcript."""
     active_plugins = set()  # Use a set to avoid duplicates
     
-    for plugin_name in available_plugins:
-        base_name = get_base_name(plugin_name)
-        
-        # Always include plugins with .all suffix
-        if '.all' in plugin_name:
-            active_plugins.add(base_name)
+    for plugin_name, plugin in plugins.items():
+        # Always include plugins with run: always
+        if plugin.run == "always":
+            active_plugins.add(plugin_name)
             continue
             
-        # For .or plugins, check if any word matches
-        if '.or' in plugin_name:
-            words = base_name.split('_')
-            if any(re.search(r'\b' + word + r'\b', text.lower()) for word in words):
-                active_plugins.add(base_name)
-        # For regular plugins, check for the exact pattern
-        else:
-            search_pattern = plugin_name.replace('_', ' ')
-            if re.search(r'\b' + search_pattern + r'\b', text.lower()):
-                active_plugins.add(base_name)
+        # For matching plugins, check based on type (and/or)
+        if plugin.run == "matching":
+            words = plugin_name.split('_')
+            if plugin.type == "or":
+                if any(re.search(r'\b' + word + r'\b', text.lower()) for word in words):
+                    active_plugins.add(plugin_name)
+            else:  # and
+                if all(re.search(r'\b' + word + r'\b', text.lower()) for word in words):
+                    active_plugins.add(plugin_name)
     
     return list(active_plugins)
 
-def generate_additional_content(plugin_base_name: str, transcript_text: str, summary_text: str, plugins: dict[str, str]) -> str:
+def generate_additional_content(plugin: Plugin, transcript_text: str, summary_text: str) -> str:
     """Generate additional content using the specified plugin."""
-    # Find the plugin key that matches the base name
-    plugin_key = next(key for key in plugins.keys() if get_base_name(key) == plugin_base_name)
-    prompt_template = plugins[plugin_key]
-    prompt = prompt_template.format(transcript=transcript_text, summary=summary_text)
+    prompt = plugin.prompt.format(transcript=transcript_text, summary=summary_text)
     
-    response = ollama.chat(model=OLLAMA_MODEL, messages=[
+    # Use plugin-specific model if specified, otherwise use default
+    model = plugin.model or OLLAMA_MODEL
+    
+    response = ollama.chat(model=model, messages=[
         {
             'role': 'user',
             'content': prompt
@@ -97,7 +69,8 @@ def main():
         sys.exit(1)
     
     # Load plugins
-    plugins = load_plugins()
+    plugin_manager = PluginManager(Path("plugins"))
+    plugins = plugin_manager.get_all_plugins()
     if not plugins:
         print("Error: No plugins found in plugins directory")
         sys.exit(1)
@@ -108,39 +81,41 @@ def main():
     
     # Create output directories for each plugin
     for plugin_name in plugins.keys():
-        base_name = get_base_name(plugin_name)
         # Use inflect to properly pluralize the directory name
-        plural_name = p.plural(base_name)
+        plural_name = p.plural(plugin_name)
         output_dir = voice_memo_dir / plural_name
         output_dir.mkdir(parents=True, exist_ok=True)
-        # Store with base name as key
-        output_dirs[base_name] = output_dir
+        output_dirs[plugin_name] = output_dir
     
     print(f"Processing transcript: {input_file}")
     print("Extracting content...")
     
     # Read transcript
-    transcript_text = read_file(input_file)
+    with open(input_file, 'r', encoding='utf-8') as f:
+        transcript_text = f.read()
     
     # Read summary if it exists
     summary_file = input_file.parent / f"{input_file.stem}_summary.txt"
     summary_text = ""
     if summary_file.exists():
-        summary_text = read_file(summary_file)
+        with open(summary_file, 'r', encoding='utf-8') as f:
+            summary_text = f.read()
     
     # Determine which plugins to run
-    active_plugins = determine_active_plugins(transcript_text, list(plugins.keys()))
+    active_plugins = determine_active_plugins(transcript_text, plugins)
     if active_plugins:
         for plugin_name in active_plugins:
+            plugin = plugins[plugin_name]
             print(f"  Running {plugin_name} plugin...")
-            additional_content = generate_additional_content(plugin_name, transcript_text, summary_text, plugins)
+            additional_content = generate_additional_content(plugin, transcript_text, summary_text)
             
             # Save to appropriate directory with timestamp
             timestamp = time.strftime("%Y%m%d_%H%M%S")
             filename = input_file.stem
             output_file = output_dirs[plugin_name] / f"{filename}_{timestamp}.md"
             
-            write_file(output_file, additional_content)
+            with open(output_file, 'w', encoding='utf-8') as f:
+                f.write(additional_content)
             print(f"  Content saved to: {output_file}")
     else:
         print("  No matching plugins found for this transcript")
