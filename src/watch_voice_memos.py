@@ -137,12 +137,12 @@ def main():
 
     # Set up event handler and observer
     event_handler = VoiceMemoHandler(voice_memo_dir, transcript_dir, summary_dir)
-    observer = Observer(follow_symlinks=True)
+    observer = Observer()
     
-    # Watch all directories
-    observer.schedule(event_handler, str(voice_memo_dir), recursive=False)
-    observer.schedule(event_handler, str(transcript_dir), recursive=False)
-    observer.schedule(event_handler, str(summary_dir), recursive=False)
+    # Watch all directories using resolved paths to handle symlinks
+    observer.schedule(event_handler, str(voice_memo_dir.resolve()), recursive=False)
+    observer.schedule(event_handler, str(transcript_dir.resolve()), recursive=False)
+    observer.schedule(event_handler, str(summary_dir.resolve()), recursive=False)
     
     # Start the observer
     observer.start()
