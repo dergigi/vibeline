@@ -6,15 +6,17 @@ import re
 from pathlib import Path
 import time
 
-def determine_content_type(transcript_text: str) -> str:
-    """Determine the type of content in the transcript."""
+def determine_content_types(transcript_text: str) -> list[str]:
+    """Determine the types of content in the transcript."""
     text = transcript_text.lower()
+    content_types = []
     
     if re.search(r'\bblog post\b', text) or re.search(r'\bdraft\b', text):
-        return "blog_post"
-    elif re.search(r'\bidea\b', text) and re.search(r'\bapp\b', text):
-        return "idea_app"
-    return "default"
+        content_types.append("blog_post")
+    if re.search(r'\bidea\b', text) and re.search(r'\bapp\b', text):
+        content_types.append("idea_app")
+    
+    return content_types if content_types else ["default"]
 
 def generate_additional_content(content_type: str, transcript_text: str, summary_text: str) -> str:
     """Generate additional content based on the content type."""
@@ -63,23 +65,24 @@ def main():
         with open(summary_file, 'r', encoding='utf-8') as f:
             summary_text = f.read()
     
-    # Determine content type and generate content if needed
-    content_type = determine_content_type(transcript_text)
-    if content_type != "default":
-        print(f"  Generating {content_type} content...")
-        additional_content = generate_additional_content(content_type, transcript_text, summary_text)
-        
-        # Save to appropriate directory with timestamp
-        timestamp = time.strftime("%Y%m%d_%H%M%S")
-        filename = input_file.stem
-        if content_type == "blog_post":
-            output_file = draft_dir / f"{filename}_{timestamp}.md"
-        else:  # idea_app
-            output_file = prompt_dir / f"{filename}_{timestamp}.md"
-        
-        with open(output_file, 'w', encoding='utf-8') as f:
-            f.write(additional_content)
-        print(f"  Content saved to: {output_file}")
+    # Determine content types and generate content if needed
+    content_types = determine_content_types(transcript_text)
+    if "default" not in content_types:
+        for content_type in content_types:
+            print(f"  Generating {content_type} content...")
+            additional_content = generate_additional_content(content_type, transcript_text, summary_text)
+            
+            # Save to appropriate directory with timestamp
+            timestamp = time.strftime("%Y%m%d_%H%M%S")
+            filename = input_file.stem
+            if content_type == "blog_post":
+                output_file = draft_dir / f"{filename}_{timestamp}.md"
+            else:  # idea_app
+                output_file = prompt_dir / f"{filename}_{timestamp}.md"
+            
+            with open(output_file, 'w', encoding='utf-8') as f:
+                f.write(additional_content)
+            print(f"  Content saved to: {output_file}")
     else:
         print("  No blog post or app idea content detected")
     
