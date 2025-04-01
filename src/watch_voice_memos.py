@@ -137,7 +137,7 @@ def main():
 
     # Set up event handler and observer
     event_handler = VoiceMemoHandler(voice_memo_dir, transcript_dir, summary_dir)
-    observer = Observer()
+    observer = Observer(follow_symlinks=True)
     
     # Watch all directories
     observer.schedule(event_handler, str(voice_memo_dir), recursive=False)
