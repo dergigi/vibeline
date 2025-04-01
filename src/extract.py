@@ -16,13 +16,13 @@ def determine_content_type(transcript_text: str) -> str:
         return "idea_app"
     return "default"
 
-def generate_additional_content(content_type: str, transcript_text: str) -> str:
+def generate_additional_content(content_type: str, transcript_text: str, summary_text: str) -> str:
     """Generate additional content based on the content type."""
     prompt_dir = Path("prompts")
     with open(prompt_dir / f"{content_type}.md", 'r', encoding='utf-8') as f:
         prompt_template = f.read()
     
-    prompt = prompt_template.format(transcript=transcript_text)
+    prompt = prompt_template.format(transcript=transcript_text, summary=summary_text)
     response = ollama.chat(model='llama2', messages=[
         {
             'role': 'user',
@@ -42,9 +42,8 @@ def main():
         sys.exit(1)
     
     # Set up directory paths
-    voice_memo_dir = Path("VoiceMemos")
-    draft_dir = voice_memo_dir / "drafts"
-    prompt_dir = voice_memo_dir / "prompts"
+    draft_dir = Path("drafts")
+    prompt_dir = Path("prompts")
     
     # Create output directories if they don't exist
     draft_dir.mkdir(parents=True, exist_ok=True)
@@ -57,11 +56,18 @@ def main():
     with open(input_file, 'r', encoding='utf-8') as f:
         transcript_text = f.read()
     
+    # Read summary if it exists
+    summary_file = input_file.parent / f"{input_file.stem}_summary.txt"
+    summary_text = ""
+    if summary_file.exists():
+        with open(summary_file, 'r', encoding='utf-8') as f:
+            summary_text = f.read()
+    
     # Determine content type and generate content if needed
     content_type = determine_content_type(transcript_text)
     if content_type != "default":
         print(f"  Generating {content_type} content...")
-        additional_content = generate_additional_content(content_type, transcript_text)
+        additional_content = generate_additional_content(content_type, transcript_text, summary_text)
         
         # Save to appropriate directory with timestamp
         timestamp = time.strftime("%Y%m%d_%H%M%S")
