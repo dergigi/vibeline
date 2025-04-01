@@ -36,12 +36,8 @@ if [ ! -f "$transcript_file" ]; then
     exit 1
 fi
 
-# Step 2: Summarize
-echo "Step 2: Generating summary..."
-./summarize.sh "$transcript_file"
-
-# Step 3: Extract content
-echo "Step 3: Extracting content..."
+# Step 2: Extract content (including summary)
+echo "Step 2: Extracting content..."
 ./extract.sh "$transcript_file"
 
 echo "----------------------------------------"
