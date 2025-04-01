@@ -3,8 +3,14 @@
 # Activate virtual environment
 source vibenv/bin/activate
 
-echo "Processing voice memos to create transcripts..."
-./process.sh
+echo "Processing all voice memos..."
+for file in VoiceMemos/*.m4a; do
+    if [ -f "$file" ]; then
+        echo "Processing: $file"
+        ./process.sh "$file"
+        echo "----------------------------------------"
+    fi
+done
 
 echo "Creating summaries for transcripts..."
 python src/summarize_transcripts.py
