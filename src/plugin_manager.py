@@ -2,7 +2,7 @@
 
 from pathlib import Path
 import yaml
-from typing import Dict, Optional
+from typing import Dict, Optional, Literal
 from dataclasses import dataclass
 
 @dataclass
@@ -10,7 +10,8 @@ class Plugin:
     name: str
     description: str
     model: Optional[str]
-    type: str  # or, and, all
+    type: Literal["and", "or"]  # Comparison type for matching
+    run: Literal["always", "matching"]  # When to run the plugin
     prompt: str
 
 class PluginManager:
@@ -26,10 +27,16 @@ class PluginManager:
                 data = yaml.safe_load(f)
                 
                 # Validate required fields
-                required_fields = ['name', 'description', 'type', 'prompt']
+                required_fields = ['name', 'description', 'type', 'run', 'prompt']
                 for field in required_fields:
                     if field not in data:
                         raise ValueError(f"Plugin {plugin_file} is missing required field: {field}")
+                
+                # Validate type and run fields
+                if data['type'] not in ['and', 'or']:
+                    raise ValueError(f"Plugin {plugin_file} has invalid type: {data['type']}. Must be 'and' or 'or'")
+                if data['run'] not in ['always', 'matching']:
+                    raise ValueError(f"Plugin {plugin_file} has invalid run value: {data['run']}. Must be 'always' or 'matching'")
                 
                 # Create Plugin instance
                 plugin = Plugin(
@@ -37,6 +44,7 @@ class PluginManager:
                     description=data['description'],
                     model=data.get('model'),  # Optional
                     type=data['type'],
+                    run=data['run'],
                     prompt=data['prompt']
                 )
                 
@@ -50,7 +58,7 @@ class PluginManager:
         """Get all loaded plugins."""
         return self.plugins
 
-    def get_plugins_by_type(self, plugin_type: str) -> Dict[str, Plugin]:
-        """Get all plugins of a specific type."""
+    def get_plugins_by_run_type(self, run_type: Literal["always", "matching"]) -> Dict[str, Plugin]:
+        """Get all plugins with a specific run type."""
         return {name: plugin for name, plugin in self.plugins.items() 
-                if plugin.type == plugin_type} 
+                if plugin.run == run_type} 
