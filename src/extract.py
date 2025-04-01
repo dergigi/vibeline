@@ -24,11 +24,18 @@ def determine_content_types(text: str, available_plugins: List[str]) -> List[str
     """Determine what types of content to generate based on the transcript text."""
     content_types = []
     
-    print(f"Available plugins: {available_plugins}")
-    print(f"Text to search: {text.lower()}")
-    
-    # Check for each plugin's content type
+    # First, add all .all plugins
     for plugin_name in available_plugins:
+        if plugin_name.endswith('.all'):
+            # Remove the .all suffix for the actual plugin name
+            content_types.append(plugin_name[:-4])
+    
+    # Then check for each plugin's content type
+    for plugin_name in available_plugins:
+        # Skip .all plugins as they're already added
+        if plugin_name.endswith('.all'):
+            continue
+            
         # Convert plugin name to search pattern (e.g., "blog_post" -> "blog post")
         search_pattern = plugin_name.replace('_', ' ')
         
@@ -39,16 +46,13 @@ def determine_content_types(text: str, available_plugins: List[str]) -> List[str
             plugin_name = plugin_name[:-3]
             # For or plugins, check if any of the words match
             words = search_pattern[:-3].split()  # Remove .or from search pattern
-            print(f"Checking .or plugin {plugin_name} with words: {words}")
             if any(re.search(r'\b' + word + r'\b', text.lower()) for word in words):
                 content_types.append(plugin_name)
         else:
             # For regular plugins, check for the exact pattern
-            print(f"Checking regular plugin {plugin_name} with pattern: {search_pattern}")
             if re.search(r'\b' + search_pattern + r'\b', text.lower()):
                 content_types.append(plugin_name)
     
-    print(f"Detected content types: {content_types}")
     return content_types
 
 def generate_additional_content(content_type: str, transcript_text: str, summary_text: str, plugins: dict[str, str]) -> str:
