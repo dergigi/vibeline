@@ -131,23 +131,4 @@ def main():
     print("----------------------------------------")
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] == "--test":
-        # Test mode
-        test_files = [
-            "tests/transcripts/test_app_idea.txt",
-            "tests/transcripts/test_blog_post.txt",
-            "tests/transcripts/test_both.txt"
-        ]
-        
-        plugins = load_plugins()
-        available_plugins = list(plugins.keys())
-        
-        for test_file in test_files:
-            print(f"\nTesting {test_file}:")
-            with open(test_file, 'r') as f:
-                text = f.read()
-            content_types = determine_active_plugins(text, available_plugins)
-            print(f"Detected content types: {content_types}")
-    else:
-        # Normal mode
-        main() 
+    main() 
