@@ -16,9 +16,6 @@ def load_plugins() -> dict[str, str]:
     for plugin_file in plugin_dir.glob("*.md"):
         plugin_name = plugin_file.stem
         if plugin_name != "summary":  # Skip the summary plugin as it's used differently
-            # If it's an .or plugin, remove the .or suffix from the plugin name
-            if plugin_name.endswith('.or'):
-                plugin_name = plugin_name[:-3]
             plugins[plugin_name] = plugin_file.read_text(encoding='utf-8')
     
     return plugins
@@ -26,6 +23,9 @@ def load_plugins() -> dict[str, str]:
 def determine_content_types(text: str, available_plugins: List[str]) -> List[str]:
     """Determine what types of content to generate based on the transcript text."""
     content_types = []
+    
+    print(f"Available plugins: {available_plugins}")
+    print(f"Text to search: {text.lower()}")
     
     # Check for each plugin's content type
     for plugin_name in available_plugins:
@@ -39,18 +39,23 @@ def determine_content_types(text: str, available_plugins: List[str]) -> List[str
             plugin_name = plugin_name[:-3]
             # For or plugins, check if any of the words match
             words = search_pattern[:-3].split()  # Remove .or from search pattern
+            print(f"Checking .or plugin {plugin_name} with words: {words}")
             if any(re.search(r'\b' + word + r'\b', text.lower()) for word in words):
                 content_types.append(plugin_name)
         else:
             # For regular plugins, check for the exact pattern
+            print(f"Checking regular plugin {plugin_name} with pattern: {search_pattern}")
             if re.search(r'\b' + search_pattern + r'\b', text.lower()):
                 content_types.append(plugin_name)
     
+    print(f"Detected content types: {content_types}")
     return content_types
 
 def generate_additional_content(content_type: str, transcript_text: str, summary_text: str, plugins: dict[str, str]) -> str:
     """Generate additional content based on the content type."""
-    prompt_template = plugins[content_type]
+    # Find the plugin key that matches the content type (with or without .or suffix)
+    plugin_key = next(key for key in plugins.keys() if key.startswith(content_type))
+    prompt_template = plugins[plugin_key]
     prompt = prompt_template.format(transcript=transcript_text, summary=summary_text)
     
     response = ollama.chat(model='llama2', messages=[
@@ -83,11 +88,12 @@ def main():
     
     # Create output directories for each plugin
     for plugin_name in plugins.keys():
-        # Remove .or suffix if present for directory name
-        dir_name = plugin_name[:-3] if plugin_name.endswith('.or') else plugin_name
-        output_dir = voice_memo_dir / f"{dir_name}s"  # Pluralize the plugin name
+        # Get base name without .or suffix for directory name
+        base_name = plugin_name[:-3] if plugin_name.endswith('.or') else plugin_name
+        output_dir = voice_memo_dir / f"{base_name}s"  # Pluralize the plugin name
         output_dir.mkdir(parents=True, exist_ok=True)
-        output_dirs[plugin_name] = output_dir
+        # Store with base name as key
+        output_dirs[base_name] = output_dir
     
     print(f"Processing transcript: {input_file}")
     print("Extracting content...")
