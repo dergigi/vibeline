@@ -4,7 +4,7 @@
 source vibenv/bin/activate
 
 echo "Processing voice memos to create transcripts..."
-./src/process_voice_memos.sh
+./process_voice_memos.sh
 
 echo "Creating summaries for transcripts..."
 python src/summarize_transcripts.py
