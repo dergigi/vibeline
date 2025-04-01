@@ -4,6 +4,14 @@
 VOICE_MEMO_DIR="VoiceMemos"
 TRANSCRIPT_DIR="$VOICE_MEMO_DIR/transcripts"
 
+# Print debug info about symlinks
+echo "Directory information:"
+echo "Voice memo dir: $(pwd)/$VOICE_MEMO_DIR"
+echo "Is symlink: $([ -L "$VOICE_MEMO_DIR" ] && echo "yes" || echo "no")"
+if [ -L "$VOICE_MEMO_DIR" ]; then
+    echo "Resolves to: $(readlink -f "$VOICE_MEMO_DIR")"
+fi
+
 # Check if directories exist
 if [ ! -d "$VOICE_MEMO_DIR" ]; then
     echo "Error: $VOICE_MEMO_DIR directory does not exist"

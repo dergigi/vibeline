@@ -117,6 +117,13 @@ def main():
     transcript_dir = voice_memo_dir / "transcripts"
     summary_dir = voice_memo_dir / "summaries"
 
+    # Print debug info about symlinks
+    print("\nDirectory information:")
+    print(f"Voice memo dir: {voice_memo_dir}")
+    print(f"Is symlink: {voice_memo_dir.is_symlink()}")
+    if voice_memo_dir.is_symlink():
+        print(f"Resolves to: {voice_memo_dir.resolve()}")
+    
     # Verify directories exist
     if not voice_memo_dir.exists():
         print(f"Error: {voice_memo_dir} directory does not exist")
