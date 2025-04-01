@@ -40,8 +40,8 @@ if [ ! -f "$transcript_file" ] || [ "$force" = true ]; then
     # Activate the virtual environment
     source vibenv/bin/activate
     
-    # Use whisper to transcribe the audio with tiny model
-    whisper "$input_file" --model tiny --output_dir "$TRANSCRIPT_DIR" --output_format txt
+    # Use whisper to transcribe the audio with base.en model
+    whisper "$input_file" --model base.en --output_dir "$TRANSCRIPT_DIR" --output_format txt
     
     # Deactivate the virtual environment
     deactivate
