@@ -5,6 +5,7 @@ import ollama
 import re
 from pathlib import Path
 import time
+from typing import List
 
 def load_plugins() -> dict[str, str]:
     """Load all plugins from the plugins directory."""
@@ -19,19 +20,24 @@ def load_plugins() -> dict[str, str]:
     
     return plugins
 
-def determine_content_types(transcript_text: str, available_plugins: list[str]) -> list[str]:
-    """Determine the types of content in the transcript."""
-    text = transcript_text.lower()
+def determine_content_types(text: str, available_plugins: List[str]) -> List[str]:
+    """Determine what types of content to generate based on the transcript text."""
     content_types = []
     
     # Check for each plugin's content type
     for plugin_name in available_plugins:
-        if plugin_name == "blog_post" and (re.search(r'\bblog post\b', text) or re.search(r'\bdraft\b', text)):
-            content_types.append(plugin_name)
-        elif plugin_name == "app_idea" and re.search(r'\bidea\b', text) and re.search(r'\bapp\b', text):
+        # Convert plugin name to search pattern (e.g., "blog_post" -> "blog post")
+        search_pattern = plugin_name.replace('_', ' ')
+        
+        # Special case for app_idea which needs both words
+        if plugin_name == "app_idea":
+            if re.search(r'\bidea\b', text) and re.search(r'\bapp\b', text):
+                content_types.append(plugin_name)
+        # For all other plugins, just search for the pattern
+        elif re.search(r'\b' + search_pattern + r'\b', text):
             content_types.append(plugin_name)
     
-    return content_types if content_types else ["default"]
+    return content_types
 
 def generate_additional_content(content_type: str, transcript_text: str, summary_text: str, plugins: dict[str, str]) -> str:
     """Generate additional content based on the content type."""
