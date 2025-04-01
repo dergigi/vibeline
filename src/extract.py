@@ -7,6 +7,9 @@ from pathlib import Path
 import time
 from typing import List
 
+# Configuration
+OLLAMA_MODEL = "llama2"  # The model to use for generating content
+
 def get_base_name(plugin_name: str) -> str:
     """Get the base name of a plugin without any suffixes."""
     return plugin_name.split('.')[0]
@@ -66,7 +69,7 @@ def generate_additional_content(plugin_base_name: str, transcript_text: str, sum
     prompt_template = plugins[plugin_key]
     prompt = prompt_template.format(transcript=transcript_text, summary=summary_text)
     
-    response = ollama.chat(model='llama2', messages=[
+    response = ollama.chat(model=OLLAMA_MODEL, messages=[
         {
             'role': 'user',
             'content': prompt
