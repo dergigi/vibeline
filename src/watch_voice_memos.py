@@ -81,17 +81,17 @@ def process_voice_memo(file_path: Path, force: bool = False) -> None:
             cmd.append('-f')
         cmd.append(str(file_path))
         
+        # Run subprocess without capturing output to show it in real-time
         result = subprocess.run(
             cmd,
             check=True,
-            capture_output=True,
             text=True
         )
-        logger.debug(f"Process output: {result.stdout}")
         logger.info(f"Successfully processed: {file_path.name}")
     except subprocess.CalledProcessError as e:
         logger.error(f"Error processing {file_path.name}: {e}")
-        logger.debug(f"Error output: {e.stderr}")
+        if e.stderr:
+            logger.error(f"Error output: {e.stderr}")
     except Exception as e:
         logger.error(f"Unexpected error processing {file_path.name}: {e}")
 

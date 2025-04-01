@@ -1,8 +1,17 @@
 #!/bin/bash
 
+# Parse arguments
+force_flag=""
+while getopts "f" opt; do
+    case $opt in
+        f) force_flag="--force" ;;
+    esac
+done
+shift $((OPTIND-1))
+
 # Check if a file argument was provided
 if [ $# -ne 1 ]; then
-    echo "Usage: $0 <audio_file>"
+    echo "Usage: $0 [-f] <audio_file>"
     exit 1
 fi
 
@@ -25,6 +34,12 @@ mkdir -p "$TRANSCRIPT_DIR"
 # Get the filename without the path and extension
 filename=$(basename "$input_file" .m4a)
 transcript_file="$TRANSCRIPT_DIR/$filename.txt"
+
+# Check if transcript already exists
+if [ -f "$transcript_file" ] && [ -z "$force_flag" ]; then
+    echo "Transcript already exists: $transcript_file (use -f to overwrite)"
+    exit 0
+fi
 
 echo "Processing file: $input_file"
 echo "Transcribing audio..."

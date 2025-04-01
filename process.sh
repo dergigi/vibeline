@@ -37,7 +37,7 @@ echo "----------------------------------------"
 
 # Step 1: Transcribe
 echo "Step 1: Transcribing audio..."
-./transcribe.sh "$input_file"
+./transcribe.sh $force_flag "$input_file"
 
 # Check if transcription was successful
 if [ ! -f "$transcript_file" ]; then
