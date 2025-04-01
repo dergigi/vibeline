@@ -1,0 +1,11 @@
+name: action_items_todo
+description: Extract action items and todos from the transcript
+model: llama2  # Optional, falls back to OLLAMA_MODEL from .env
+type: or  # or, and, all
+prompt: |
+  Extract action items and todos from the following transcript. 
+  Format each item as a markdown checkbox. 
+  If there are no action items or todos, output "No action items or todos found."
+
+  Transcript:
+  {transcript} 

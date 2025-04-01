@@ -1,0 +1,10 @@
+name: summary
+description: Generate a concise summary of the transcript
+model: llama2  # Optional, falls back to OLLAMA_MODEL from .env
+type: all  # or, and, all
+prompt: |
+  Please provide a concise summary of the following transcript. 
+  Focus on the main points and key takeaways.
+
+  Transcript:
+  {transcript} 
