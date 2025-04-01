@@ -12,7 +12,4 @@ for file in VoiceMemos/*.m4a; do
     fi
 done
 
-echo "Creating summaries for transcripts..."
-python src/summarize_transcripts.py
-
-echo "Done! All voice memos have been processed and summarized." 
+echo "Done! All voice memos have been processed." 
