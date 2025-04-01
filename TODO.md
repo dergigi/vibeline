@@ -16,6 +16,8 @@
 - [x] Use more structured files for the plugins & put metadata into those structured files
 - [x] Write README.md with project overview, installation instructions, usage examples, plugin system documentation, and directory structure explanation
 - [x] Create LICENSE (MIT recommended)
+- [ ] Create graphic generation plugin (SVGs)
+- [ ] Create image generation plugin (jpgs - using a local StableDiffusion model)
 - [ ] Add error handling for Ollama connection issues
 - [ ] Implement plugin validation system
 - [ ] Add support for custom output formats
