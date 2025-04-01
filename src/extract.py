@@ -112,7 +112,7 @@ def main():
             # Save to appropriate directory with timestamp
             timestamp = time.strftime("%Y%m%d_%H%M%S")
             filename = input_file.stem
-            output_file = output_dirs[plugin_name] / f"{filename}_{timestamp}.md"
+            output_file = output_dirs[plugin_name] / f"{filename}_{timestamp}{plugin.output_extension}"
             
             with open(output_file, 'w', encoding='utf-8') as f:
                 f.write(additional_content)

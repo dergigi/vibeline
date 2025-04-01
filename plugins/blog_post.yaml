@@ -3,6 +3,7 @@ description: Generate draft blog posts from transcripts
 model: llama2  # Optional, falls back to OLLAMA_MODEL from .env
 type: or  # and, or
 run: matching  # always, matching
+output_extension: .md  # Explicitly set markdown extension
 prompt: |
   Based on the following transcript and its summary, create a draft blog post. The draft should include:
   1. A compelling title

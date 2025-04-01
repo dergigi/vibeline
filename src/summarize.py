@@ -50,6 +50,9 @@ def main():
     
     # Load plugins
     plugin_manager = PluginManager(Path("plugins"))
+    summary_plugin = plugin_manager.get_plugin("summary")
+    if not summary_plugin:
+        raise ValueError("Summary plugin not found")
     
     # Set up directory paths
     voice_memo_dir = Path(VOICE_MEMOS_DIR)
@@ -67,7 +70,7 @@ def main():
     summary = generate_summary(transcript_text, plugin_manager)
     
     # Save summary
-    output_file = summary_dir / f"{input_file.stem}_summary.txt"
+    output_file = summary_dir / f"{input_file.stem}_summary{summary_plugin.output_extension}"
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write(summary)
     

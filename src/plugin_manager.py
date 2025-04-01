@@ -3,7 +3,7 @@
 from pathlib import Path
 import yaml
 from typing import Dict, Optional, Literal
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 @dataclass
 class Plugin:
@@ -13,6 +13,7 @@ class Plugin:
     type: Literal["and", "or"]  # Comparison type for matching
     run: Literal["always", "matching"]  # When to run the plugin
     prompt: str
+    output_extension: str = field(default=".txt")  # Default to .txt if not specified
 
 class PluginManager:
     def __init__(self, plugin_dir: Path):
@@ -45,7 +46,8 @@ class PluginManager:
                     model=data.get('model'),  # Optional
                     type=data['type'],
                     run=data['run'],
-                    prompt=data['prompt']
+                    prompt=data['prompt'],
+                    output_extension=data.get('output_extension', '.txt')  # Default to .txt
                 )
                 
                 self.plugins[plugin.name] = plugin
