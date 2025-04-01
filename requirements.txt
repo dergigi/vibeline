@@ -3,6 +3,7 @@ requests>=2.31.0
 python-dotenv>=1.0.0
 ollama>=0.1.17
 watchdog>=3.0.0
+inflect>=7.5.0
 
 # Development dependencies
 pytest>=7.4.0
