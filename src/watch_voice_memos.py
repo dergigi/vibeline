@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import sys
 import time
 import subprocess
@@ -133,7 +134,7 @@ def main():
     observer = Observer()
     
     # Watch all directories
-    observer.schedule(event_handler, str(voice_memo_dir), recursive=False)
+    observer.schedule(event_handler, os.path.realpath(str(voice_memo_dir)), recursive=False)
     observer.schedule(event_handler, str(transcript_dir), recursive=False)
     observer.schedule(event_handler, str(summary_dir), recursive=False)
     
