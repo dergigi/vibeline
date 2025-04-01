@@ -9,9 +9,9 @@ from watchdog.events import FileSystemEventHandler
 
 class VoiceMemoHandler(FileSystemEventHandler):
     def __init__(self, voice_memo_dir: Path, transcript_dir: Path, summary_dir: Path):
-        self.voice_memo_dir = voice_memo_dir
-        self.transcript_dir = transcript_dir
-        self.summary_dir = summary_dir
+        self.voice_memo_dir = voice_memo_dir.resolve()  # Store resolved path
+        self.transcript_dir = transcript_dir.resolve()  # Store resolved path
+        self.summary_dir = summary_dir.resolve()  # Store resolved path
         self.processing_lock = False
         self.base_dir = Path(__file__).parent.parent
 
@@ -20,7 +20,7 @@ class VoiceMemoHandler(FileSystemEventHandler):
             return
 
         if not event.is_directory:
-            file_path = Path(event.src_path)
+            file_path = Path(event.src_path).resolve()  # Resolve the event path
             
             # Handle new voice memo
             if file_path.parent == self.voice_memo_dir and file_path.suffix.lower() == '.m4a':
@@ -37,7 +37,7 @@ class VoiceMemoHandler(FileSystemEventHandler):
             return
 
         if not event.is_directory:
-            file_path = Path(event.src_path)
+            file_path = Path(event.src_path).resolve()  # Resolve the event path
             
             # Handle modified voice memo
             if file_path.parent == self.voice_memo_dir and file_path.suffix.lower() == '.m4a':
@@ -54,7 +54,7 @@ class VoiceMemoHandler(FileSystemEventHandler):
             return
 
         if not event.is_directory:
-            file_path = Path(event.src_path)
+            file_path = Path(event.src_path).resolve()  # Resolve the event path
             
             # Handle deleted voice memo
             if file_path.parent == self.voice_memo_dir and file_path.suffix.lower() == '.m4a':
@@ -147,9 +147,9 @@ def main():
     # Start the observer
     observer.start()
     print(f"\nWatching for changes in:")
-    print(f"- Voice memos: {voice_memo_dir}")
-    print(f"- Transcripts: {transcript_dir}")
-    print(f"- Summaries: {summary_dir}")
+    print(f"- Voice memos: {voice_memo_dir.resolve()}")
+    print(f"- Transcripts: {transcript_dir.resolve()}")
+    print(f"- Summaries: {summary_dir.resolve()}")
     print("\nPress Ctrl+C to stop...")
 
     try:

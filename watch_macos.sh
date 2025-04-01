@@ -4,22 +4,26 @@
 VOICE_MEMO_DIR="VoiceMemos"
 TRANSCRIPT_DIR="$VOICE_MEMO_DIR/transcripts"
 
+# Get resolved paths
+RESOLVED_VOICE_MEMO_DIR=$(readlink -f "$VOICE_MEMO_DIR")
+RESOLVED_TRANSCRIPT_DIR=$(readlink -f "$TRANSCRIPT_DIR")
+
 # Print debug info about symlinks
 echo "Directory information:"
 echo "Voice memo dir: $(pwd)/$VOICE_MEMO_DIR"
 echo "Is symlink: $([ -L "$VOICE_MEMO_DIR" ] && echo "yes" || echo "no")"
 if [ -L "$VOICE_MEMO_DIR" ]; then
-    echo "Resolves to: $(readlink -f "$VOICE_MEMO_DIR")"
+    echo "Resolves to: $RESOLVED_VOICE_MEMO_DIR"
 fi
 
 # Check if directories exist
-if [ ! -d "$VOICE_MEMO_DIR" ]; then
-    echo "Error: $VOICE_MEMO_DIR directory does not exist"
+if [ ! -d "$RESOLVED_VOICE_MEMO_DIR" ]; then
+    echo "Error: $RESOLVED_VOICE_MEMO_DIR directory does not exist"
     exit 1
 fi
 
-if [ ! -d "$TRANSCRIPT_DIR" ]; then
-    echo "Error: $TRANSCRIPT_DIR directory does not exist"
+if [ ! -d "$RESOLVED_TRANSCRIPT_DIR" ]; then
+    echo "Error: $RESOLVED_TRANSCRIPT_DIR directory does not exist"
     exit 1
 fi
 
@@ -37,14 +41,14 @@ process_transcript() {
 
 echo "Starting file watcher..."
 echo "Watching for changes in:"
-echo "- Voice memos: $VOICE_MEMO_DIR"
-echo "- Transcripts: $TRANSCRIPT_DIR"
+echo "- Voice memos: $RESOLVED_VOICE_MEMO_DIR"
+echo "- Transcripts: $RESOLVED_TRANSCRIPT_DIR"
 echo "Press Ctrl+C to stop..."
 
 # Monitor both directories in parallel
 # -L flag enables following symlinks
 (
-    fswatch -L -o "$VOICE_MEMO_DIR" | while read -r f; do
+    fswatch -L -o "$RESOLVED_VOICE_MEMO_DIR" | while read -r f; do
         if [[ "$f" =~ \.m4a$ ]]; then
             process_voice_memo
         fi
@@ -52,7 +56,7 @@ echo "Press Ctrl+C to stop..."
 ) &
 
 (
-    fswatch -L -o "$TRANSCRIPT_DIR" | while read -r f; do
+    fswatch -L -o "$RESOLVED_TRANSCRIPT_DIR" | while read -r f; do
         if [[ "$f" =~ \.txt$ ]]; then
             process_transcript
         fi
