@@ -3,12 +3,18 @@
 import sys
 import ollama
 import re
+import os
 from pathlib import Path
 import time
 from typing import List
+from dotenv import load_dotenv
 
-# Configuration
-OLLAMA_MODEL = "llama2"  # The model to use for generating content
+# Load environment variables
+load_dotenv()
+
+# Configuration from environment variables
+OLLAMA_MODEL = os.getenv("OLLAMA_EXTRACT_MODEL", "llama2")
+VOICE_MEMOS_DIR = os.getenv("VOICE_MEMOS_DIR", "VoiceMemos")
 
 def get_base_name(plugin_name: str) -> str:
     """Get the base name of a plugin without any suffixes."""
@@ -94,7 +100,7 @@ def main():
         sys.exit(1)
     
     # Set up directory paths
-    voice_memo_dir = Path("VoiceMemos")
+    voice_memo_dir = Path(VOICE_MEMOS_DIR)
     output_dirs = {}
     
     # Create output directories for each plugin
@@ -122,12 +128,12 @@ def main():
     if active_plugins:
         for plugin_name in active_plugins:
             print(f"  Running {plugin_name} plugin...")
-            additional_content = generate_additional_content(get_base_name(plugin_name), transcript_text, summary_text, plugins)
+            additional_content = generate_additional_content(plugin_name, transcript_text, summary_text, plugins)
             
             # Save to appropriate directory with timestamp
             timestamp = time.strftime("%Y%m%d_%H%M%S")
             filename = input_file.stem
-            output_file = output_dirs[get_base_name(plugin_name)] / f"{filename}_{timestamp}.md"
+            output_file = output_dirs[plugin_name] / f"{filename}_{timestamp}.md"
             
             write_file(output_file, additional_content)
             print(f"  Content saved to: {output_file}")

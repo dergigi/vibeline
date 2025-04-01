@@ -10,8 +10,8 @@
 - [x] Implement file organization system
 - [x] Add timestamp-based file naming
 - [x] Make scripts executable
-- [ ] Extract llama models to ENV variables
-- [ ] Create action_items plugin
+- [x] Extract llama models to ENV variables
+- [x] Create action_items plugin (renamed to action_items_todo)
 - [ ] Write README.md with project overview, installation instructions, usage examples, plugin system documentation, and directory structure explanation
 - [ ] Create LICENSE (MIT recommended)
 - [ ] Add error handling for Ollama connection issues
@@ -20,5 +20,5 @@
 - [ ] Create plugin template system
 - [ ] Add tests for core functionality
 - [ ] Implement logging system
-- [ ] Add configuration file support
+- [x] Add configuration file support (.env)
 - [ ] Create plugin documentation system 

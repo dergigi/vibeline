@@ -2,16 +2,25 @@
 
 import sys
 import ollama
+import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Configuration from environment variables
+OLLAMA_MODEL = os.getenv("OLLAMA_SUMMARIZE_MODEL", "llama2")
+VOICE_MEMOS_DIR = os.getenv("VOICE_MEMOS_DIR", "VoiceMemos")
 
 def generate_summary(transcript_text: str) -> str:
     """Generate a summary of the transcript."""
-    prompt_dir = Path("prompts")
-    with open(prompt_dir / "summary.md", 'r', encoding='utf-8') as f:
+    plugin_dir = Path("plugins")
+    with open(plugin_dir / "summary.md", 'r', encoding='utf-8') as f:
         prompt_template = f.read()
     
     prompt = prompt_template.format(transcript=transcript_text)
-    response = ollama.chat(model='llama2', messages=[
+    response = ollama.chat(model=OLLAMA_MODEL, messages=[
         {
             'role': 'user',
             'content': prompt
@@ -30,7 +39,7 @@ def main():
         sys.exit(1)
     
     # Set up directory paths
-    voice_memo_dir = Path("VoiceMemos")
+    voice_memo_dir = Path(VOICE_MEMOS_DIR)
     summary_dir = voice_memo_dir / "summaries"
     summary_dir.mkdir(parents=True, exist_ok=True)
     
