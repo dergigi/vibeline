@@ -5,6 +5,7 @@ import time
 import subprocess
 import re
 import ollama
+import argparse
 from pathlib import Path
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
@@ -54,7 +55,7 @@ def count_words(text: str) -> int:
     return len(text.split())
 
 class VoiceMemoHandler(FileSystemEventHandler):
-    def __init__(self, voice_memo_dir: Path, transcript_dir: Path, summary_dir: Path):
+    def __init__(self, voice_memo_dir: Path, transcript_dir: Path, summary_dir: Path, force: bool = False):
         self.voice_memo_dir = voice_memo_dir.resolve()  # Store resolved path
         self.transcript_dir = transcript_dir.resolve()  # Store resolved path
         self.summary_dir = summary_dir.resolve()  # Store resolved path
@@ -62,6 +63,7 @@ class VoiceMemoHandler(FileSystemEventHandler):
         self.prompt_dir = voice_memo_dir.parent / "prompts"  # New directory for app ideas
         self.processing_lock = False
         self.base_dir = Path(__file__).parent.parent
+        self.force = force  # Store force flag
 
         # Create additional directories if they don't exist
         self.draft_dir.mkdir(parents=True, exist_ok=True)
@@ -77,7 +79,7 @@ class VoiceMemoHandler(FileSystemEventHandler):
             # Handle new voice memo
             if file_path.parent == self.voice_memo_dir and file_path.suffix.lower() == '.m4a':
                 print(f"\nNew voice memo detected: {file_path.name}")
-                self.process_voice_memo(file_path)
+                self.process_voice_memo(file_path, force=self.force)
 
     def on_modified(self, event):
         if self.processing_lock:
@@ -89,7 +91,7 @@ class VoiceMemoHandler(FileSystemEventHandler):
             # Handle modified voice memo
             if file_path.parent == self.voice_memo_dir and file_path.suffix.lower() == '.m4a':
                 print(f"\nVoice memo modified: {file_path.name}")
-                self.process_voice_memo(file_path, force=True)  # Force regeneration for modified files
+                self.process_voice_memo(file_path, force=True)  # Always force for modified files
 
     def on_deleted(self, event):
         if self.processing_lock:
@@ -194,6 +196,12 @@ class VoiceMemoHandler(FileSystemEventHandler):
             print(f"Error processing transcript: {str(e)}")
 
 def main():
+    # Set up argument parser
+    parser = argparse.ArgumentParser(description='Watch for voice memos and process them')
+    parser.add_argument('-f', '--force', action='store_true', 
+                      help='Force regeneration of existing files')
+    args = parser.parse_args()
+
     # Set up directory paths
     base_dir = Path(__file__).parent.parent
     voice_memo_dir = base_dir / "VoiceMemos"
@@ -219,7 +227,7 @@ def main():
         sys.exit(1)
 
     # Set up event handler and observer
-    event_handler = VoiceMemoHandler(voice_memo_dir, transcript_dir, summary_dir)
+    event_handler = VoiceMemoHandler(voice_memo_dir, transcript_dir, summary_dir, force=args.force)
     observer = Observer()
     
     # Watch voice memo directory only (we'll handle transcripts immediately after creation)
@@ -229,6 +237,8 @@ def main():
     observer.start()
     print(f"\nWatching for changes in:")
     print(f"- Voice memos: {voice_memo_dir.resolve()}")
+    if args.force:
+        print("Force mode enabled - will regenerate existing files")
     print("\nPress Ctrl+C to stop...")
 
     try:
