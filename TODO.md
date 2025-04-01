@@ -14,8 +14,8 @@
 - [x] Create action_items plugin (renamed to action_items_todo)
 - [x] Use python library for pluralization
 - [x] Use more structured files for the plugins & put metadata into those structured files
-- [ ] Write README.md with project overview, installation instructions, usage examples, plugin system documentation, and directory structure explanation
-- [ ] Create LICENSE (MIT recommended)
+- [x] Write README.md with project overview, installation instructions, usage examples, plugin system documentation, and directory structure explanation
+- [x] Create LICENSE (MIT recommended)
 - [ ] Add error handling for Ollama connection issues
 - [ ] Implement plugin validation system
 - [ ] Add support for custom output formats
