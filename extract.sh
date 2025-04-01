@@ -1,8 +1,17 @@
 #!/bin/bash
 
+# Parse arguments
+force_flag=""
+while getopts "f" opt; do
+    case $opt in
+        f) force_flag="--force" ;;
+    esac
+done
+shift $((OPTIND-1))
+
 # Check if a file argument was provided
 if [ $# -ne 1 ]; then
-    echo "Usage: $0 <transcript_file>"
+    echo "Usage: $0 [-f] <transcript_file>"
     exit 1
 fi
 
@@ -18,8 +27,8 @@ fi
 # Activate the virtual environment
 source vibenv/bin/activate
 
-# Run the Python script
-python src/extract.py "$input_file"
+# Run the Python script with force flag if provided
+python src/extract.py $force_flag "$input_file"
 
 # Deactivate the virtual environment
 deactivate 

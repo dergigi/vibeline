@@ -4,6 +4,7 @@ import sys
 import ollama
 import re
 import os
+import argparse
 from pathlib import Path
 import inflect
 from typing import List, Dict
@@ -58,11 +59,13 @@ def generate_additional_content(plugin: Plugin, transcript_text: str, summary_te
     return response['message']['content'].strip()
 
 def main():
-    if len(sys.argv) != 2:
-        print("Usage: python extract.py <transcript_file>")
-        sys.exit(1)
+    # Set up argument parser
+    parser = argparse.ArgumentParser(description='Extract content from transcripts using plugins.')
+    parser.add_argument('transcript_file', help='The transcript file to process')
+    parser.add_argument('-f', '--force', action='store_true', help='Force overwrite existing output files')
+    args = parser.parse_args()
     
-    input_file = Path(sys.argv[1])
+    input_file = Path(args.transcript_file)
     if not input_file.exists():
         print(f"Error: File {input_file} does not exist")
         sys.exit(1)
@@ -106,12 +109,18 @@ def main():
         for plugin_name in active_plugins:
             plugin = plugins[plugin_name]
             print(f"  Running {plugin_name} plugin...")
-            additional_content = generate_additional_content(plugin, transcript_text, summary_text)
             
-            # Save to appropriate directory using base filename
+            # Check if output file exists
             filename = input_file.stem
             output_file = output_dirs[plugin_name] / f"{filename}{plugin.output_extension}"
             
+            if output_file.exists() and not args.force:
+                print(f"  Skipping: {output_file} already exists (use -f to overwrite)")
+                continue
+            
+            additional_content = generate_additional_content(plugin, transcript_text, summary_text)
+            
+            # Save to appropriate directory using base filename
             with open(output_file, 'w', encoding='utf-8') as f:
                 f.write(additional_content)
             print(f"  Content saved to: {output_file}")

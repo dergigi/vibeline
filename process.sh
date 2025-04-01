@@ -1,8 +1,17 @@
 #!/bin/bash
 
+# Parse arguments
+force_flag=""
+while getopts "f" opt; do
+    case $opt in
+        f) force_flag="-f" ;;
+    esac
+done
+shift $((OPTIND-1))
+
 # Check if a file argument was provided
 if [ $# -ne 1 ]; then
-    echo "Usage: $0 <voice_memo_file>"
+    echo "Usage: $0 [-f] <voice_memo_file>"
     exit 1
 fi
 
@@ -38,7 +47,7 @@ fi
 
 # Step 2: Extract content (including summary)
 echo "Step 2: Extracting content..."
-./extract.sh "$transcript_file"
+./extract.sh $force_flag "$transcript_file"
 
 echo "----------------------------------------"
 echo "Processing complete!" 

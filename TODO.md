@@ -23,4 +23,13 @@
 - [ ] Add tests for core functionality
 - [ ] Implement logging system
 - [x] Add configuration file support (.env)
-- [ ] Create plugin documentation system 
+- [ ] Create plugin documentation system
+- [ ] Modernize CLI structure:
+      - Replace bash scripts with a unified Python CLI tool
+      - Implement subcommands: run, watch, process, transcribe
+      - Use click/typer for better CLI experience
+      - Support commands like:
+        - vibeline run
+        - vibeline watch
+        - vibeline process transcript.txt
+        - vibeline transcribe memo.m4a 
