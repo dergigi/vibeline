@@ -6,25 +6,38 @@ import re
 from pathlib import Path
 import time
 
-def determine_content_types(transcript_text: str) -> list[str]:
+def load_plugins() -> dict[str, str]:
+    """Load all plugins from the plugins directory."""
+    plugin_dir = Path("plugins")
+    plugins = {}
+    
+    # Load all .md files from plugins directory
+    for plugin_file in plugin_dir.glob("*.md"):
+        plugin_name = plugin_file.stem
+        if plugin_name != "summary":  # Skip the summary plugin as it's used differently
+            plugins[plugin_name] = plugin_file.read_text(encoding='utf-8')
+    
+    return plugins
+
+def determine_content_types(transcript_text: str, available_plugins: list[str]) -> list[str]:
     """Determine the types of content in the transcript."""
     text = transcript_text.lower()
     content_types = []
     
-    if re.search(r'\bblog post\b', text) or re.search(r'\bdraft\b', text):
-        content_types.append("blog_post")
-    if re.search(r'\bidea\b', text) and re.search(r'\bapp\b', text):
-        content_types.append("app_idea")
+    # Check for each plugin's content type
+    for plugin_name in available_plugins:
+        if plugin_name == "blog_post" and (re.search(r'\bblog post\b', text) or re.search(r'\bdraft\b', text)):
+            content_types.append(plugin_name)
+        elif plugin_name == "app_idea" and re.search(r'\bidea\b', text) and re.search(r'\bapp\b', text):
+            content_types.append(plugin_name)
     
     return content_types if content_types else ["default"]
 
-def generate_additional_content(content_type: str, transcript_text: str, summary_text: str) -> str:
+def generate_additional_content(content_type: str, transcript_text: str, summary_text: str, plugins: dict[str, str]) -> str:
     """Generate additional content based on the content type."""
-    plugin_dir = Path("plugins")
-    with open(plugin_dir / f"{content_type}.md", 'r', encoding='utf-8') as f:
-        prompt_template = f.read()
-    
+    prompt_template = plugins[content_type]
     prompt = prompt_template.format(transcript=transcript_text, summary=summary_text)
+    
     response = ollama.chat(model='llama2', messages=[
         {
             'role': 'user',
@@ -43,14 +56,21 @@ def main():
         print(f"Error: File {input_file} does not exist")
         sys.exit(1)
     
+    # Load plugins
+    plugins = load_plugins()
+    if not plugins:
+        print("Error: No plugins found in plugins directory")
+        sys.exit(1)
+    
     # Set up directory paths
     voice_memo_dir = Path("VoiceMemos")
-    blog_posts_dir = voice_memo_dir / "blog_posts"
-    app_ideas_dir = voice_memo_dir / "app_ideas"
+    output_dirs = {}
     
-    # Create output directories if they don't exist
-    blog_posts_dir.mkdir(parents=True, exist_ok=True)
-    app_ideas_dir.mkdir(parents=True, exist_ok=True)
+    # Create output directories for each plugin
+    for plugin_name in plugins.keys():
+        output_dir = voice_memo_dir / f"{plugin_name}s"  # Pluralize the plugin name
+        output_dir.mkdir(parents=True, exist_ok=True)
+        output_dirs[plugin_name] = output_dir
     
     print(f"Processing transcript: {input_file}")
     print("Extracting content...")
@@ -67,25 +87,22 @@ def main():
             summary_text = f.read()
     
     # Determine content types and generate content if needed
-    content_types = determine_content_types(transcript_text)
+    content_types = determine_content_types(transcript_text, list(plugins.keys()))
     if "default" not in content_types:
         for content_type in content_types:
             print(f"  Generating {content_type} content...")
-            additional_content = generate_additional_content(content_type, transcript_text, summary_text)
+            additional_content = generate_additional_content(content_type, transcript_text, summary_text, plugins)
             
             # Save to appropriate directory with timestamp
             timestamp = time.strftime("%Y%m%d_%H%M%S")
             filename = input_file.stem
-            if content_type == "blog_post":
-                output_file = blog_posts_dir / f"{filename}_{timestamp}.md"
-            else:  # app_idea
-                output_file = app_ideas_dir / f"{filename}_{timestamp}.md"
+            output_file = output_dirs[content_type] / f"{filename}_{timestamp}.md"
             
             with open(output_file, 'w', encoding='utf-8') as f:
                 f.write(additional_content)
             print(f"  Content saved to: {output_file}")
     else:
-        print("  No blog post or app idea content detected")
+        print("  No content types detected for available plugins")
     
     print("----------------------------------------")
 
