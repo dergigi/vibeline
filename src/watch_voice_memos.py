@@ -15,10 +15,9 @@ from datetime import datetime
 # Set up logging with more detailed formatting
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - [%(name)s] %(message)s',
+    format='%(asctime)s - %(levelname)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S',
     handlers=[
-        logging.FileHandler('voice_memo_watcher.log'),
         logging.StreamHandler()
     ]
 )
