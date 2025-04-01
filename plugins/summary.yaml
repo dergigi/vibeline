@@ -4,7 +4,7 @@ model: llama2  # Optional, falls back to OLLAMA_MODEL from .env
 type: or  # and, or
 run: always  # always, matching
 prompt: |
-  Please provide a short, 2-3 sentence summary of the following transcript. The summary should never be longer than a single paragraph. 
+  Please provide a short, 2-3 sentence summary of the following transcript. The summary should never be longer than a single paragraph. Don't add anything else, don't add a headline or a "Summary:" or anything. I just want the summary. 2-3 sentences. One paragraph MAX.
 
   Transcript:
   {transcript} 
