@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import sys
+import os
 import time
 import subprocess
 import re
@@ -9,6 +9,18 @@ import argparse
 from pathlib import Path
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+import logging
+from datetime import datetime
+
+# Set up logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('voice_memo_watcher.log'),
+        logging.StreamHandler()
+    ]
+)
 
 def generate_summary(transcript_text: str) -> str:
     """Generate a summary of the transcript."""
@@ -54,146 +66,53 @@ def count_words(text: str) -> int:
     """Count the number of words in a text string."""
     return len(text.split())
 
-class VoiceMemoHandler(FileSystemEventHandler):
-    def __init__(self, voice_memo_dir: Path, transcript_dir: Path, summary_dir: Path, force: bool = False):
-        self.voice_memo_dir = voice_memo_dir.resolve()  # Store resolved path
-        self.transcript_dir = transcript_dir.resolve()  # Store resolved path
-        self.summary_dir = summary_dir.resolve()  # Store resolved path
-        self.draft_dir = voice_memo_dir.parent / "drafts"  # New directory for blog posts
-        self.prompt_dir = voice_memo_dir.parent / "prompts"  # New directory for app ideas
-        self.processing_lock = False
-        self.base_dir = Path(__file__).parent.parent
-        self.force = force  # Store force flag
+def get_file_modification_time(file_path):
+    """Get the last modification time of a file."""
+    return os.path.getmtime(file_path)
 
-        # Create additional directories if they don't exist
-        self.draft_dir.mkdir(parents=True, exist_ok=True)
-        self.prompt_dir.mkdir(parents=True, exist_ok=True)
+def process_voice_memo(file_path):
+    """Process a voice memo file using process.sh."""
+    try:
+        logging.info(f"Processing voice memo: {file_path}")
+        subprocess.run(['./process.sh', str(file_path)], check=True)
+        logging.info(f"Successfully processed: {file_path}")
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Error processing {file_path}: {e}")
 
-    def on_created(self, event):
-        if self.processing_lock:
-            return
-
-        if not event.is_directory:
-            file_path = Path(event.src_path).resolve()  # Resolve the event path
-            
-            # Handle new voice memo
-            if file_path.parent == self.voice_memo_dir and file_path.suffix.lower() == '.m4a':
-                print(f"\nNew voice memo detected: {file_path.name}")
-                self.process_voice_memo(file_path, force=self.force)
-
-    def on_modified(self, event):
-        if self.processing_lock:
-            return
-
-        if not event.is_directory:
-            file_path = Path(event.src_path).resolve()  # Resolve the event path
-            
-            # Handle modified voice memo
-            if file_path.parent == self.voice_memo_dir and file_path.suffix.lower() == '.m4a':
-                print(f"\nVoice memo modified: {file_path.name}")
-                self.process_voice_memo(file_path, force=True)  # Always force for modified files
-
-    def on_deleted(self, event):
-        if self.processing_lock:
-            return
-
-        if not event.is_directory:
-            file_path = Path(event.src_path).resolve()  # Resolve the event path
-            
-            # Handle deleted voice memo
-            if file_path.parent == self.voice_memo_dir and file_path.suffix.lower() == '.m4a':
-                print(f"\nVoice memo deleted: {file_path.name}")
-                print("  Note: Corresponding transcript and summary files remain unchanged")
-
-    def process_voice_memo(self, voice_memo_path: Path, force: bool = False):
-        """Process a single voice memo file"""
+def watch_voice_memos():
+    """Watch the VoiceMemos directory for new or modified .m4a files."""
+    voice_memos_dir = Path("VoiceMemos")
+    processed_files = {}  # Dictionary to store file paths and their last modification times
+    
+    logging.info("Starting voice memo watcher...")
+    logging.info(f"Watching directory: {voice_memos_dir}")
+    
+    while True:
         try:
-            self.processing_lock = True
-            print(f"Processing voice memo: {voice_memo_path.name}")
-            
-            # Get the transcript file path
-            transcript_file = self.transcript_dir / f"{voice_memo_path.stem}.txt"
-            
-            # Skip if transcript exists and we're not forcing regeneration
-            if transcript_file.exists() and not force:
-                print(f"  Transcript already exists at {transcript_file}, skipping...")
-                return
-            
-            # Generate transcript
-            cmd = [str(self.base_dir / 'src' / 'process_voice_memos.sh'), str(voice_memo_path)]
-            if force:
-                cmd.append("--force")
+            # Recursively find all .m4a files
+            for file_path in voice_memos_dir.rglob("*.m4a"):
+                current_mtime = get_file_modification_time(file_path)
                 
-            result = subprocess.run(cmd, capture_output=True, text=True)
+                # Check if file is new or modified
+                if str(file_path) not in processed_files or processed_files[str(file_path)] != current_mtime:
+                    logging.info(f"New or modified file detected: {file_path}")
+                    process_voice_memo(file_path)
+                    processed_files[str(file_path)] = current_mtime
             
-            if result.returncode == 0:
-                print("Voice memo transcription completed successfully")
-                
-                if not transcript_file.exists():
-                    print(f"Error: Transcript file not found at {transcript_file}")
-                    return
-                
-                # Process the transcript
-                self.process_transcript(transcript_file, force)
-            else:
-                print(f"Error transcribing voice memo: {result.stderr}")
-                
+            # Check for deleted files
+            for file_path in list(processed_files.keys()):
+                if not os.path.exists(file_path):
+                    logging.info(f"File deleted: {file_path}")
+                    del processed_files[file_path]
+            
+            time.sleep(1)  # Wait for 1 second before next check
+            
+        except KeyboardInterrupt:
+            logging.info("Voice memo watcher stopped by user")
+            break
         except Exception as e:
-            print(f"Error processing voice memo: {str(e)}")
-        finally:
-            self.processing_lock = False
-
-    def process_transcript(self, transcript_file: Path, force: bool = False):
-        """Process a single transcript file"""
-        try:
-            print(f"Processing transcript: {transcript_file.name}")
-            
-            # Read transcript
-            with open(transcript_file, 'r', encoding='utf-8') as f:
-                transcript_text = f.read()
-            
-            word_count = count_words(transcript_text)
-            print(f"  Read transcript ({len(transcript_text)} characters, {word_count} words)")
-            
-            # Skip if transcript is too short
-            if word_count <= 210:
-                print("  Transcript is too short (≤210 words), skipping processing")
-                return
-            
-            # Check for existing summary
-            summary_file = self.summary_dir / f"{transcript_file.stem}_summary.txt"
-            if summary_file.exists() and not force:
-                print(f"  Summary already exists at {summary_file}, skipping...")
-                return
-            
-            # Generate summary
-            print("  Generating summary...")
-            summary = generate_summary(transcript_text)
-            
-            # Save summary
-            with open(summary_file, 'w', encoding='utf-8') as f:
-                f.write(summary)
-            print(f"  Summary saved to {summary_file}")
-            
-            # Determine content type and generate additional content if needed
-            content_type = determine_content_type(transcript_text)
-            if content_type != "default":
-                print(f"  Generating additional content for type: {content_type}")
-                additional_content = generate_additional_content(content_type, transcript_text, summary)
-                
-                # Save to appropriate directory with timestamp
-                timestamp = time.strftime("%Y%m%d_%H%M%S")
-                if content_type == "blog_post":
-                    output_file = self.draft_dir / f"{transcript_file.stem}_{timestamp}.md"
-                else:  # idea_app
-                    output_file = self.prompt_dir / f"{transcript_file.stem}_{timestamp}.md"
-                
-                with open(output_file, 'w', encoding='utf-8') as f:
-                    f.write(additional_content)
-                print(f"  Additional content saved to {output_file}")
-                
-        except Exception as e:
-            print(f"Error processing transcript: {str(e)}")
+            logging.error(f"Error in watch_voice_memos: {e}")
+            time.sleep(5)  # Wait longer if there's an error
 
 def main():
     # Set up argument parser
@@ -251,4 +170,4 @@ def main():
     observer.join()
 
 if __name__ == "__main__":
-    main() 
+    watch_voice_memos() 
