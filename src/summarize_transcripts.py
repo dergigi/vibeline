@@ -43,7 +43,7 @@ def determine_content_type(transcript_text: str) -> str:
     """Determine the type of content in the transcript."""
     text = transcript_text.lower()
     
-    if re.search(r'\bblog post\b', text):
+    if re.search(r'\bblog post\b', text) or re.search(r'\bdraft\b', text):
         return "blog_post"
     elif re.search(r'\bidea\b', text) and re.search(r'\bapp\b', text):
         return "idea_app"
