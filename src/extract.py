@@ -29,13 +29,19 @@ def determine_content_types(text: str, available_plugins: List[str]) -> List[str
         # Convert plugin name to search pattern (e.g., "blog_post" -> "blog post")
         search_pattern = plugin_name.replace('_', ' ')
         
-        # Special case for app_idea which needs both words
-        if plugin_name == "app_idea":
-            if re.search(r'\bidea\b', text) and re.search(r'\bapp\b', text):
+        # Check if this is an "or" plugin (has .or.md suffix)
+        is_or_plugin = plugin_name.endswith('.or')
+        if is_or_plugin:
+            # Remove the .or suffix for the actual plugin name
+            plugin_name = plugin_name[:-3]
+            # For or plugins, check if any of the words match
+            words = search_pattern.split()
+            if any(re.search(r'\b' + word + r'\b', text) for word in words):
                 content_types.append(plugin_name)
-        # For all other plugins, just search for the pattern
-        elif re.search(r'\b' + search_pattern + r'\b', text):
-            content_types.append(plugin_name)
+        else:
+            # For regular plugins, check for the exact pattern
+            if re.search(r'\b' + search_pattern + r'\b', text):
+                content_types.append(plugin_name)
     
     return content_types
 
