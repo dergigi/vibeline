@@ -5,7 +5,6 @@ import ollama
 import re
 import os
 from pathlib import Path
-import time
 import inflect
 from typing import List, Dict
 from dotenv import load_dotenv
@@ -109,10 +108,9 @@ def main():
             print(f"  Running {plugin_name} plugin...")
             additional_content = generate_additional_content(plugin, transcript_text, summary_text)
             
-            # Save to appropriate directory with timestamp
-            timestamp = time.strftime("%Y%m%d_%H%M%S")
+            # Save to appropriate directory using base filename
             filename = input_file.stem
-            output_file = output_dirs[plugin_name] / f"{filename}_{timestamp}{plugin.output_extension}"
+            output_file = output_dirs[plugin_name] / f"{filename}{plugin.output_extension}"
             
             with open(output_file, 'w', encoding='utf-8') as f:
                 f.write(additional_content)
