@@ -4,10 +4,14 @@ import sys
 import ollama
 import os
 from pathlib import Path
+import inflect
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
+
+# Initialize inflect engine
+p = inflect.engine()
 
 # Configuration from environment variables
 OLLAMA_MODEL = os.getenv("OLLAMA_SUMMARIZE_MODEL", "llama2")
@@ -44,7 +48,7 @@ def main():
     
     # Set up directory paths
     voice_memo_dir = Path(VOICE_MEMOS_DIR)
-    summary_dir = voice_memo_dir / "summarys"  # Using the same convention as other plugins
+    summary_dir = voice_memo_dir / p.plural("summary")  # Using proper pluralization
     summary_dir.mkdir(parents=True, exist_ok=True)
     
     # Get the filename without the path and extension

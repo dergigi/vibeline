@@ -6,11 +6,15 @@ import re
 import os
 from pathlib import Path
 import time
+import inflect
 from typing import List
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
+
+# Initialize inflect engine
+p = inflect.engine()
 
 # Configuration from environment variables
 OLLAMA_MODEL = os.getenv("OLLAMA_EXTRACT_MODEL", "llama2")
@@ -105,7 +109,9 @@ def main():
     # Create output directories for each plugin
     for plugin_name in plugins.keys():
         base_name = get_base_name(plugin_name)
-        output_dir = voice_memo_dir / f"{base_name}s"  # Pluralize the plugin name
+        # Use inflect to properly pluralize the directory name
+        plural_name = p.plural(base_name)
+        output_dir = voice_memo_dir / plural_name
         output_dir.mkdir(parents=True, exist_ok=True)
         # Store with base name as key
         output_dirs[base_name] = output_dir
