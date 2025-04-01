@@ -1,13 +1,19 @@
 #!/bin/bash
 
 # Check if a file argument was provided
-if [ $# -ne 1 ]; then
-    echo "Usage: $0 <voice_memo_file>"
+if [ $# -lt 1 ]; then
+    echo "Usage: $0 <voice_memo_file> [--force]"
     exit 1
 fi
 
 # Get the input file
 input_file="$1"
+force=false
+
+# Check for force flag
+if [ $# -eq 2 ] && [ "$2" = "--force" ]; then
+    force=true
+fi
 
 # Check if the input file exists
 if [ ! -f "$input_file" ]; then
@@ -26,8 +32,8 @@ mkdir -p "$TRANSCRIPT_DIR"
 filename=$(basename "$input_file" .m4a)
 transcript_file="$TRANSCRIPT_DIR/$filename.txt"
 
-# Only process if transcript doesn't exist
-if [ ! -f "$transcript_file" ]; then
+# Process if transcript doesn't exist or force flag is set
+if [ ! -f "$transcript_file" ] || [ "$force" = true ]; then
     echo "Processing file: $input_file"
     echo "Transcribing audio..."
     

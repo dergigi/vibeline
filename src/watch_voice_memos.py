@@ -89,7 +89,7 @@ class VoiceMemoHandler(FileSystemEventHandler):
             # Handle modified voice memo
             if file_path.parent == self.voice_memo_dir and file_path.suffix.lower() == '.m4a':
                 print(f"\nVoice memo modified: {file_path.name}")
-                self.process_voice_memo(file_path)
+                self.process_voice_memo(file_path, force=True)  # Force regeneration for modified files
 
     def on_deleted(self, event):
         if self.processing_lock:
@@ -103,28 +103,36 @@ class VoiceMemoHandler(FileSystemEventHandler):
                 print(f"\nVoice memo deleted: {file_path.name}")
                 print("  Note: Corresponding transcript and summary files remain unchanged")
 
-    def process_voice_memo(self, voice_memo_path: Path):
+    def process_voice_memo(self, voice_memo_path: Path, force: bool = False):
         """Process a single voice memo file"""
         try:
             self.processing_lock = True
             print(f"Processing voice memo: {voice_memo_path.name}")
             
+            # Get the transcript file path
+            transcript_file = self.transcript_dir / f"{voice_memo_path.stem}.txt"
+            
+            # Skip if transcript exists and we're not forcing regeneration
+            if transcript_file.exists() and not force:
+                print(f"  Transcript already exists at {transcript_file}, skipping...")
+                return
+            
             # Generate transcript
-            result = subprocess.run([str(self.base_dir / 'src' / 'process_voice_memos.sh'), str(voice_memo_path)], 
-                                 capture_output=True, 
-                                 text=True)
+            cmd = [str(self.base_dir / 'src' / 'process_voice_memos.sh'), str(voice_memo_path)]
+            if force:
+                cmd.append("--force")
+                
+            result = subprocess.run(cmd, capture_output=True, text=True)
             
             if result.returncode == 0:
                 print("Voice memo transcription completed successfully")
                 
-                # Get the transcript file path
-                transcript_file = self.transcript_dir / f"{voice_memo_path.stem}.txt"
                 if not transcript_file.exists():
                     print(f"Error: Transcript file not found at {transcript_file}")
                     return
                 
                 # Process the transcript
-                self.process_transcript(transcript_file)
+                self.process_transcript(transcript_file, force)
             else:
                 print(f"Error transcribing voice memo: {result.stderr}")
                 
@@ -133,7 +141,7 @@ class VoiceMemoHandler(FileSystemEventHandler):
         finally:
             self.processing_lock = False
 
-    def process_transcript(self, transcript_file: Path):
+    def process_transcript(self, transcript_file: Path, force: bool = False):
         """Process a single transcript file"""
         try:
             print(f"Processing transcript: {transcript_file.name}")
@@ -150,12 +158,17 @@ class VoiceMemoHandler(FileSystemEventHandler):
                 print("  Transcript is too short (≤210 words), skipping processing")
                 return
             
+            # Check for existing summary
+            summary_file = self.summary_dir / f"{transcript_file.stem}_summary.txt"
+            if summary_file.exists() and not force:
+                print(f"  Summary already exists at {summary_file}, skipping...")
+                return
+            
             # Generate summary
             print("  Generating summary...")
             summary = generate_summary(transcript_text)
             
             # Save summary
-            summary_file = self.summary_dir / f"{transcript_file.stem}_summary.txt"
             with open(summary_file, 'w', encoding='utf-8') as f:
                 f.write(summary)
             print(f"  Summary saved to {summary_file}")
