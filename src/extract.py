@@ -16,6 +16,9 @@ def load_plugins() -> dict[str, str]:
     for plugin_file in plugin_dir.glob("*.md"):
         plugin_name = plugin_file.stem
         if plugin_name != "summary":  # Skip the summary plugin as it's used differently
+            # If it's an .or plugin, remove the .or suffix from the plugin name
+            if plugin_name.endswith('.or'):
+                plugin_name = plugin_name[:-3]
             plugins[plugin_name] = plugin_file.read_text(encoding='utf-8')
     
     return plugins
@@ -35,12 +38,12 @@ def determine_content_types(text: str, available_plugins: List[str]) -> List[str
             # Remove the .or suffix for the actual plugin name
             plugin_name = plugin_name[:-3]
             # For or plugins, check if any of the words match
-            words = search_pattern.split()
-            if any(re.search(r'\b' + word + r'\b', text) for word in words):
+            words = search_pattern[:-3].split()  # Remove .or from search pattern
+            if any(re.search(r'\b' + word + r'\b', text.lower()) for word in words):
                 content_types.append(plugin_name)
         else:
             # For regular plugins, check for the exact pattern
-            if re.search(r'\b' + search_pattern + r'\b', text):
+            if re.search(r'\b' + search_pattern + r'\b', text.lower()):
                 content_types.append(plugin_name)
     
     return content_types
@@ -119,4 +122,23 @@ def main():
     print("----------------------------------------")
 
 if __name__ == "__main__":
-    main() 
+    if len(sys.argv) > 1 and sys.argv[1] == "--test":
+        # Test mode
+        test_files = [
+            "tests/transcripts/test_app_idea.txt",
+            "tests/transcripts/test_blog_post.txt",
+            "tests/transcripts/test_both.txt"
+        ]
+        
+        plugins = load_plugins()
+        available_plugins = list(plugins.keys())
+        
+        for test_file in test_files:
+            print(f"\nTesting {test_file}:")
+            with open(test_file, 'r') as f:
+                text = f.read()
+            content_types = determine_content_types(text, available_plugins)
+            print(f"Detected content types: {content_types}")
+    else:
+        # Normal mode
+        main() 
