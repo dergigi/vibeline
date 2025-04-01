@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import inflect
 from dotenv import load_dotenv
+from plugin_manager import PluginManager
 
 # Load environment variables
 load_dotenv()
@@ -17,18 +18,19 @@ p = inflect.engine()
 OLLAMA_MODEL = os.getenv("OLLAMA_SUMMARIZE_MODEL", "llama2")
 VOICE_MEMOS_DIR = os.getenv("VOICE_MEMOS_DIR", "VoiceMemos")
 
-def load_summary_plugin() -> str:
-    """Load the summary plugin template."""
-    plugin_dir = Path("plugins")
-    with open(plugin_dir / "summary.all.md", 'r', encoding='utf-8') as f:
-        return f.read()
-
-def generate_summary(transcript_text: str) -> str:
-    """Generate a summary of the transcript."""
-    prompt_template = load_summary_plugin()
-    prompt = prompt_template.format(transcript=transcript_text)
+def generate_summary(transcript_text: str, plugin_manager: PluginManager) -> str:
+    """Generate a summary of the transcript using the summary plugin."""
+    # Get the summary plugin
+    summary_plugin = plugin_manager.get_plugin("summary")
+    if not summary_plugin:
+        raise ValueError("Summary plugin not found")
     
-    response = ollama.chat(model=OLLAMA_MODEL, messages=[
+    prompt = summary_plugin.prompt.format(transcript=transcript_text)
+    
+    # Use plugin-specific model if specified, otherwise use default
+    model = summary_plugin.model or OLLAMA_MODEL
+    
+    response = ollama.chat(model=model, messages=[
         {
             'role': 'user',
             'content': prompt
@@ -46,29 +48,30 @@ def main():
         print(f"Error: File {input_file} does not exist")
         sys.exit(1)
     
+    # Load plugins
+    plugin_manager = PluginManager(Path("plugins"))
+    
     # Set up directory paths
     voice_memo_dir = Path(VOICE_MEMOS_DIR)
-    summary_dir = voice_memo_dir / p.plural("summary")  # Using proper pluralization
+    summary_dir = voice_memo_dir / p.plural("summary")
     summary_dir.mkdir(parents=True, exist_ok=True)
-    
-    # Get the filename without the path and extension
-    filename = input_file.stem
-    summary_file = summary_dir / f"{filename}_summary.txt"
     
     print(f"Processing transcript: {input_file}")
     print("Generating summary...")
     
-    # Read transcript and generate summary
+    # Read transcript
     with open(input_file, 'r', encoding='utf-8') as f:
         transcript_text = f.read()
     
-    summary = generate_summary(transcript_text)
+    # Generate summary
+    summary = generate_summary(transcript_text, plugin_manager)
     
     # Save summary
-    with open(summary_file, 'w', encoding='utf-8') as f:
+    output_file = summary_dir / f"{input_file.stem}_summary.txt"
+    with open(output_file, 'w', encoding='utf-8') as f:
         f.write(summary)
     
-    print(f"Summary saved to: {summary_file}")
+    print(f"Summary saved to: {output_file}")
     print("----------------------------------------")
 
 if __name__ == "__main__":
