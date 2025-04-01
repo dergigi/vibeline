@@ -44,8 +44,9 @@ def main():
         sys.exit(1)
     
     # Set up directory paths
-    draft_dir = Path("drafts")
-    prompt_dir = Path("prompts")
+    voice_memo_dir = Path("VoiceMemos")
+    draft_dir = voice_memo_dir / "drafts"
+    prompt_dir = voice_memo_dir / "prompts"
     
     # Create output directories if they don't exist
     draft_dir.mkdir(parents=True, exist_ok=True)
