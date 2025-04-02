@@ -49,5 +49,9 @@ fi
 echo "Step 2: Extracting content..."
 ./extract.sh $force_flag "$transcript_file"
 
+# Step 3: Post-process action items
+echo "Step 3: Post-processing action items..."
+./post_process.sh
+
 echo "----------------------------------------"
 echo "Processing complete!" 
