@@ -57,6 +57,12 @@ def main():
     for action_file in action_items_dir.glob("*.txt"):
         print(f"Processing {action_file.name}...")
         
+        # Check if output file already exists
+        formatted_file = todos_dir / f"{action_file.stem}.txt"
+        if formatted_file.exists():
+            print(f"  Skipping: {formatted_file} already exists")
+            continue
+        
         # Read the action items
         with open(action_file, 'r', encoding='utf-8') as f:
             content = f.read()
@@ -66,7 +72,6 @@ def main():
         formatted_content = format_action_items(items)
         
         # Save formatted content in TODOs directory
-        formatted_file = todos_dir / f"{action_file.stem}.txt"
         with open(formatted_file, 'w', encoding='utf-8') as f:
             f.write(formatted_content)
         
