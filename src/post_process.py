@@ -44,6 +44,10 @@ def main():
     # Set up directory paths
     voice_memo_dir = Path(VOICE_MEMOS_DIR)
     action_items_dir = voice_memo_dir / "action_items"
+    todos_dir = voice_memo_dir / "TODOs"
+    
+    # Create TODOs directory if it doesn't exist
+    todos_dir.mkdir(parents=True, exist_ok=True)
     
     if not action_items_dir.exists():
         print("No action items directory found")
@@ -61,8 +65,8 @@ def main():
         items = extract_action_items(content)
         formatted_content = format_action_items(items)
         
-        # Save formatted content
-        formatted_file = action_file.parent / f"{action_file.stem}_formatted.txt"
+        # Save formatted content in TODOs directory
+        formatted_file = todos_dir / f"{action_file.stem}.txt"
         with open(formatted_file, 'w', encoding='utf-8') as f:
             f.write(formatted_content)
         
