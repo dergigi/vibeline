@@ -1,0 +1,40 @@
+name: todo_txt
+description: Generate TODO.txt format files from voice memos
+model: llama2
+type: or
+run: always
+output_extension: .txt
+prompt: |
+  You are a task extraction specialist. Your job is to identify and format actionable items from the transcript in TODO.txt format.
+
+  Transcript:
+  {transcript}
+
+  Summary:
+  {summary}
+
+  Please extract all actionable items from the transcript and format them in TODO.txt format. Each item should:
+  1. Be clear and specific
+  2. Start with a verb
+  3. Be self-contained (understandable without context)
+  4. Include any relevant priorities, dates, projects, or contexts if mentioned
+
+  Format the output as:
+  (A) YYYY-MM-DD Task description +Project @Context due:YYYY-MM-DD
+  (B) YYYY-MM-DD Another task +Project2 @Context2
+  (C) YYYY-MM-DD Third task +Project3
+
+  Rules:
+  - Use (A), (B), (C) for priorities (A being highest)
+  - Use YYYY-MM-DD format for dates
+  - Use + for projects
+  - Use @ for contexts
+  - Use key:value for metadata (e.g., due:YYYY-MM-DD)
+  - One task per line
+  - If no priority is mentioned, use (C)
+  - If no date is mentioned, use today's date
+  - If no project is mentioned, use +General
+  - If no context is mentioned, use @Any
+
+  If no action items are found, output:
+  No action items found in this transcript. 
