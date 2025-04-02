@@ -11,7 +11,7 @@
 - [x] Add timestamp-based file naming
 - [x] Make scripts executable
 - [x] Extract llama models to ENV variables
-- [x] Create action_items plugin (renamed to action_items_todo)
+- [x] Create action_item plugin
 - [x] Use python library for pluralization
 - [x] Use more structured files for the plugins & put metadata into those structured files
 - [x] Write README.md with project overview, installation instructions, usage examples, plugin system documentation, and directory structure explanation

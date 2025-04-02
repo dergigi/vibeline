@@ -1,4 +1,4 @@
-name: action_items_todo
+name: action_item
 description: Extract action items and todos from the transcript
 model: llama2  # Optional, falls back to OLLAMA_MODEL from .env
 type: or  # and, or

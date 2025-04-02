@@ -64,7 +64,7 @@ VoiceMemos/
 ├── summaries/       # Generated summaries
 ├── blog_posts/      # Generated blog posts
 ├── app_ideas/      # Generated app ideas
-└── action_items_todos/  # Generated action items
+└── action_items/  # Generated action items
 ```
 
 ## Plugin System
