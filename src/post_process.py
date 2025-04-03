@@ -2,6 +2,7 @@
 
 import os
 import re
+import argparse
 from pathlib import Path
 from typing import List, Dict
 from datetime import datetime
@@ -14,13 +15,23 @@ load_dotenv()
 VOICE_MEMOS_DIR = os.getenv("VOICE_MEMOS_DIR", "VoiceMemos")
 
 def extract_action_items(content: str) -> List[str]:
-    """Extract action items from content, ignoring original list markers."""
+    """Extract action items from content, cleaning up any non-letter characters from the beginning."""
     items = []
     for line in content.split('\n'):
-        # Match lines that start with any list marker (-, *, +) and optional checkbox
-        match = re.match(r'^\s*[-*+]\s*(?:\[\s*\])?\s*(.*)', line)
-        if match:
-            item = match.group(1).strip()
+        # Skip empty lines and headers
+        if not line.strip() or line.strip().startswith(('Here are', 'Rules were', 'No action items')):
+            continue
+            
+        # Find the first letter in the line
+        first_letter_pos = -1
+        for i, char in enumerate(line):
+            if char.isalpha():
+                first_letter_pos = i
+                break
+                
+        if first_letter_pos >= 0:
+            # Extract the item starting from the first letter
+            item = line[first_letter_pos:].strip()
             if item and not item.startswith('#'):  # Skip headers
                 items.append(item)
     return items
@@ -54,6 +65,11 @@ def format_action_items(items: List[str], filename: str) -> str:
     return formatted
 
 def main():
+    # Set up argument parser
+    parser = argparse.ArgumentParser(description='Post-process action items from voice memos.')
+    parser.add_argument('-f', '--force', action='store_true', help='Force overwrite of existing files')
+    args = parser.parse_args()
+    
     # Set up directory paths
     voice_memo_dir = Path(VOICE_MEMOS_DIR)
     action_items_dir = voice_memo_dir / "action_items"
@@ -72,7 +88,7 @@ def main():
         
         # Check if output file already exists
         formatted_file = todos_dir / f"{action_file.stem}.txt"
-        if formatted_file.exists():
+        if formatted_file.exists() and not args.force:
             print(f"  Skipping: {formatted_file} already exists")
             continue
         
