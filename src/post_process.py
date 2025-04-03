@@ -22,18 +22,16 @@ def extract_action_items(content: str) -> List[str]:
         if not line.strip() or line.strip().startswith(('Here are', 'Rules were', 'No action items')):
             continue
             
-        # Find the first letter in the line
-        first_letter_pos = -1
-        for i, char in enumerate(line):
-            if char.isalpha():
-                first_letter_pos = i
-                break
-                
-        if first_letter_pos >= 0:
-            # Extract the item starting from the first letter
-            item = line[first_letter_pos:].strip()
-            if item and not item.startswith('#'):  # Skip headers
-                items.append(item)
+        # Match lines that start with any list marker (-, *, +)
+        if re.match(r'^\s*[-*+]', line):
+            # Find the first letter in the line
+            match = re.search(r'[a-zA-Z]', line)
+            if match:
+                item = line[match.start():].strip()
+                if item and not item.startswith('#'):  # Skip headers
+                    # Remove any trailing "(no deadline or priority mentioned)"
+                    item = re.sub(r'\s*\(no deadline or priority mentioned\)$', '', item)
+                    items.append(item)
     return items
 
 def format_action_items(items: List[str], filename: str) -> str:
