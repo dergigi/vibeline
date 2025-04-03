@@ -96,6 +96,12 @@ def main():
         
         # Extract and format action items
         items = extract_action_items(content)
+        
+        # Skip if no items found
+        if not items:
+            print(f"  No action items found in {action_file.name}")
+            continue
+            
         formatted_content = format_action_items(items, action_file.stem)
         
         # Save formatted content in TODOs directory
