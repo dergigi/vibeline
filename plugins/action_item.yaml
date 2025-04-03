@@ -22,6 +22,8 @@ prompt: |
   - No priorities
   - Never use the "+" symbol
   - Prefix each action item with "- [ ]"
+  - You MUST NOT mention the word "deadline" or "priority" in the output
+  - All action items MUST be on the same level; no indentation
 
   Format the output as:
   - [ ] First action item
