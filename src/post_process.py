@@ -4,6 +4,7 @@ import os
 import re
 from pathlib import Path
 from typing import List, Dict
+from datetime import datetime
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -24,12 +25,24 @@ def extract_action_items(content: str) -> List[str]:
                 items.append(item)
     return items
 
-def format_action_items(items: List[str]) -> str:
-    """Format action items in markdown checkbox format with consistent - [ ] prefix."""
+def format_action_items(items: List[str], filename: str) -> str:
+    """Format action items in markdown checkbox format with consistent - [ ] prefix.
+    Uses the filename (timestamp) to create a human-readable header."""
     if not items:
-        return "# Action Items\n\nNo action items found."
+        return "# No items found\n"
     
-    formatted = "# Action Items\n\n"
+    # Extract date and time from filename (format: YYYYMMDD_HHMMSS.txt)
+    date_str = filename.split('.')[0]  # Remove .txt extension
+    year = int(date_str[:4])
+    month = int(date_str[4:6])
+    day = int(date_str[6:8])
+    hour = int(date_str[9:11])
+    minute = int(date_str[11:13])
+    
+    # Create datetime object and format it
+    dt = datetime(year, month, day, hour, minute)
+    formatted = f"# {dt.strftime('%a %b %d @ %I:%M %p')}\n\n"
+    
     for item in items:
         # Ensure each item starts with a capital letter
         item = item[0].upper() + item[1:] if item else item
@@ -69,7 +82,7 @@ def main():
         
         # Extract and format action items
         items = extract_action_items(content)
-        formatted_content = format_action_items(items)
+        formatted_content = format_action_items(items, action_file.stem)
         
         # Save formatted content in TODOs directory
         with open(formatted_file, 'w', encoding='utf-8') as f:
