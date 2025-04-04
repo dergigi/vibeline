@@ -1,5 +1,18 @@
 # VibeLine TODO List
 
+Steps to glory, aka make this thing awesome forever:
+
+- [ ] Allow plugins to execute stuff using MCP Tools
+- [ ] Convert `transcribe` step into a plugin
+- [ ] Allow plugins to have an "input", i.e. which dir they should watch
+
+After that:
+- [ ] Create an "archive" plugin that moves old stuff to a separate folder
+- [ ] Create even more plugins
+- [ ] Dockerize it for easy deployment
+
+Old vibe TODO list:
+
 - [x] Set up basic project structure
 - [x] Create voice memo processing system
 - [x] Implement dynamic plugin loading system
