@@ -5,7 +5,7 @@ ollama>=0.1.17
 watchdog>=3.0.0
 inflect>=7.5.0
 pyyaml>=6.0.1
-modelcontext-python-sdk>=0.1.0
+mcptools @ https://mcptools.info
 
 # Development dependencies
 pytest>=7.4.0
