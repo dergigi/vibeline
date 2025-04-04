@@ -24,21 +24,6 @@ logging.basicConfig(
 
 logger = logging.getLogger('voice_memo_watcher')
 
-def generate_summary(transcript_text: str) -> str:
-    """Generate a summary of the transcript."""
-    prompt_dir = Path(__file__).parent.parent / "prompts"
-    with open(prompt_dir / "summary.md", 'r', encoding='utf-8') as f:
-        prompt_template = f.read()
-    
-    prompt = prompt_template.format(transcript=transcript_text)
-    response = ollama.chat(model='llama2', messages=[
-        {
-            'role': 'user',
-            'content': prompt
-        }
-    ])
-    return response['message']['content'].strip()
-
 def determine_content_type(transcript_text: str) -> str:
     """Determine the type of content in the transcript."""
     text = transcript_text.lower()
