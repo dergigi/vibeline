@@ -5,7 +5,7 @@ ollama>=0.1.17
 watchdog>=3.0.0
 inflect>=7.5.0
 pyyaml>=6.0.1
-mcptools @ https://mcptools.info
+mcp>=1.6.0
 
 # Development dependencies
 pytest>=7.4.0
