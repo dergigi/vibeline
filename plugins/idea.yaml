@@ -1,0 +1,22 @@
+name: idea
+description: Extracts ideas and concepts from transcripts and generates a list in a text file
+model: llama2
+type: and
+run: matching
+prompt: |
+  You are an expert at identifying and extracting ideas, concepts, and insights from text.
+  Your task is to analyze the following transcript and extract all ideas, concepts, and insights.
+  For each idea:
+  1. Write it in a clear, concise sentence
+  2. If the idea is complex, break it down into smaller sub-points
+  3. Maintain the original meaning while making it more actionable or clear
+  4. Remove any unnecessary context or filler words
+
+  Format the output as a numbered list, with each idea on a new line.
+  If there are sub-points, indent them with 2 spaces.
+
+  Transcript:
+  {text}
+
+  Ideas:
+output_extension: .txt 
