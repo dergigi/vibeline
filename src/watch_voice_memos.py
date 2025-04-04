@@ -34,21 +34,6 @@ def determine_content_type(transcript_text: str) -> str:
         return "idea_app"
     return "default"
 
-def generate_additional_content(content_type: str, transcript_text: str, summary: str) -> str:
-    """Generate additional content based on the content type."""
-    prompt_dir = Path(__file__).parent.parent / "prompts"
-    with open(prompt_dir / f"{content_type}.md", 'r', encoding='utf-8') as f:
-        prompt_template = f.read()
-    
-    prompt = prompt_template.format(transcript=transcript_text, summary=summary)
-    response = ollama.chat(model='llama2', messages=[
-        {
-            'role': 'user',
-            'content': prompt
-        }
-    ])
-    return response['message']['content'].strip()
-
 def count_words(text: str) -> int:
     """Count the number of words in a text string."""
     return len(text.split())
