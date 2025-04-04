@@ -1,0 +1,38 @@
+name: decision
+description: Extract decisions made from the transcript
+model: llama2  # Optional, falls back to OLLAMA_MODEL from .env
+type: and  # and, or
+run: matching  # always, matching
+output_extension: .json
+prompt: |
+  You are a decision extraction specialist. Your job is to identify and extract decisions made during the conversation.
+
+  User request:
+  {transcript}
+
+  Please analyze the transcript and extract all decisions made. For each decision, identify:
+  1. The decision itself
+  2. Who made the decision (if clear)
+  3. When it was made (if clear)
+  4. Any context or reasoning behind the decision
+  5. Any conditions or dependencies
+
+  Rules:
+  - Output should be in valid JSON format
+  - Each decision should be a separate object in an array
+  - Include all relevant details for each decision
+  - Be specific and clear in the decision descriptions
+  - If certain information is not available, use null for that field
+
+  Format the output as:
+  {
+    "decisions": [
+      {
+        "decision": "string",
+        "made_by": "string or null",
+        "timestamp": "string or null",
+        "context": "string or null",
+        "conditions": "string or null"
+      }
+    ]
+  } 
