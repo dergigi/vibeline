@@ -3,7 +3,7 @@ description: Generate TODO.txt format files from voice memos
 model: llama2
 type: or
 run: always
-output_extension: .txt
+output_extension: .todo.txt
 prompt: |
   You are a task extraction specialist. Your job is to identify and format actionable items from the transcript in TODO.txt format.
 
