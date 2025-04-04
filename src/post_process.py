@@ -85,7 +85,7 @@ def main():
         print(f"Processing {action_file.name}...")
         
         # Check if output file already exists
-        formatted_file = todos_dir / f"{action_file.stem}.txt"
+        formatted_file = todos_dir / f"{action_file.stem}.md"
         if formatted_file.exists() and not args.force:
             print(f"  Skipping: {formatted_file} already exists")
             continue
