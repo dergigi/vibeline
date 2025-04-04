@@ -47,8 +47,20 @@ echo "Transcribing audio..."
 # Activate the virtual environment
 source vibenv/bin/activate
 
-# Use whisper to transcribe the audio with base.en model
-whisper "$input_file" --model base.en --output_dir "$TRANSCRIPT_DIR" --output_format all
+# Get the duration of the audio file in seconds using ffprobe
+duration=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$input_file")
+
+# Convert duration to minutes (floating point)
+duration_minutes=$(echo "$duration / 60" | bc -l)
+
+# Set output format based on duration
+if (( $(echo "$duration_minutes > 21" | bc -l) )); then
+    # For files longer than 21 minutes, produce all formats
+    whisper "$input_file" --model base.en --output_dir "$TRANSCRIPT_DIR" --output_format all
+else
+    # For shorter files, produce only txt format
+    whisper "$input_file" --model base.en --output_dir "$TRANSCRIPT_DIR" --output_format txt
+fi
 
 # Deactivate the virtual environment
 deactivate
