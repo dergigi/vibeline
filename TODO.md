@@ -2,8 +2,8 @@
 
 Steps to glory, aka make this thing awesome forever:
 
-- [ ] Allow plugins to execute stuff using MCP Tools
-- [ ] Convert `transcribe` step into a plugin
+- [ ] Allow plugins to execute stuff using [MCP Tools](https://github.com/patruff/ollama-mcp-bridge)
+- [ ] Convert `transcribe` step into a plugin using a [whisper-ollama](https://ollama.com/search?q=whisper) model
 - [ ] Allow plugins to have an "input", i.e. which dir they should watch
 
 After that:
