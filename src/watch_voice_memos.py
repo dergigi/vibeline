@@ -3,14 +3,11 @@
 import os
 import time
 import subprocess
-import re
-import ollama
 import argparse
 from pathlib import Path
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import logging
-from datetime import datetime
 
 # Set up logging with more detailed formatting
 logging.basicConfig(
@@ -40,7 +37,7 @@ def process_voice_memo(file_path: Path, force: bool = False) -> None:
         if force:
             cmd.append('-f')
         cmd.append(str(file_path))
-        
+
         # Run subprocess without capturing output to show it in real-time
         result = subprocess.run(
             cmd,
@@ -59,21 +56,21 @@ def watch_voice_memos() -> None:
     """Watch the VoiceMemos directory for new or modified .m4a files."""
     voice_memos_dir = Path("VoiceMemos")
     processed_files = {}  # Dictionary to store file paths and their last modification times
-    
+
     # Set up argument parser
     parser = argparse.ArgumentParser(description='Watch for voice memos and process them')
-    parser.add_argument('-f', '--force', action='store_true', 
+    parser.add_argument('-f', '--force', action='store_true',
                       help='Force regeneration of existing files')
     args = parser.parse_args()
-    
+
     # Verify the VoiceMemos directory exists
     if not voice_memos_dir.exists():
         logger.error(f"VoiceMemos directory does not exist at: {voice_memos_dir.absolute()}")
         return
-    
+
     logger.info("Starting voice memo watcher")
     logger.info(f"Watching directory: {voice_memos_dir.absolute()}")
-    
+
     try:
         while True:
             # Recursively find all .m4a files
@@ -82,7 +79,7 @@ def watch_voice_memos() -> None:
                 current_files.add(str(file_path))
                 try:
                     current_mtime = os.path.getmtime(file_path)
-                    
+
                     # Check if file is new or modified
                     if str(file_path) not in processed_files or processed_files[str(file_path)] != current_mtime:
                         process_voice_memo(file_path, force=args.force)
@@ -91,15 +88,15 @@ def watch_voice_memos() -> None:
                     logger.debug(f"File disappeared while processing: {file_path}")
                 except Exception as e:
                     logger.error(f"Error checking file {file_path}: {e}")
-            
+
             # Check for deleted files
             deleted_files = set(processed_files.keys()) - current_files
             for file_path in deleted_files:
                 logger.info(f"File removed: {Path(file_path).name}")
                 del processed_files[file_path]
-            
+
             time.sleep(1)  # Wait for 1 second before next check
-            
+
     except KeyboardInterrupt:
         logger.info("Watcher stopped by user")
     except Exception as e:
@@ -109,7 +106,7 @@ def watch_voice_memos() -> None:
 def main():
     # Set up argument parser
     parser = argparse.ArgumentParser(description='Watch for voice memos and process them')
-    parser.add_argument('-f', '--force', action='store_true', 
+    parser.add_argument('-f', '--force', action='store_true',
                       help='Force regeneration of existing files')
     args = parser.parse_args()
 
@@ -125,7 +122,7 @@ def main():
     print(f"Is symlink: {voice_memo_dir.is_symlink()}")
     if voice_memo_dir.is_symlink():
         print(f"Resolves to: {voice_memo_dir.resolve()}")
-    
+
     # Verify directories exist
     if not voice_memo_dir.exists():
         print(f"Error: {voice_memo_dir} directory does not exist")
@@ -140,10 +137,10 @@ def main():
     # Set up event handler and observer
     event_handler = VoiceMemoHandler(voice_memo_dir, transcript_dir, summary_dir, force=args.force)
     observer = Observer()
-    
+
     # Watch voice memo directory only (we'll handle transcripts immediately after creation)
     observer.schedule(event_handler, str(voice_memo_dir.resolve()), recursive=False)
-    
+
     # Start the observer
     observer.start()
     print(f"\nWatching for changes in:")
@@ -158,7 +155,7 @@ def main():
     except KeyboardInterrupt:
         observer.stop()
         print("\nStopping file watcher...")
-    
+
     observer.join()
 
 if __name__ == "__main__":
@@ -166,4 +163,4 @@ if __name__ == "__main__":
         watch_voice_memos()
     except Exception as e:
         logger.critical(f"Fatal error: {e}")
-        raise 
+        raise

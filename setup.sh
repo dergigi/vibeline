@@ -8,10 +8,10 @@ fi
 
 # Activate virtual environment
 echo "Activating virtual environment..."
-source vibenv/bin/activate
+[ -d "vibenv" ] && source vibenv/bin/activate
 
 # Install requirements
 echo "Installing requirements..."
 pip3 install -r requirements.txt
 
-echo "Setup complete! Virtual environment is activated and requirements are installed." 
+echo "Setup complete! Virtual environment is activated and requirements are installed."
