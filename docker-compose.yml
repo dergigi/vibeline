@@ -8,9 +8,8 @@ services:
       - OLLAMA_MODEL=llama2
 
   vibeline:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
+    # image: ghcr.io/dergigi/vibeline
     restart: unless-stopped
     environment:
       OLLAMA_HOST: http://ollama:11434
@@ -24,17 +23,13 @@ services:
     volumes:
       - ./VoiceMemos:/app/VoiceMemos
 
-  open-webui:
-    image: ghcr.io/open-webui/open-webui:main
+  vibeline-ui:
+    image: ghcr.io/dergigi/vibeline-ui
     restart: unless-stopped
     ports:
-      - "3000:8080"
+      - 3000:3000
     volumes:
-      - ./open-webui:/app/backend/data
-    depends_on:
-      - ollama
-    environment:
-      OLLAMA_BASE_URL: http://ollama:11434
+      - ./VoiceMemos:/app/VoiceMemos
 
   # Optionally run syncthing
   syncthing:
