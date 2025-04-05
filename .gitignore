@@ -7,7 +7,7 @@ VoiceMemos
 # Python cache files
 __pycache__/
 *.py[cod]
-*$py.class 
+*$py.class
 
 # macOS stuff
 .DS_Store
@@ -15,3 +15,8 @@ __pycache__/
 # Environment variables
 .env
 .env.local
+
+# docker compose volumes
+ollama
+open-webui
+syncthing

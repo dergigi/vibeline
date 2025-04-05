@@ -25,10 +25,10 @@ if [ ! -f "$input_file" ]; then
 fi
 
 # Activate the virtual environment
-source vibenv/bin/activate
+[ -d "vibenv" ] && source vibenv/bin/activate
 
 # Run the Python script with force flag if provided
 python src/extract.py $force_flag "$input_file"
 
 # Deactivate the virtual environment
-deactivate 
+[ -d "vibenv" ] && deactivate

@@ -26,7 +26,7 @@ cd vibeline
 2. Create and activate a virtual environment:
 ```bash
 python -m venv vibenv
-source vibenv/bin/activate  # On Windows: vibenv\Scripts\activate
+[ -d "vibenv" ] && source vibenv/bin/activate  # On Windows: vibenv\Scripts\activate
 ```
 
 3. Install dependencies:
@@ -112,7 +112,7 @@ run: matching
 output_extension: .md
 prompt: |
   Based on the following transcript, create a blog post...
-  
+
   Transcript:
   {transcript}
 ```
@@ -129,4 +129,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. 
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

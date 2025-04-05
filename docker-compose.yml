@@ -1,0 +1,53 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    volumes:
+      - ./ollama:/root/.ollama
+    environment:
+      - OLLAMA_MODEL=llama2
+
+  vibeline:
+    build: .
+    # image: ghcr.io/dergigi/vibeline
+    restart: unless-stopped
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+      VOICE_MEMOS_DIR: /app/VoiceMemos
+      OLLAMA_EXTRACT_MODEL: llama2
+      OLLAMA_SUMMARIZE_MODEL: llama2
+      OLLAMA_DEFAULT_MODEL: llama2
+      WHISPER_MODEL: base
+    depends_on:
+      - ollama
+    volumes:
+      - ./VoiceMemos:/app/VoiceMemos
+
+  vibeline-ui:
+    image: ghcr.io/dergigi/vibeline-ui
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    volumes:
+      - ./VoiceMemos:/app/VoiceMemos
+
+  # Optionally run syncthing
+  syncthing:
+    image: syncthing/syncthing
+    restart: unless-stopped
+    environment:
+      PUID: 1000
+      PGID: 1000
+    volumes:
+      - ./syncthing:/var/syncthing/config
+      - ./VoiceMemos:/var/syncthing/VoiceMemos
+    ports:
+      - 8384:8384 # Web UI
+      - 22000:22000/tcp # TCP file transfers
+      - 22000:22000/udp # QUIC file transfers
+      - 21027:21027/udp # Receive local discovery broadcasts
+    healthcheck:
+      test: curl -fkLsS -m 2 127.0.0.1:8384/rest/noauth/health | grep -o --color=never OK || exit 1
+      interval: 1m
+      timeout: 10s
+      retries: 3

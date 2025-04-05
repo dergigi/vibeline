@@ -10,7 +10,7 @@ done
 shift $((OPTIND-1))
 
 # Activate virtual environment
-source vibenv/bin/activate
+[ -d "vibenv" ] && source vibenv/bin/activate
 
 echo "Processing all voice memos..."
 for file in VoiceMemos/*.m4a; do
@@ -21,4 +21,4 @@ for file in VoiceMemos/*.m4a; do
     fi
 done
 
-echo "Done! All voice memos have been processed." 
+echo "Done! All voice memos have been processed."
