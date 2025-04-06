@@ -25,8 +25,8 @@ if [ ! -f "$input_file" ]; then
 fi
 
 # Set the directory paths
-VOICE_MEMO_DIR="VoiceMemos"
-TRANSCRIPT_DIR="$VOICE_MEMO_DIR/transcripts"
+VOICE_MEMOS_DIR="${VOICE_MEMOS_DIR:-VoiceMemos}"
+TRANSCRIPT_DIR="$VOICE_MEMOS_DIR/transcripts"
 
 # Create transcripts directory if it doesn't exist
 mkdir -p "$TRANSCRIPT_DIR"

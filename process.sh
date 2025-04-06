@@ -25,8 +25,8 @@ if [ ! -f "$input_file" ]; then
 fi
 
 # Set the directory paths
-VOICE_MEMO_DIR="VoiceMemos"
-TRANSCRIPT_DIR="$VOICE_MEMO_DIR/transcripts"
+VOICE_MEMOS_DIR="${VOICE_MEMOS_DIR:-VoiceMemos}"
+TRANSCRIPT_DIR="$VOICE_MEMOS_DIR/transcripts"
 
 # Get the filename without the path and extension
 filename=$(basename "$input_file" .m4a)

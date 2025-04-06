@@ -101,14 +101,14 @@ def main():
         sys.exit(1)
 
     # Set up directory paths
-    voice_memo_dir = Path(VOICE_MEMOS_DIR)
+    voice_memos_dir = Path(VOICE_MEMOS_DIR)
     output_dirs = {}
 
     # Create output directories for each plugin
     for plugin_name in plugins.keys():
         # Use inflect to properly pluralize the directory name
         plural_name = p.plural(plugin_name)
-        output_dir = voice_memo_dir / plural_name
+        output_dir = voice_memos_dir / plural_name
         output_dir.mkdir(parents=True, exist_ok=True)
         output_dirs[plugin_name] = output_dir
 
