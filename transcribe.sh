@@ -25,8 +25,8 @@ if [ ! -f "$input_file" ]; then
 fi
 
 # Set the directory paths
-VOICE_MEMO_DIR="VoiceMemos"
-TRANSCRIPT_DIR="$VOICE_MEMO_DIR/transcripts"
+VOICE_MEMOS_DIR="${VOICE_MEMOS_DIR:-VoiceMemos}"
+TRANSCRIPT_DIR="$VOICE_MEMOS_DIR/transcripts"
 
 # Create transcripts directory if it doesn't exist
 mkdir -p "$TRANSCRIPT_DIR"
@@ -45,7 +45,7 @@ echo "Processing file: $input_file"
 echo "Transcribing audio..."
 
 # Activate the virtual environment
-source vibenv/bin/activate
+[ -d "vibenv" ] && source vibenv/bin/activate
 
 # Get the duration of the audio file in seconds using ffprobe
 duration=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$input_file")
@@ -56,14 +56,15 @@ duration_minutes=$(echo "$duration / 60" | bc -l)
 # Set output format based on duration
 if (( $(echo "$duration_minutes > 21" | bc -l) )); then
     # For files longer than 21 minutes, produce all formats
-    whisper "$input_file" --model base.en --output_dir "$TRANSCRIPT_DIR" --output_format all
+    whisper-ctranslate2 "$input_file" --model $WHISPER_MODEL --output_dir "$TRANSCRIPT_DIR" --output_format all
 else
     # For shorter files, produce only txt format
-    whisper "$input_file" --model base.en --output_dir "$TRANSCRIPT_DIR" --output_format txt
+    whisper-ctranslate2 "$input_file" --model $WHISPER_MODEL --output_dir "$TRANSCRIPT_DIR" --output_format txt
 fi
 
 # Deactivate the virtual environment
-deactivate
+[ -d "vibenv" ] && deactivate
 
 echo "Transcription saved to: $transcript_file"
-echo "----------------------------------------" 
+echo "----------------------------------------"
+
