@@ -18,8 +18,8 @@ def extract_action_items(content: str) -> List[str]:
     """Extract action items from content, cleaning up any non-letter characters from the beginning."""
     items = []
     for line in content.split('\n'):
-        # Skip empty lines and headers
-        if not line.strip() or line.strip().startswith(('Here are', 'Rules were', 'No action items')):
+        # Skip empty lines, headers, and lines starting with whitespace
+        if not line.strip() or line.strip().startswith(('Here are', 'Rules were', 'No action items')) or line.startswith((' ', '\t')):
             continue
 
         # Match lines that start with any list marker (-, *, +)
