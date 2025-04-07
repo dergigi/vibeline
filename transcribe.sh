@@ -56,10 +56,10 @@ duration_minutes=$(echo "$duration / 60" | bc -l)
 # Set output format based on duration
 if (( $(echo "$duration_minutes > 21" | bc -l) )); then
     # For files longer than 21 minutes, produce all formats
-    whisper-ctranslate2 "$input_file" --model $WHISPER_MODEL --output_dir "$TRANSCRIPT_DIR" --output_format all
+    whisper "$input_file" --model $WHISPER_MODEL --output_dir "$TRANSCRIPT_DIR"
 else
     # For shorter files, produce only txt format
-    whisper-ctranslate2 "$input_file" --model $WHISPER_MODEL --output_dir "$TRANSCRIPT_DIR" --output_format txt
+    whisper "$input_file" --model $WHISPER_MODEL --output_dir "$TRANSCRIPT_DIR" --output_format txt
 fi
 
 # Deactivate the virtual environment
