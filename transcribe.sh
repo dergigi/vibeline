@@ -9,6 +9,9 @@ while getopts "f" opt; do
 done
 shift $((OPTIND-1))
 
+# Load environment variables
+[ -f .env ] && source .env
+
 # Check if a file argument was provided
 if [ $# -ne 1 ]; then
     echo "Usage: $0 [-f] <audio_file>"
