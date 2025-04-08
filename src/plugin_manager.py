@@ -14,6 +14,7 @@ class Plugin:
     run: Literal["always", "matching"]  # When to run the plugin
     prompt: str
     output_extension: str = field(default=".txt")  # Default to .txt if not specified
+    command: Optional[str] = None  # Optional command to run after generation
 
 class PluginManager:
     def __init__(self, plugin_dir: Path):
@@ -47,7 +48,8 @@ class PluginManager:
                     type=data['type'],
                     run=data['run'],
                     prompt=data['prompt'],
-                    output_extension=data.get('output_extension', '.txt')  # Default to .txt
+                    output_extension=data.get('output_extension', '.txt'),  # Default to .txt
+                    command=data.get('command') # Get the command if present
                 )
                 
                 self.plugins[plugin.name] = plugin
