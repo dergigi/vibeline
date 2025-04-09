@@ -4,6 +4,8 @@ VibeLine is a powerful voice memo processing system that uses AI to extract mean
 
 > **Note:** VibeLine is a highly opinionated system with specific design choices and workflows. While it offers flexibility through its plugin system, it follows a particular philosophy in how voice memos should be processed and structured. If you're looking for a more generic or customizable solution, this might not be the right tool for you.
 
+![Touch Grass](touch-grass.png)
+
 ## Features
 
 - 🎙️ Automatic voice memo transcription
