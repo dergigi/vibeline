@@ -45,6 +45,7 @@ This will:
 
 ## How to use
 
+- Use whatever you want to record voice notes (I use [Fossify](https://github.com/FossifyOrg/Voice-Recorder))
 - Use whatever you want to sync your files (I use [Syncthing](https://syncthing.net/))
 - Use whatever you want to look at the markdown/output files (I use [Zettel Notes](https://www.zettelnotes.com/))
 - Run the `./watch.sh` script on an idle machine to get the most out of it
