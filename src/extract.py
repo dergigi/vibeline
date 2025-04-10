@@ -2,6 +2,7 @@
 
 import sys
 import ollama
+import subprocess
 import re
 import os
 import argparse
@@ -147,6 +148,24 @@ def main():
             with open(output_file, 'w', encoding='utf-8') as f:
                 f.write(additional_content)
             print(f"  Content saved to: {output_file}")
+
+            # Execute command if defined for the plugin
+            if plugin.command:
+                try:
+                    # Replace FILE placeholder with the actual output file path
+                    cmd_to_run = plugin.command.replace("FILE", str(output_file))
+                    print(f"  Executing command: {cmd_to_run}")
+                    # Run the command, check=True raises an exception on non-zero exit code
+                    subprocess.run(cmd_to_run, shell=True, check=True, text=True, capture_output=True)
+                    print(f"  Command executed successfully.")
+                except FileNotFoundError:
+                    print(f"  Error: Command not found - {plugin.command.split()[0]}")
+                except subprocess.CalledProcessError as e:
+                    print(f"  Error executing command: {e}")
+                    print(f"  Stderr: {e.stderr}")
+                    print(f"  Stdout: {e.stdout}")
+                except Exception as e:
+                    print(f"  An unexpected error occurred during command execution: {e}")
     else:
         print("  No matching plugins found for this transcript")
 
