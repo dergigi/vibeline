@@ -1,0 +1,21 @@
+name: build_idea
+description: Generate detailed app idea specifications from transcripts
+type: or  # and, or
+run: matching  # always, matching
+command: bun /Users/pablofernandez/vibeline/run/build_idea.ts FILE
+prompt: |
+  Based on the following transcript and its summary, create a detailed app idea specification. The specification should include:
+  1. App name and tagline
+  2. Problem statement
+  3. Target audience
+  4. Key features
+  5. Technical considerations
+  6. User flow
+
+  Transcript:
+  {transcript}
+
+  Summary:
+  {summary}
+
+  App Idea Specification: 
