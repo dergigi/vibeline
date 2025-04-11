@@ -167,7 +167,9 @@ prompt: |
   Please generate a valid SVG file with proper XML formatting.
 ```
 
-### Plugin with Command Execution
+### Build Idea Plugin with Command Execution
+
+This plugin executes Roo Code and starts building your idea. It depends on having the [ionutvmi.vscode-commands-executor](https://marketplace.visualstudio.com/items/?itemName=ionutvmi.vscode-commands-executor) vscode extension installed to talk to Roo Code.
 
 ```yaml
 name: build_idea
