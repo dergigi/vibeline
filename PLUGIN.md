@@ -16,10 +16,9 @@ Plugins can:
 
 ### Basic Structure
 
-Plugins are defined as YAML files in the `plugins` directory. A simple plugin looks like:
+Plugins are defined as YAML files in the `plugins` directory. The plugin name is derived from the filename (without the .yaml extension). A simple plugin looks like:
 
 ```yaml
-name: summary
 description: Generate a concise summary of the transcript
 type: or
 run: always
@@ -36,7 +35,6 @@ prompt: |
 
 | Field | Description |
 |-------|-------------|
-| `name` | Unique identifier for the plugin (used for referencing) |
 | `description` | Brief explanation of what the plugin does |
 | `type` | Comparison type (`and` or `or`) for matching conditions |
 | `run` | When to run the plugin (`always` or `matching`) |
@@ -97,10 +95,9 @@ This allows for post-processing of the generated content or triggering additiona
 
 ## Example Plugins
 
-### Summary Generator
+### Summary Generator (summary.yaml)
 
 ```yaml
-name: summary
 description: Generate a concise summary of the transcript
 type: or
 run: always
@@ -113,10 +110,9 @@ prompt: |
   Summary:
 ```
 
-### Action Item Extractor
+### Action Item Extractor (action_item.yaml)
 
 ```yaml
-name: action_item
 description: Extract action items and todos from the transcript
 type: or
 run: always
@@ -130,10 +126,9 @@ prompt: |
   Each item should start with "- [ ] ".
 ```
 
-### Blog Post Generator with Custom Extension
+### Blog Post Generator with Custom Extension (blog_post.yaml)
 
 ```yaml
-name: blog_post
 description: Generate draft blog posts from transcripts
 type: or
 run: matching
@@ -194,7 +189,7 @@ prompt: |
 To create a new plugin:
 
 1. Create a new YAML file in the `plugins` directory (e.g., `my_plugin.yaml`)
-2. Define the required fields (name, description, type, run, prompt)
+2. Define the required fields (description, type, run, prompt)
 3. Add optional fields as needed (model, output_extension, command)
 4. Design your prompt template with appropriate placeholders
 5. Save the file and restart the application to load the new plugin
@@ -202,7 +197,6 @@ To create a new plugin:
 Example of a custom plugin:
 
 ```yaml
-name: code_snippets
 description: Extract code snippets from the transcript
 type: or
 run: matching
@@ -226,7 +220,7 @@ The `PluginManager` handles plugin loading and management:
 
 1. On initialization, it scans the `plugins` directory for YAML files
 2. Each plugin file is validated for required fields and field values
-3. Valid plugins are instantiated as `Plugin` objects and stored by name
+3. Valid plugins are instantiated as `Plugin` objects and stored by name (derived from filename)
 4. The application can retrieve plugins by name, get all plugins, or get plugins by run type
 
 ## Plugin Validation
