@@ -9,10 +9,10 @@ from dataclasses import dataclass, field
 class Plugin:
     name: str
     description: str
-    model: Optional[str]
-    type: Literal["and", "or"] = field(default="and")  # Default to "and" if not specified
     run: Literal["always", "matching"]  # When to run the plugin
     prompt: str
+    model: Optional[str] = None
+    type: Literal["and", "or"] = field(default="and")  # Default to "and" if not specified
     output_extension: str = field(default=".txt")  # Default to .txt if not specified
     command: Optional[str] = None  # Optional command to run after generation
 
