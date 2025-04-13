@@ -1,0 +1,25 @@
+description: Analyze the emotional tone and sentiment of the transcript
+model: llama3  # Optional, falls back to OLLAMA_MODEL from .env
+type: or  # and, or
+run: always  # always, matching
+prompt: |
+  Please analyze the emotional tone and sentiment of the following transcript using these specific emotion categories:
+
+  1. High Energy Pleasant:
+  - Alert, Alive, Absorbed, Accomplished, Adoring, Attentive, Buoyant, Challenged, Chatty, Cheerful, Competent, Confident, Curious, Determined, Delighted, Desire, Eager, Ecstatic, Elated, Empowered, Enchanted, Encouraged, Energized, Engaged, Engrossed
+
+  2. Low Energy Pleasant:
+  - Accepted, Affectionate, Appreciated, At Ease, Balanced, Blessed, Blissful, Calm, Carefree, Chill, Clear, Comfortable, Compassionate, Connected, Contemplative, Content, Copacetic, Fulfilled
+
+  3. Low Energy Unpleasant:
+  - Abandoned, Alienated, Apathetic, Ashamed, Avoidant, Bereft, Betrayed, Bleh, Blue, Bored, Brooding, Burdened, Burned Out, Cancelled, Crushed, Dead Inside, Defeated, Deficient, Dejected, Desolate, Despair, Disappointed, Disconnected, Discontented, Discouraged, Disenchanted, Disengaged, Disgruntled, Disgusted, Disheartened, Disillusioned, Dispirited, Disrespected, Dissatisfied, Empty, Forlorn, Fragile
+
+  4. High Energy Unpleasant:
+  - Afraid, Agitated, Alarmed, Ambivalent, Angry, Anguished, Annoyed, Anxious, Apprehensive, Astonished, Confused, Contempt, Conflicted, Concerned, Discombobulated, Discomfort, Distracted, Distressed, Dread, Dumbfounded, Dysregulated, Embarrassed, Frazzled, Frightened, Frozen, Frustrated, Furious
+
+  For each category, identify which emotions are present and provide specific examples from the transcript that demonstrate these emotions. Also note any shifts between categories throughout the transcript.
+
+  Transcript:
+  {transcript}
+
+  Sentiment Analysis: 
