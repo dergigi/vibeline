@@ -28,8 +28,12 @@ class PluginManager:
             with open(plugin_file, 'r', encoding='utf-8') as f:
                 data = yaml.safe_load(f)
                 
+                # Use filename (without .yaml) as name if not provided
+                if 'name' not in data:
+                    data['name'] = plugin_file.stem
+                
                 # Validate required fields
-                required_fields = ['name', 'description', 'type', 'run', 'prompt']
+                required_fields = ['description', 'type', 'run', 'prompt']
                 for field in required_fields:
                     if field not in data:
                         raise ValueError(f"Plugin {plugin_file} is missing required field: {field}")
