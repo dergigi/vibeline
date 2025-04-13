@@ -50,10 +50,10 @@ class PluginManager:
                 plugin = Plugin(
                     name=data['name'],
                     description=data['description'],
-                    model=data.get('model'),  # Optional
-                    type=data.get('type', 'and'),  # Default to 'and' if not specified
                     run=data['run'],
                     prompt=data['prompt'],
+                    model=data.get('model'),  # Optional
+                    type=data.get('type', 'and'),  # Default to 'and' if not specified
                     output_extension=data.get('output_extension', '.txt'),  # Default to .txt
                     command=data.get('command') # Get the command if present
                 )
