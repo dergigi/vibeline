@@ -1,5 +1,4 @@
 description: Generate a concise summary of the transcript
-model: llama3  # Optional, falls back to OLLAMA_MODEL from .env
 run: always  # always, matching
 prompt: |
   Please provide a short, 2-3 sentence summary of the following transcript. The summary should never be longer than a single paragraph. Don't add anything else, don't add a headline or a "Summary:" or any other sentence or anything. I just want the summary. 2-3 sentences. One paragraph MAX.

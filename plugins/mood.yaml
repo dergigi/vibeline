@@ -1,5 +1,4 @@
 description: Analyze the emotional tone and sentiment of the transcript
-model: llama3  # Optional, falls back to OLLAMA_MODEL from .env
 run: always  # always, matching
 prompt: |
   Please analyze the emotional tone and sentiment of the following transcript using these specific emotion categories:

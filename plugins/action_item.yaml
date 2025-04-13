@@ -1,5 +1,4 @@
 description: Extract action items and todos from the transcript
-model: llama3  # Optional, falls back to OLLAMA_MODEL from .env
 run: always  # always, matching
 prompt: |
   You are a task extraction specialist. Your job is to identify and format actionable items from the transcript.
