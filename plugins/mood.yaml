@@ -3,13 +3,21 @@ model: llama3  # Optional, falls back to OLLAMA_MODEL from .env
 type: or  # and, or
 run: always  # always, matching
 prompt: |
-  Please analyze the emotional tone and sentiment of the following transcript. Provide a brief analysis that includes:
-  1. The overall sentiment (positive, negative, or neutral)
-  2. The primary emotions expressed
-  3. Any notable shifts in emotional tone
-  4. The intensity level of the emotions (mild, moderate, strong)
+  Please analyze the emotional tone and sentiment of the following transcript using these specific emotion categories:
 
-  Keep the analysis concise and focused on the emotional aspects. Format the response as a clear, structured analysis.
+  1. High Energy Pleasant (Yellow):
+  - Alert, Alive, Absorbed, Accomplished, Adoring, Attentive, Buoyant, Challenged, Chatty, Cheerful, Competent, Confident, Curious, Determined, Delighted, Desire, Eager, Ecstatic, Elated, Empowered, Enchanted, Encouraged, Energized, Engaged, Engrossed
+
+  2. Low Energy Pleasant (Green):
+  - Accepted, Affectionate, Appreciated, At Ease, Balanced, Blessed, Blissful, Calm, Carefree, Chill, Clear, Comfortable, Compassionate, Connected, Contemplative, Content, Copacetic, Fulfilled
+
+  3. Low Energy Unpleasant (Blue):
+  - Abandoned, Alienated, Apathetic, Ashamed, Avoidant, Bereft, Betrayed, Bleh, Blue, Bored, Brooding, Burdened, Burned Out, Cancelled, Crushed, Dead Inside, Defeated, Deficient, Dejected, Desolate, Despair, Disappointed, Disconnected, Discontented, Discouraged, Disenchanted, Disengaged, Disgruntled, Disgusted, Disheartened, Disillusioned, Dispirited, Disrespected, Dissatisfied, Empty, Forlorn, Fragile
+
+  4. High Energy Unpleasant (Red):
+  - Afraid, Agitated, Alarmed, Ambivalent, Angry, Anguished, Annoyed, Anxious, Apprehensive, Astonished, Confused, Contempt, Conflicted, Concerned, Discombobulated, Discomfort, Distracted, Distressed, Dread, Dumbfounded, Dysregulated, Embarrassed, Frazzled, Frightened, Frozen, Frustrated, Furious
+
+  For each category, identify which emotions are present and provide specific examples from the transcript that demonstrate these emotions. Also note any shifts between categories throughout the transcript.
 
   Transcript:
   {transcript}
