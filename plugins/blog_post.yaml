@@ -1,6 +1,6 @@
 description: Generate draft blog posts from transcripts
 model: llama3  # Optional, falls back to OLLAMA_MODEL from .env
-type: or  # and, or
+type: and  # Optional, defaults to and. Ignored when run is always
 run: matching  # always, matching
 output_extension: .md  # Explicitly set markdown extension
 prompt: |

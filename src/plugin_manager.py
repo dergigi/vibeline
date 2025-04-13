@@ -10,7 +10,7 @@ class Plugin:
     name: str
     description: str
     model: Optional[str]
-    type: Literal["and", "or"]  # Comparison type for matching
+    type: Literal["and", "or"] = field(default="and")  # Default to "and" if not specified
     run: Literal["always", "matching"]  # When to run the plugin
     prompt: str
     output_extension: str = field(default=".txt")  # Default to .txt if not specified
@@ -33,23 +33,25 @@ class PluginManager:
                     data['name'] = plugin_file.stem
                 
                 # Validate required fields
-                required_fields = ['description', 'type', 'run', 'prompt']
+                required_fields = ['description', 'run', 'prompt']
                 for field in required_fields:
                     if field not in data:
                         raise ValueError(f"Plugin {plugin_file} is missing required field: {field}")
                 
-                # Validate type and run fields
-                if data['type'] not in ['and', 'or']:
-                    raise ValueError(f"Plugin {plugin_file} has invalid type: {data['type']}. Must be 'and' or 'or'")
+                # Validate run field
                 if data['run'] not in ['always', 'matching']:
                     raise ValueError(f"Plugin {plugin_file} has invalid run value: {data['run']}. Must be 'always' or 'matching'")
+                
+                # Validate type field if present
+                if 'type' in data and data['type'] not in ['and', 'or']:
+                    raise ValueError(f"Plugin {plugin_file} has invalid type: {data['type']}. Must be 'and' or 'or'")
                 
                 # Create Plugin instance
                 plugin = Plugin(
                     name=data['name'],
                     description=data['description'],
                     model=data.get('model'),  # Optional
-                    type=data['type'],
+                    type=data.get('type', 'and'),  # Default to 'and' if not specified
                     run=data['run'],
                     prompt=data['prompt'],
                     output_extension=data.get('output_extension', '.txt'),  # Default to .txt

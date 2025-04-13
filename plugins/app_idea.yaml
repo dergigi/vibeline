@@ -1,6 +1,6 @@
 description: Generate detailed app idea specifications from transcripts
 model: llama3  # Optional, falls back to OLLAMA_MODEL from .env
-type: or  # and, or
+type: and  # Optional, defaults to and. Ignored when run is always
 run: matching  # always, matching
 prompt: |
   Based on the following transcript and its summary, create a detailed app idea specification. The specification should include:

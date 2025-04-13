@@ -20,7 +20,6 @@ Plugins are defined as YAML files in the `plugins` directory. The plugin name is
 
 ```yaml
 description: Generate a concise summary of the transcript
-type: or
 run: always
 prompt: |
   Please provide a short, 2-3 sentence summary of the following transcript.
@@ -36,7 +35,6 @@ prompt: |
 | Field | Description |
 |-------|-------------|
 | `description` | Brief explanation of what the plugin does |
-| `type` | Comparison type (`and` or `or`) for matching conditions |
 | `run` | When to run the plugin (`always` or `matching`) |
 | `prompt` | Template used for text generation with placeholders |
 
@@ -45,6 +43,7 @@ prompt: |
 | Field | Description | Default Value |
 |-------|-------------|---------------|
 | `model` | Specific language model to use | System default |
+| `type` | Comparison type (`and` or `or`) for matching conditions | `and` |
 | `output_extension` | File extension for the output | `.txt` |
 | `command` | Command to execute after generation | None |
 
@@ -52,7 +51,7 @@ prompt: |
 
 ### Type Field
 
-The `type` field determines how the plugin name is matched against the transcript content. The plugin name is derived from the filename (e.g., `blog_post.yaml` becomes `blog_post`), and this name is split into words for matching.
+The `type` field is optional and determines how the plugin name is matched against the transcript content when `run` is set to `matching`. The plugin name is derived from the filename (e.g., `blog_post.yaml` becomes `blog_post`), and this name is split into words for matching.
 
 - `and` (default): All words from the plugin name must be found in the transcript for the plugin to run
   - Example: For `blog_post.yaml`, both "blog" and "post" must appear in the transcript
@@ -61,6 +60,8 @@ The `type` field determines how the plugin name is matched against the transcrip
 - `or`: Only one word from the plugin name needs to be found in the transcript
   - Example: For `blog_post.yaml`, either "blog" or "post" appearing in the transcript is sufficient
   - This is useful for broader, more general plugins
+
+Note: The `type` field is ignored when `run` is set to `always`.
 
 ### Run Field
 
