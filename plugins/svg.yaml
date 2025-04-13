@@ -1,4 +1,3 @@
-name: svg
 description: Generate SVG files based on user descriptions
 model: llama3  # Optional, falls back to OLLAMA_MODEL from .env
 type: and  # and, or

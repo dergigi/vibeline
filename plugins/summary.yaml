@@ -1,4 +1,3 @@
-name: summary
 description: Generate a concise summary of the transcript
 model: llama3  # Optional, falls back to OLLAMA_MODEL from .env
 type: or  # and, or

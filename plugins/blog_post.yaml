@@ -1,4 +1,3 @@
-name: blog_post
 description: Generate draft blog posts from transcripts
 model: llama3  # Optional, falls back to OLLAMA_MODEL from .env
 type: or  # and, or
