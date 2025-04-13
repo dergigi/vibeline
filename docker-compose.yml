@@ -5,7 +5,7 @@ services:
     volumes:
       - ./ollama:/root/.ollama
     environment:
-      - OLLAMA_MODEL=llama2
+      - OLLAMA_MODEL=llama3
 
   vibeline:
     build: .
@@ -14,9 +14,9 @@ services:
     environment:
       OLLAMA_HOST: http://ollama:11434
       VOICE_MEMOS_DIR: /app/VoiceMemos
-      OLLAMA_EXTRACT_MODEL: llama2
-      OLLAMA_SUMMARIZE_MODEL: llama2
-      OLLAMA_DEFAULT_MODEL: llama2
+      OLLAMA_EXTRACT_MODEL: llama3
+      OLLAMA_SUMMARIZE_MODEL: llama3
+      OLLAMA_DEFAULT_MODEL: llama3
       WHISPER_MODEL: base
     depends_on:
       - ollama

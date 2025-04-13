@@ -1,6 +1,6 @@
 name: svg
 description: Generate SVG files based on user descriptions
-model: llama2  # Optional, falls back to OLLAMA_MODEL from .env
+model: llama3  # Optional, falls back to OLLAMA_MODEL from .env
 type: and  # and, or
 run: matching  # always, matching
 output_extension: .svg
