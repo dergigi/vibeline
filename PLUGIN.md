@@ -52,10 +52,15 @@ prompt: |
 
 ### Type Field
 
-The `type` field determines how conditions are evaluated for plugin matching:
+The `type` field determines how the plugin name is matched against the transcript content. The plugin name is derived from the filename (e.g., `blog_post.yaml` becomes `blog_post`), and this name is split into words for matching.
 
-- `and`: All conditions must match for the plugin to be considered applicable
-- `or`: Any condition matching makes the plugin applicable
+- `and` (default): All words from the plugin name must be found in the transcript for the plugin to run
+  - Example: For `blog_post.yaml`, both "blog" and "post" must appear in the transcript
+  - This is useful for more specific, targeted plugins
+
+- `or`: Only one word from the plugin name needs to be found in the transcript
+  - Example: For `blog_post.yaml`, either "blog" or "post" appearing in the transcript is sufficient
+  - This is useful for broader, more general plugins
 
 ### Run Field
 
