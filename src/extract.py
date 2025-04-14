@@ -29,21 +29,44 @@ def determine_active_plugins(text: str, plugins: Dict[str, Plugin]) -> List[str]
     """Determine which plugins should be run on this transcript."""
     active_plugins = set()  # Use a set to avoid duplicates
 
+    print("\nDebug: Checking plugins for activation:")
     for plugin_name, plugin in plugins.items():
+        print(f"\nPlugin: {plugin_name}")
+        print(f"  Run type: {plugin.run}")
+        print(f"  Keywords: {plugin.keywords}")
+        print(f"  Match type: {plugin.match}")
+
         # Always include plugins with run: always
         if plugin.run == "always":
+            print("  Activated: Yes (always run)")
             active_plugins.add(plugin_name)
             continue
 
-        # For matching plugins, check based on type (and/or)
+        # For matching plugins, check based on match type
         if plugin.run == "matching":
-            words = plugin_name.split('_')
-            if plugin.type == "or":
-                if any(re.search(r'\b' + word + r'\b', text.lower()) for word in words):
+            # Use keywords if available, otherwise fall back to plugin name
+            if plugin.keywords:
+                words = plugin.keywords
+                print(f"  Using keywords: {words}")
+            else:
+                # Fall back to splitting plugin name if no keywords defined
+                words = plugin_name.split('_')
+                print(f"  Using plugin name words: {words}")
+                
+            matches = [word for word in words if re.search(r'\b' + word + r'\b', text.lower())]
+            
+            if plugin.match == "any":
+                if matches:
+                    print(f"  Activated: Yes (matched keywords: {matches})")
                     active_plugins.add(plugin_name)
-            else:  # and
-                if all(re.search(r'\b' + word + r'\b', text.lower()) for word in words):
+                else:
+                    print("  Activated: No (no keywords matched)")
+            else:  # all
+                if len(matches) == len(words):
+                    print(f"  Activated: Yes (matched all keywords: {matches})")
                     active_plugins.add(plugin_name)
+                else:
+                    print(f"  Activated: No (only matched: {matches})")
 
     return list(active_plugins)
 

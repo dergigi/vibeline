@@ -43,7 +43,7 @@ prompt: |
 | Field | Description | Default Value |
 |-------|-------------|---------------|
 | `model` | Specific language model to use | System default |
-| `type` | Comparison type (`and` or `or`) for matching conditions | `and` |
+| `match` | How to match keywords (`any` or `all`) | `all` |
 | `output_extension` | File extension for the output | `.txt` |
 | `command` | Command to execute after generation | None |
 | `keywords` | Keywords to trigger the plugin when in `matching` mode | Derived from plugin name |
@@ -69,6 +69,28 @@ If no keywords are specified, they will be automatically derived from the plugin
 - `blog_post.yaml` → keywords: ["blog", "post"]
 - `app_idea.yaml` → keywords: ["app", "idea"]
 - `therapist.yaml` → keywords: ["therapist"]
+
+### Matching Behavior
+
+When a plugin has `run: matching`, its activation depends on the `match` field:
+
+- `match: any` - The plugin will be triggered if ANY of its keywords are found in the text
+- `match: all` - The plugin will be triggered only if ALL of its keywords are found in the text
+
+For example:
+```yaml
+run: matching
+match: any
+keywords: therapy, wife, kids, marriage
+```
+This plugin will be triggered if any of the words "therapy", "wife", "kids", or "marriage" appear in the text.
+
+```yaml
+run: matching
+match: all
+keywords: action, item
+```
+This plugin will only be triggered if both "action" AND "item" appear in the text.
 
 ## Plugin Types and Run Modes
 

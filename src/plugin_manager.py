@@ -12,7 +12,7 @@ class Plugin:
     run: Literal["always", "matching"]  # When to run the plugin
     prompt: str
     model: Optional[str] = None
-    type: Literal["and", "or"] = field(default="and")  # Default to "and" if not specified
+    match: Literal["any", "all"] = field(default="all")  # Default to "all" if not specified
     output_extension: str = field(default=".txt")  # Default to .txt if not specified
     command: Optional[str] = None  # Optional command to run after generation
     keywords: List[str] = field(default_factory=list)  # Keywords for matching
@@ -47,9 +47,21 @@ class PluginManager:
                 if data['run'] not in ['always', 'matching']:
                     raise ValueError(f"Plugin {plugin_file} has invalid run value: {data['run']}. Must be 'always' or 'matching'")
                 
-                # Validate type field if present
-                if 'type' in data and data['type'] not in ['and', 'or']:
-                    raise ValueError(f"Plugin {plugin_file} has invalid type: {data['type']}. Must be 'and' or 'or'")
+                # Validate match field if present (convert old 'type' field if present)
+                match_value = None
+                if 'match' in data:
+                    if data['match'] not in ['any', 'all']:
+                        raise ValueError(f"Plugin {plugin_file} has invalid match value: {data['match']}. Must be 'any' or 'all'")
+                    match_value = data['match']
+                elif 'type' in data:
+                    # Convert old type value to new match value
+                    old_type = data['type']
+                    if old_type == 'or':
+                        match_value = 'any'
+                    elif old_type == 'and':
+                        match_value = 'all'
+                    else:
+                        raise ValueError(f"Plugin {plugin_file} has invalid type: {old_type}. Must be 'and' or 'or'")
                 
                 # Handle keywords
                 keywords = []
@@ -71,7 +83,7 @@ class PluginManager:
                     run=data['run'],
                     prompt=data['prompt'],
                     model=data.get('model'),  # Optional
-                    type=data.get('type', 'and'),  # Default to 'and' if not specified
+                    match=match_value or 'all',  # Default to 'all' if not specified
                     output_extension=data.get('output_extension', '.txt'),  # Default to .txt
                     command=data.get('command'),  # Get the command if present
                     keywords=keywords  # Add keywords
