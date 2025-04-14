@@ -2,7 +2,7 @@
 
 from pathlib import Path
 import yaml
-from typing import Dict, Optional, Literal
+from typing import Dict, Optional, Literal, List
 from dataclasses import dataclass, field
 
 @dataclass
@@ -15,12 +15,17 @@ class Plugin:
     type: Literal["and", "or"] = field(default="and")  # Default to "and" if not specified
     output_extension: str = field(default=".txt")  # Default to .txt if not specified
     command: Optional[str] = None  # Optional command to run after generation
+    keywords: List[str] = field(default_factory=list)  # Keywords for matching
 
 class PluginManager:
     def __init__(self, plugin_dir: Path):
         self.plugin_dir = plugin_dir
         self.plugins: Dict[str, Plugin] = {}
         self.load_plugins()
+
+    def _derive_keywords_from_name(self, name: str) -> List[str]:
+        """Derive keywords from plugin name by splitting on underscores."""
+        return [word.lower() for word in name.split('_')]
 
     def load_plugins(self) -> None:
         """Load all YAML plugins from the plugin directory."""
@@ -46,6 +51,19 @@ class PluginManager:
                 if 'type' in data and data['type'] not in ['and', 'or']:
                     raise ValueError(f"Plugin {plugin_file} has invalid type: {data['type']}. Must be 'and' or 'or'")
                 
+                # Handle keywords
+                keywords = []
+                if 'keywords' in data:
+                    # If keywords are provided as a comma-separated string, split them
+                    if isinstance(data['keywords'], str):
+                        keywords = [k.strip() for k in data['keywords'].split(',')]
+                    # If keywords are provided as a list, use them directly
+                    elif isinstance(data['keywords'], list):
+                        keywords = data['keywords']
+                else:
+                    # If no keywords provided, derive them from the plugin name
+                    keywords = self._derive_keywords_from_name(data['name'])
+                
                 # Create Plugin instance
                 plugin = Plugin(
                     name=data['name'],
@@ -55,7 +73,8 @@ class PluginManager:
                     model=data.get('model'),  # Optional
                     type=data.get('type', 'and'),  # Default to 'and' if not specified
                     output_extension=data.get('output_extension', '.txt'),  # Default to .txt
-                    command=data.get('command') # Get the command if present
+                    command=data.get('command'),  # Get the command if present
+                    keywords=keywords  # Add keywords
                 )
                 
                 self.plugins[plugin.name] = plugin

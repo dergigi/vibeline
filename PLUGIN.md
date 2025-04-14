@@ -46,6 +46,29 @@ prompt: |
 | `type` | Comparison type (`and` or `or`) for matching conditions | `and` |
 | `output_extension` | File extension for the output | `.txt` |
 | `command` | Command to execute after generation | None |
+| `keywords` | Keywords to trigger the plugin when in `matching` mode | Derived from plugin name |
+
+### Keywords
+
+The `keywords` field is used to determine when a plugin should be triggered in `matching` mode. It can be specified in two ways:
+
+1. As a comma-separated string:
+```yaml
+keywords: blog, post, article
+```
+
+2. As a list:
+```yaml
+keywords:
+  - blog
+  - post
+  - article
+```
+
+If no keywords are specified, they will be automatically derived from the plugin name by splitting on underscores. For example:
+- `blog_post.yaml` → keywords: ["blog", "post"]
+- `app_idea.yaml` → keywords: ["app", "idea"]
+- `therapist.yaml` → keywords: ["therapist"]
 
 ## Plugin Types and Run Modes
 
