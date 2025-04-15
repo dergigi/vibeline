@@ -62,29 +62,75 @@ class TranscriptCleaner:
                 
         return re.sub(pattern, replace_match, text, flags=re.IGNORECASE)
     
+    def _extract_transcript_from_response(self, response_text: str, original_text: str) -> str:
+        """
+        Extract only the transcript part from the LLM response.
+        This is a fallback in case the LLM includes instructions in its response.
+        """
+        # If the response contains the original text verbatim, it's likely the LLM
+        # included the original text as part of its response
+        if original_text in response_text:
+            # Extract just the part that contains the original text and any corrections
+            return original_text
+            
+        # Look for common markers that might indicate the start of the transcript
+        markers = [
+            "Here is the corrected transcript:",
+            "Corrected transcript:",
+            "Transcript:",
+            "Here's the corrected text:"
+        ]
+        
+        for marker in markers:
+            if marker in response_text:
+                # Extract everything after the marker
+                parts = response_text.split(marker, 1)
+                if len(parts) > 1:
+                    return parts[1].strip()
+        
+        # If we can't find any markers, just return the response as is
+        # but remove any lines that look like instructions
+        lines = response_text.splitlines()
+        cleaned_lines = []
+        for line in lines:
+            # Skip lines that look like instructions or explanations
+            if any(keyword in line.lower() for keyword in ["correct", "replace", "focus", "task", "instruction"]):
+                continue
+            cleaned_lines.append(line)
+        
+        # If we filtered out all lines, return the original response
+        if not cleaned_lines:
+            return response_text
+            
+        return "\n".join(cleaned_lines)
+    
     def _apply_model_corrections(self, text: str) -> str:
         """Use an LLM to apply context-aware corrections."""
         if not self.model:
             return text
             
         # Create a prompt that includes the vocabulary and the transcript
-        corrections_list = "\n".join([f"- '{incorrect}' should be '{correct}'" 
+        corrections_list = "\n".join([f"- '{incorrect}' should be '{correct}'"
                                      for incorrect, correct in self.corrections.items()])
         
         prompt = f"""
-        You are a transcript correction assistant. Your task is to correct common transcription errors 
+        You are a transcript correction assistant. Your task is to correct common transcription errors
         in the following text while preserving the original meaning and style.
         
         Please focus on correcting these specific words or phrases:
         {corrections_list}
         
-        Only correct these specific words or phrases when they appear in the transcript. 
-        Do not make any other changes to the text. Preserve all punctuation, capitalization, 
+        Only correct these specific words or phrases when they appear in the transcript.
+        Do not make any other changes to the text. Preserve all punctuation, capitalization,
         and formatting except when correcting the specified words.
         
         Here is the transcript to correct:
         
         {text}
+        
+        IMPORTANT: Your response must ONLY contain the corrected transcript text.
+        DO NOT include any explanations, instructions, or the list of corrections in your response.
+        DO NOT repeat these instructions in your output.
         """
         
         response = ollama.chat(model=self.model, messages=[
@@ -94,7 +140,12 @@ class TranscriptCleaner:
             }
         ])
         
-        return response['message']['content'].strip()
+        response_text = response['message']['content'].strip()
+        
+        # Process the response to extract only the transcript part
+        cleaned_response = self._extract_transcript_from_response(response_text, text)
+        
+        return cleaned_response
     
     def clean_transcript(self, text: str) -> Tuple[str, List[Dict]]:
         """
