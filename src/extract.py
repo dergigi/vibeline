@@ -87,7 +87,6 @@ def main():
     parser.add_argument('transcript_file', help='The transcript file to process')
     parser.add_argument('-f', '--force', action='store_true', help='Force overwrite existing output files')
     parser.add_argument('--no-clean', action='store_true', help='Skip transcript cleaning step')
-    parser.add_argument('--no-model-clean', action='store_true', help='Use only direct replacements for cleaning (no LLM)')
     args = parser.parse_args()
 
     # Ensure the default model exists

@@ -127,12 +127,3 @@ class TranscriptCleaner:
                     })
         
         return cleaned_text, corrections_made
-
-
-def ensure_model_exists(model_name: str) -> None:
-    """
-    This function is kept for backward compatibility but does nothing
-    since we no longer use LLMs for transcript cleaning.
-    """
-    # No-op function
-    pass

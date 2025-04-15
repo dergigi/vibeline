@@ -65,20 +65,12 @@ To use this feature:
 ```
 # Format: incorrect_word -> correct_word
 Noster -> Nostr
-Etherium -> Ethereum
 ```
 
 2. The transcript cleaner will automatically run as part of the extraction process.
 
 3. You can customize the behavior with these options:
    - `--no-clean`: Skip the transcript cleaning step entirely
-   - `--no-model-clean`: Use only direct word replacements without the LLM model
-
-4. Configure the model used for cleaning in your `.env` file:
-```
-TRANSCRIPT_CLEANER_MODEL=tinyllama
-VOCABULARY_FILE=VOCABULARY.txt
-```
 
 ## Contributors
 
