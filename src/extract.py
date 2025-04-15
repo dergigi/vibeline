@@ -11,6 +11,7 @@ import inflect
 from typing import List, Dict
 from dotenv import load_dotenv
 from plugin_manager import PluginManager, Plugin
+from transcript_cleaner import TranscriptCleaner, ensure_model_exists
 
 # Load environment variables
 load_dotenv()
@@ -21,6 +22,8 @@ p = inflect.engine()
 # Configuration from environment variables
 OLLAMA_MODEL = os.getenv("OLLAMA_EXTRACT_MODEL", "llama2")
 VOICE_MEMOS_DIR = os.getenv("VOICE_MEMOS_DIR", "VoiceMemos")
+TRANSCRIPT_CLEANER_MODEL = os.getenv("TRANSCRIPT_CLEANER_MODEL", OLLAMA_MODEL)
+VOCABULARY_FILE = os.getenv("VOCABULARY_FILE", "VOCABULARY.txt")
 
 # Set a different host (default is http://localhost:11434)
 ollama.host = os.getenv("OLLAMA_HOST", "http://localhost:11434")
@@ -84,10 +87,16 @@ def main():
     parser = argparse.ArgumentParser(description='Extract content from transcripts using plugins.')
     parser.add_argument('transcript_file', help='The transcript file to process')
     parser.add_argument('-f', '--force', action='store_true', help='Force overwrite existing output files')
+    parser.add_argument('--no-clean', action='store_true', help='Skip transcript cleaning step')
+    parser.add_argument('--no-model-clean', action='store_true', help='Use only direct replacements for cleaning (no LLM)')
     args = parser.parse_args()
 
     # Ensure the default model exists
     ensure_model_exists(OLLAMA_MODEL)
+    
+    # If we're using a model for transcript cleaning, ensure it exists
+    if not args.no_clean and not args.no_model_clean:
+        ensure_model_exists(TRANSCRIPT_CLEANER_MODEL)
 
     input_file = Path(args.transcript_file)
     if not input_file.exists():
@@ -118,7 +127,43 @@ def main():
 
     # Read transcript
     with open(input_file, 'r', encoding='utf-8') as f:
-        transcript_text = f.read()
+        original_transcript_text = f.read()
+    
+    # Clean transcript if not disabled
+    if not args.no_clean:
+        print("Cleaning transcript...")
+        
+        # Initialize transcript cleaner
+        vocabulary_path = Path(VOCABULARY_FILE)
+        if not vocabulary_path.exists():
+            print(f"Warning: Vocabulary file {VOCABULARY_FILE} not found. Creating a default one.")
+            with open(vocabulary_path, 'w', encoding='utf-8') as f:
+                f.write("# Vocabulary file for transcript corrections\n")
+                f.write("# Format: incorrect_word -> correct_word\n\n")
+                f.write("# Example:\n")
+                f.write("# Noster -> Nostr\n")
+        
+        # Use model for cleaning if not disabled
+        model = None if args.no_model_clean else TRANSCRIPT_CLEANER_MODEL
+        cleaner = TranscriptCleaner(vocabulary_file=vocabulary_path, model=model)
+        
+        # Clean the transcript
+        transcript_text, corrections = cleaner.clean_transcript(original_transcript_text)
+        
+        # Log corrections
+        if corrections:
+            print(f"Made {len(corrections)} corrections to the transcript.")
+            
+            # Save cleaned transcript
+            cleaned_file = input_file.parent / f"{input_file.stem}_cleaned.txt"
+            with open(cleaned_file, 'w', encoding='utf-8') as f:
+                f.write(transcript_text)
+            print(f"Cleaned transcript saved to: {cleaned_file}")
+        else:
+            print("No corrections needed for this transcript.")
+            transcript_text = original_transcript_text
+    else:
+        transcript_text = original_transcript_text
 
     # Read summary if it exists
     summary_file = input_file.parent / f"{input_file.stem}_summary.txt"
