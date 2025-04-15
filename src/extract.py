@@ -11,7 +11,7 @@ import inflect
 from typing import List, Dict
 from dotenv import load_dotenv
 from plugin_manager import PluginManager, Plugin
-from transcript_cleaner import TranscriptCleaner, ensure_model_exists
+from transcript_cleaner import TranscriptCleaner
 
 # Load environment variables
 load_dotenv()
@@ -127,33 +127,34 @@ def main():
     if not args.no_clean:
         print("Cleaning transcript...")
         
-        # Initialize transcript cleaner
+        # Check if vocabulary file exists
         vocabulary_path = Path(VOCABULARY_FILE)
         if not vocabulary_path.exists():
-            print(f"Warning: Vocabulary file {VOCABULARY_FILE} not found. Creating a default one.")
-            with open(vocabulary_path, 'w', encoding='utf-8') as f:
-                f.write("# Vocabulary file for transcript corrections\n")
-                f.write("# Format: incorrect_word -> correct_word\n\n")
-                f.write("# Example:\n")
-                f.write("# Noster -> Nostr\n")
-        
-        cleaner = TranscriptCleaner(vocabulary_file=vocabulary_path)
-        
-        # Clean the transcript
-        transcript_text, corrections = cleaner.clean_transcript(original_transcript_text)
-        
-        # Log corrections
-        if corrections:
-            print(f"Made {len(corrections)} corrections to the transcript.")
-            
-            # Save cleaned transcript
-            cleaned_file = input_file.parent / f"{input_file.stem}_cleaned.txt"
-            with open(cleaned_file, 'w', encoding='utf-8') as f:
-                f.write(transcript_text)
-            print(f"Cleaned transcript saved to: {cleaned_file}")
-        else:
-            print("No corrections needed for this transcript.")
+            print(f"Warning: Vocabulary file {VOCABULARY_FILE} not found. Skipping transcript cleaning.")
             transcript_text = original_transcript_text
+        else:
+            # Initialize transcript cleaner and clean the transcript
+            cleaner = TranscriptCleaner(vocabulary_file=vocabulary_path)
+            transcript_text, corrections = cleaner.clean_transcript(original_transcript_text)
+            
+            # Log corrections
+            if corrections:
+                print(f"Made {len(corrections)} corrections to the transcript.")
+
+                # List the corrections made
+                for i, correction in enumerate(corrections, 1):
+                    print(f"{i}. Line {correction['line']}:")
+                    print(f"   Original: {correction['original']}")
+                    print(f"   Corrected: {correction['corrected']}")
+                
+                # Save cleaned transcript
+                cleaned_file = input_file.parent / f"{input_file.stem}_cleaned.txt"
+                with open(cleaned_file, 'w', encoding='utf-8') as f:
+                    f.write(transcript_text)
+                print(f"Cleaned transcript saved to: {cleaned_file}")
+            else:
+                print("No corrections needed for this transcript.")
+                transcript_text = original_transcript_text
     else:
         transcript_text = original_transcript_text
 
