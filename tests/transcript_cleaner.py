@@ -7,14 +7,12 @@ from dotenv import load_dotenv
 
 # Add the src directory to the Python path
 sys.path.append(str(Path(__file__).parent))
-from src.transcript_cleaner import TranscriptCleaner, ensure_model_exists
+from src.transcript_cleaner import TranscriptCleaner
 
 # Load environment variables
 load_dotenv()
 
 def main():
-    # Get model from environment or use default
-    model = os.getenv("TRANSCRIPT_CLEANER_MODEL", "tinyllama")
     vocabulary_file = Path(os.getenv("VOCABULARY_FILE", "VOCABULARY.txt"))
     
     # Check if vocabulary file exists
@@ -50,14 +48,7 @@ def main():
         print(f"Cleaning text: {text}")
     
     # Initialize the transcript cleaner
-    use_model = "--no-model" not in sys.argv
-    if use_model:
-        print(f"Using model: {model}")
-        ensure_model_exists(model)
-        cleaner = TranscriptCleaner(vocabulary_file=vocabulary_file, model=model)
-    else:
-        print("Using only direct replacements (no model)")
-        cleaner = TranscriptCleaner(vocabulary_file=vocabulary_file)
+    cleaner = TranscriptCleaner(vocabulary_file=vocabulary_file)
     
     # Clean the transcript
     cleaned_text, corrections = cleaner.clean_transcript(text)

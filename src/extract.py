@@ -22,7 +22,6 @@ p = inflect.engine()
 # Configuration from environment variables
 OLLAMA_MODEL = os.getenv("OLLAMA_EXTRACT_MODEL", "llama2")
 VOICE_MEMOS_DIR = os.getenv("VOICE_MEMOS_DIR", "VoiceMemos")
-TRANSCRIPT_CLEANER_MODEL = os.getenv("TRANSCRIPT_CLEANER_MODEL", OLLAMA_MODEL)
 VOCABULARY_FILE = os.getenv("VOCABULARY_FILE", "VOCABULARY.txt")
 
 # Set a different host (default is http://localhost:11434)
@@ -94,10 +93,6 @@ def main():
     # Ensure the default model exists
     ensure_model_exists(OLLAMA_MODEL)
     
-    # If we're using a model for transcript cleaning, ensure it exists
-    if not args.no_clean and not args.no_model_clean:
-        ensure_model_exists(TRANSCRIPT_CLEANER_MODEL)
-
     input_file = Path(args.transcript_file)
     if not input_file.exists():
         print(f"Error: File {input_file} does not exist")
@@ -143,9 +138,7 @@ def main():
                 f.write("# Example:\n")
                 f.write("# Noster -> Nostr\n")
         
-        # Use model for cleaning if not disabled
-        model = None if args.no_model_clean else TRANSCRIPT_CLEANER_MODEL
-        cleaner = TranscriptCleaner(vocabulary_file=vocabulary_path, model=model)
+        cleaner = TranscriptCleaner(vocabulary_file=vocabulary_path)
         
         # Clean the transcript
         transcript_text, corrections = cleaner.clean_transcript(original_transcript_text)
