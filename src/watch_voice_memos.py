@@ -4,10 +4,10 @@ import os
 import time
 import subprocess
 import argparse
+import logging
 from pathlib import Path
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-import logging
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -16,17 +16,14 @@ load_dotenv()
 # Configuration from environment variables
 VOICE_MEMOS_DIR = os.getenv("VOICE_MEMOS_DIR", "VoiceMemos")
 
-# Set up logging with more detailed formatting
+# Set up logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S',
-    handlers=[
-        logging.StreamHandler()
-    ]
+    datefmt='%Y-%m-%d %H:%M:%S'
 )
 
-logger = logging.getLogger('voice_memo_watcher')
+logger = logging.getLogger(__name__)
 
 def count_words(text: str) -> int:
     """Count the number of words in a text string."""
@@ -109,61 +106,6 @@ def watch_voice_memos() -> None:
     except Exception as e:
         logger.error(f"Unexpected error in watcher: {e}")
         raise  # Re-raise the exception after logging
-
-def main():
-    # Set up argument parser
-    parser = argparse.ArgumentParser(description='Watch for voice memos and process them')
-    parser.add_argument('-f', '--force', action='store_true',
-                      help='Force regeneration of existing files')
-    args = parser.parse_args()
-
-    # Set up directory paths
-    base_dir = Path(__file__).parent.parent
-    voice_memos_dir = base_dir / VOICE_MEMOS_DIR
-    transcript_dir = voice_memos_dir / "transcripts"
-    summary_dir = voice_memos_dir / "summaries"
-
-    # Print debug info about symlinks
-    print("\nDirectory information:")
-    print(f"Voice memo dir: {voice_memos_dir}")
-    print(f"Is symlink: {voice_memos_dir.is_symlink()}")
-    if voice_memos_dir.is_symlink():
-        print(f"Resolves to: {voice_memos_dir.resolve()}")
-
-    # Verify directories exist
-    if not voice_memos_dir.exists():
-        print(f"Error: {voice_memos_dir} directory does not exist")
-        sys.exit(1)
-    if not transcript_dir.exists():
-        print(f"Error: {transcript_dir} directory does not exist")
-        sys.exit(1)
-    if not summary_dir.exists():
-        print(f"Error: {summary_dir} directory does not exist")
-        sys.exit(1)
-
-    # Set up event handler and observer
-    event_handler = VoiceMemoHandler(voice_memos_dir, transcript_dir, summary_dir, force=args.force)
-    observer = Observer()
-
-    # Watch voice memo directory only (we'll handle transcripts immediately after creation)
-    observer.schedule(event_handler, str(voice_memos_dir.resolve()), recursive=False)
-
-    # Start the observer
-    observer.start()
-    print(f"\nWatching for changes in:")
-    print(f"- Voice memos: {voice_memos_dir.resolve()}")
-    if args.force:
-        print("Force mode enabled - will regenerate existing files")
-    print("\nPress Ctrl+C to stop...")
-
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        observer.stop()
-        print("\nStopping file watcher...")
-
-    observer.join()
 
 if __name__ == "__main__":
     try:

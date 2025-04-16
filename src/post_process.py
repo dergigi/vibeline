@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 
-import os
-import re
+import sys
 import argparse
+import logging
 from pathlib import Path
-from typing import List, Dict
-from datetime import datetime
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -14,52 +12,26 @@ load_dotenv()
 # Configuration from environment variables
 VOICE_MEMOS_DIR = os.getenv("VOICE_MEMOS_DIR", "VoiceMemos")
 
-def extract_action_items(content: str) -> List[str]:
-    """Extract action items from content, cleaning up any non-letter characters from the beginning."""
+# Set up logging
+logger = logging.getLogger(__name__)
+
+def extract_action_items(content: str) -> list:
+    """Extract action items from the content."""
     items = []
     for line in content.split('\n'):
-        # Skip empty lines, headers, and lines starting with whitespace
-        if not line.strip() or line.strip().startswith(('Here are', 'Rules were', 'No action items')) or line.startswith((' ', '\t')):
-            continue
-
-        # Match lines that start with any list marker (-, *, +)
-        if re.match(r'^\s*[-*+]', line):
-            # Find the first letter in the line
-            match = re.search(r'[a-zA-Z]', line)
-            if match:
-                item = line[match.start():].strip()
-                if item and not item.startswith('#'):  # Skip headers
-                    # Remove any trailing "(no deadline or priority mentioned)"
-                    item = re.sub(r'\s*\(no deadline or priority mentioned\)$', '', item)
-                    items.append(item)
+        line = line.strip()
+        if line.startswith('- [ ]'):
+            items.append(line)
     return items
 
-def format_action_items(items: List[str], filename: str) -> str:
-    """Format action items in markdown checkbox format with consistent - [ ] prefix.
-    Uses the filename (timestamp) to create a human-readable header."""
+def format_action_items(items: list, source: str) -> str:
+    """Format action items with source information."""
     if not items:
-        return "# No items found\n"
-
-    # Extract date and time from filename (format: YYYYMMDD_HHMMSS.txt)
-    date_str = filename.split('.')[0]  # Remove .txt extension
-    year = int(date_str[:4])
-    month = int(date_str[4:6])
-    day = int(date_str[6:8])
-    hour = int(date_str[9:11])
-    minute = int(date_str[11:13])
-
-    # Create datetime object and format it
-    dt = datetime(year, month, day, hour, minute)
-    formatted = f"# {dt.strftime('%a %b %d @ %I:%M %p')}\n\n"
-
+        return ""
+    
+    formatted = f"# Action Items from {source}\n\n"
     for item in items:
-        # Ensure each item starts with a capital letter
-        item = item[0].upper() + item[1:] if item else item
-        # Ensure each item ends with a period
-        if not item.endswith(('.', '!', '?')):
-            item += '.'
-        formatted += f"- [ ] {item}\n"
-
+        formatted += f"{item}\n"
     return formatted
 
 def main():
@@ -77,17 +49,17 @@ def main():
     todos_dir.mkdir(parents=True, exist_ok=True)
 
     if not action_items_dir.exists():
-        print("No action items directory found")
+        logger.error("No action items directory found")
         return
 
     # Process each action items file
     for action_file in action_items_dir.glob("*.txt"):
-        print(f"Processing {action_file.name}...")
+        logger.info(f"Processing {action_file.name}...")
 
         # Check if output file already exists
         formatted_file = todos_dir / f"{action_file.stem}.md"
         if formatted_file.exists() and not args.force:
-            print(f"  Skipping: {formatted_file} already exists")
+            logger.info(f"Skipping: {formatted_file} already exists")
             continue
 
         # Read the action items
@@ -99,7 +71,7 @@ def main():
 
         # Skip if no items found
         if not items:
-            print(f"  No action items found in {action_file.name}")
+            logger.info(f"No action items found in {action_file.name}")
             continue
 
         formatted_content = format_action_items(items, action_file.stem)
@@ -108,7 +80,7 @@ def main():
         with open(formatted_file, 'w', encoding='utf-8') as f:
             f.write(formatted_content)
 
-        print(f"  Formatted content saved to: {formatted_file}")
+        logger.info(f"Formatted content saved to: {formatted_file}")
 
 if __name__ == "__main__":
     main()
