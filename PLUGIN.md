@@ -81,9 +81,9 @@ For example:
 ```yaml
 run: matching
 match: any
-keywords: therapy, wife, kids, marriage
+keywords: svg, graphic, logo, illustration
 ```
-This plugin will be triggered if any of the words "therapy", "wife", "kids", or "marriage" appear in the text.
+This plugin will be triggered if any of the words "svg", "graphic", "logo", or "illustration" appear in the text.
 
 ```yaml
 run: matching
@@ -199,18 +199,38 @@ prompt: |
 ### SVG Generator with Custom Extension
 
 ```yaml
-name: svg
 description: Generate SVG files based on user descriptions
-type: and
-run: matching
+type: any  # and, or
+run: matching  # always, matching
+keywords: svg, graphic, logo, illustration
 output_extension: .svg
 prompt: |
-  You are an SVG generation specialist. Create an SVG file that matches the description.
-  
+  You are an SVG generation specialist. Your job is to create SVG files based on user descriptions.
+
   User request:
   {transcript}
-  
-  Please generate a valid SVG file with proper XML formatting.
+
+  Please generate a valid SVG file that matches the user's description. The SVG should:
+  1. Be well-formed and valid XML
+  2. Include proper SVG namespace and viewBox
+  3. Be optimized for web use
+  4. Use appropriate SVG elements and attributes
+  5. Include comments explaining the structure
+
+  Rules:
+  - Output only the SVG code, no markdown or additional text
+  - Use proper XML formatting
+  - Include viewBox attribute
+  - Use semantic element names
+  - Add comments for complex sections
+  - Optimize for performance
+  - The output will be saved as an SVG file, so ensure it's complete and valid
+
+  Format the output as:
+  <?xml version="1.0" encoding="UTF-8"?>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+    <!-- SVG content here -->
+  </svg>
 ```
 
 ### Build Idea Plugin with Command Execution
