@@ -76,6 +76,10 @@ def determine_active_plugins(text: str, plugins: Dict[str, Plugin]) -> List[str]
 
 def generate_additional_content(plugin: Plugin, transcript_text: str, summary_text: str) -> str:
     """Generate additional content using the specified plugin."""
+    # If there's no prompt, return empty string as no content generation is needed
+    if not plugin.prompt:
+        return ""
+
     prompt = plugin.prompt.format(transcript=transcript_text, summary=summary_text)
 
     # Use plugin-specific model if specified, otherwise use default
@@ -113,19 +117,21 @@ def main():
     parser.add_argument('-f', '--force', action='store_true', help='Force overwrite existing output files')
     args = parser.parse_args()
 
-    # Ensure the default model exists
-    ensure_model_exists(OLLAMA_MODEL)
-
-    input_file = Path(args.input_file)
-    if not input_file.exists():
-        logger.error(f"Error: File {input_file} does not exist")
-        sys.exit(1)
-
-    # Load plugins
+    # Only ensure model exists if we have plugins with prompts
     plugin_manager = PluginManager(Path("plugins"))
     plugins = plugin_manager.get_all_plugins()
     if not plugins:
         logger.error("Error: No plugins found in plugins directory")
+        sys.exit(1)
+
+    # Check if any plugins have prompts before ensuring model exists
+    has_prompts = any(plugin.prompt for plugin in plugins.values())
+    if has_prompts:
+        ensure_model_exists(OLLAMA_MODEL)
+
+    input_file = Path(args.input_file)
+    if not input_file.exists():
+        logger.error(f"Error: File {input_file} does not exist")
         sys.exit(1)
 
     # Set up directory paths
@@ -204,12 +210,13 @@ def main():
                     logger.info(f"Skipping: {output_file} already exists (use -f to overwrite)")
                     continue
 
-                additional_content = generate_additional_content(plugin, transcript_text, summary_text)
-
-                # Save to appropriate directory using base filename
-                with open(output_file, 'w', encoding='utf-8') as f:
-                    f.write(additional_content)
-                logger.info(f"Content saved to: {output_file}")
+                # Only generate content if the plugin has a prompt
+                if plugin.prompt:
+                    additional_content = generate_additional_content(plugin, transcript_text, summary_text)
+                    # Save to appropriate directory using base filename
+                    with open(output_file, 'w', encoding='utf-8') as f:
+                        f.write(additional_content)
+                    logger.info(f"Content saved to: {output_file}")
 
                 # Execute command if defined for the plugin
                 if plugin.command:

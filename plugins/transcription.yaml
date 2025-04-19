@@ -1,6 +1,3 @@
 description: Transcribe audio files using whisper
 run: always
-command: whisper FILE --model base --output_dir VoiceMemos/transcripts
-prompt: |
-  This plugin uses whisper to transcribe audio files.
-  The command will be executed automatically. 
+command: whisper FILE --model base --output_dir VoiceMemos/transcripts 
