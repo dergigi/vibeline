@@ -152,25 +152,25 @@ def main():
     is_audio = input_file.suffix.lower() in ['.m4a', '.mp3', '.wav', '.ogg']
     
     if is_audio:
-        # For audio files, we only run the transcription plugin
-        transcription_plugin = plugins.get('transcription')
-        if not transcription_plugin:
-            logger.error("Error: Transcription plugin not found")
+        # For audio files, we only run the transcript plugin
+        transcript_plugin = plugins.get('transcript')
+        if not transcript_plugin:
+            logger.error("Error: Transcript plugin not found")
             sys.exit(1)
             
         logger.info("Transcribing audio...")
         
-        # Execute the transcription command
-        if transcription_plugin.command:
+        # Execute the transcript command
+        if transcript_plugin.command:
             try:
                 # Replace FILE placeholder with the actual input file path
-                cmd_to_run = transcription_plugin.command.replace("FILE", str(input_file))
+                cmd_to_run = transcript_plugin.command.replace("FILE", str(input_file))
                 logger.info(f"Executing command: {cmd_to_run}")
                 # Run the command, check=True raises an exception on non-zero exit code
                 subprocess.run(cmd_to_run, shell=True, check=True, text=True, capture_output=True)
-                logger.info("Transcription completed successfully.")
+                logger.info("Transcript completed successfully.")
             except FileNotFoundError:
-                logger.error(f"Error: Command not found - {transcription_plugin.command.split()[0]}")
+                logger.error(f"Error: Command not found - {transcript_plugin.command.split()[0]}")
                 sys.exit(1)
             except subprocess.CalledProcessError as e:
                 logger.error(f"Error executing command: {e}")
@@ -178,7 +178,7 @@ def main():
                 logger.error(f"Stdout: {e.stdout}")
                 sys.exit(1)
             except Exception as e:
-                logger.error(f"An unexpected error occurred during transcription: {e}")
+                logger.error(f"An unexpected error occurred during transcript: {e}")
                 sys.exit(1)
     else:
         # For text files, proceed with normal plugin processing
