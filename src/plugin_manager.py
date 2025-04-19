@@ -10,7 +10,7 @@ class Plugin:
     name: str
     description: str
     run: Literal["always", "matching"]  # When to run the plugin
-    prompt: str
+    prompt: Optional[str] = None  # Optional prompt for content generation
     model: Optional[str] = None
     match: Literal["any", "all"] = field(default="all")  # Default to "all" if not specified
     output_extension: str = field(default=".txt")  # Default to .txt if not specified
@@ -38,7 +38,7 @@ class PluginManager:
                     data['name'] = plugin_file.stem
                 
                 # Validate required fields
-                required_fields = ['description', 'run', 'prompt']
+                required_fields = ['description', 'run']
                 for field in required_fields:
                     if field not in data:
                         raise ValueError(f"Plugin {plugin_file} is missing required field: {field}")
@@ -81,7 +81,7 @@ class PluginManager:
                     name=data['name'],
                     description=data['description'],
                     run=data['run'],
-                    prompt=data['prompt'],
+                    prompt=data.get('prompt'),  # Optional
                     model=data.get('model'),  # Optional
                     match=match_value or 'all',  # Default to 'all' if not specified
                     output_extension=data.get('output_extension', '.txt'),  # Default to .txt
