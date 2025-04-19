@@ -37,7 +37,7 @@ echo "----------------------------------------"
 
 # Step 1: Transcribe using the transcription plugin
 echo "Step 1: Transcribing audio..."
-python3 src/extract.py $force_flag "$input_file"
+./extract.sh $force_flag "$input_file"
 
 # Check if transcription was successful
 if [ ! -f "$transcript_file" ]; then
