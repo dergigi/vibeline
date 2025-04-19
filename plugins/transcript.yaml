@@ -1,3 +1,4 @@
 description: Transcribe audio files using whisper
 run: always
+input: VoiceMemos/*.m4a
 command: whisper FILE --model base --output_dir VoiceMemos/transcripts 

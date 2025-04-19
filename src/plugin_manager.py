@@ -2,6 +2,7 @@
 
 from pathlib import Path
 import yaml
+import fnmatch
 from typing import Dict, Optional, Literal, List
 from dataclasses import dataclass, field
 
@@ -16,6 +17,7 @@ class Plugin:
     output_extension: str = field(default=".txt")  # Default to .txt if not specified
     command: Optional[str] = None  # Optional command to run after generation
     keywords: List[str] = field(default_factory=list)  # Keywords for matching
+    input: Optional[str] = None  # Optional input pattern (e.g., "VoiceMemos/*.m4a")
 
 class PluginManager:
     def __init__(self, plugin_dir: Path):
@@ -86,7 +88,8 @@ class PluginManager:
                     match=match_value or 'all',  # Default to 'all' if not specified
                     output_extension=data.get('output_extension', '.txt'),  # Default to .txt
                     command=data.get('command'),  # Get the command if present
-                    keywords=keywords  # Add keywords
+                    keywords=keywords,  # Add keywords
+                    input=data.get('input')  # Optional input pattern
                 )
                 
                 self.plugins[plugin.name] = plugin
@@ -102,4 +105,12 @@ class PluginManager:
     def get_plugins_by_run_type(self, run_type: Literal["always", "matching"]) -> Dict[str, Plugin]:
         """Get all plugins with a specific run type."""
         return {name: plugin for name, plugin in self.plugins.items() 
-                if plugin.run == run_type} 
+                if plugin.run == run_type}
+
+    def get_plugins_for_file(self, file_path: Path) -> List[Plugin]:
+        """Get all plugins that should process a given file based on input patterns."""
+        matching_plugins = []
+        for plugin in self.plugins.values():
+            if plugin.input and fnmatch.fnmatch(str(file_path), plugin.input):
+                matching_plugins.append(plugin)
+        return matching_plugins 

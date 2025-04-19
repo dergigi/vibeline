@@ -148,40 +148,35 @@ def main():
 
     logger.info(f"Processing file: {input_file}")
 
-    # Check if this is an audio file
-    is_audio = input_file.suffix.lower() in ['.m4a', '.mp3', '.wav', '.ogg']
-    
-    if is_audio:
-        # For audio files, we only run the transcript plugin
-        transcript_plugin = plugins.get('transcript')
-        if not transcript_plugin:
-            logger.error("Error: Transcript plugin not found")
-            sys.exit(1)
+    # Get plugins that should process this file based on input patterns
+    matching_plugins = plugin_manager.get_plugins_for_file(input_file)
+    if matching_plugins:
+        for plugin in matching_plugins:
+            logger.info(f"Running {plugin.name} plugin...")
             
-        logger.info("Transcribing audio...")
-        
-        # Execute the transcript command
-        if transcript_plugin.command:
-            try:
-                # Replace FILE placeholder with the actual input file path
-                cmd_to_run = transcript_plugin.command.replace("FILE", str(input_file))
-                logger.info(f"Executing command: {cmd_to_run}")
-                # Run the command, check=True raises an exception on non-zero exit code
-                subprocess.run(cmd_to_run, shell=True, check=True, text=True, capture_output=True)
-                logger.info("Transcript completed successfully.")
-            except FileNotFoundError:
-                logger.error(f"Error: Command not found - {transcript_plugin.command.split()[0]}")
-                sys.exit(1)
-            except subprocess.CalledProcessError as e:
-                logger.error(f"Error executing command: {e}")
-                logger.error(f"Stderr: {e.stderr}")
-                logger.error(f"Stdout: {e.stdout}")
-                sys.exit(1)
-            except Exception as e:
-                logger.error(f"An unexpected error occurred during transcript: {e}")
-                sys.exit(1)
-    else:
-        # For text files, proceed with normal plugin processing
+            # Execute the plugin command
+            if plugin.command:
+                try:
+                    # Replace FILE placeholder with the actual input file path
+                    cmd_to_run = plugin.command.replace("FILE", str(input_file))
+                    logger.info(f"Executing command: {cmd_to_run}")
+                    # Run the command, check=True raises an exception on non-zero exit code
+                    subprocess.run(cmd_to_run, shell=True, check=True, text=True, capture_output=True)
+                    logger.info(f"{plugin.name} completed successfully.")
+                except FileNotFoundError:
+                    logger.error(f"Error: Command not found - {plugin.command.split()[0]}")
+                    sys.exit(1)
+                except subprocess.CalledProcessError as e:
+                    logger.error(f"Error executing command: {e}")
+                    logger.error(f"Stderr: {e.stderr}")
+                    logger.error(f"Stdout: {e.stdout}")
+                    sys.exit(1)
+                except Exception as e:
+                    logger.error(f"An unexpected error occurred during {plugin.name}: {e}")
+                    sys.exit(1)
+
+    # For text files, proceed with normal plugin processing
+    if input_file.suffix.lower() in ['.txt']:
         logger.info("Extracting content...")
 
         # Read transcript
