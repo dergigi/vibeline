@@ -109,14 +109,14 @@ def ensure_model_exists(model_name: str) -> None:
 def main():
     # Set up argument parser
     parser = argparse.ArgumentParser(description='Extract content from transcripts using plugins.')
-    parser.add_argument('transcript_file', help='The transcript file to process')
+    parser.add_argument('input_file', help='The input file to process (audio or transcript)')
     parser.add_argument('-f', '--force', action='store_true', help='Force overwrite existing output files')
     args = parser.parse_args()
 
     # Ensure the default model exists
     ensure_model_exists(OLLAMA_MODEL)
 
-    input_file = Path(args.transcript_file)
+    input_file = Path(args.input_file)
     if not input_file.exists():
         logger.error(f"Error: File {input_file} does not exist")
         sys.exit(1)
@@ -140,61 +140,96 @@ def main():
         output_dir.mkdir(parents=True, exist_ok=True)
         output_dirs[plugin_name] = output_dir
 
-    logger.info(f"Processing transcript: {input_file}")
-    logger.info("Extracting content...")
+    logger.info(f"Processing file: {input_file}")
 
-    # Read transcript
-    with open(input_file, 'r', encoding='utf-8') as f:
-        transcript_text = f.read()
-
-    # Read summary if it exists
-    summary_file = input_file.parent / f"{input_file.stem}_summary.txt"
-    summary_text = ""
-    if summary_file.exists():
-        with open(summary_file, 'r', encoding='utf-8') as f:
-            summary_text = f.read()
-
-    # Determine which plugins to run
-    active_plugins = determine_active_plugins(transcript_text, plugins)
-    if active_plugins:
-        for plugin_name in active_plugins:
-            plugin = plugins[plugin_name]
-            logger.info(f"Running {plugin_name} plugin...")
-
-            # Check if output file exists
-            filename = input_file.stem
-            output_file = output_dirs[plugin_name] / f"{filename}{plugin.output_extension}"
-
-            if output_file.exists() and not args.force:
-                logger.info(f"Skipping: {output_file} already exists (use -f to overwrite)")
-                continue
-
-            additional_content = generate_additional_content(plugin, transcript_text, summary_text)
-
-            # Save to appropriate directory using base filename
-            with open(output_file, 'w', encoding='utf-8') as f:
-                f.write(additional_content)
-            logger.info(f"Content saved to: {output_file}")
-
-            # Execute command if defined for the plugin
-            if plugin.command:
-                try:
-                    # Replace FILE placeholder with the actual output file path
-                    cmd_to_run = plugin.command.replace("FILE", str(output_file))
-                    logger.info(f"Executing command: {cmd_to_run}")
-                    # Run the command, check=True raises an exception on non-zero exit code
-                    subprocess.run(cmd_to_run, shell=True, check=True, text=True, capture_output=True)
-                    logger.info("Command executed successfully.")
-                except FileNotFoundError:
-                    logger.error(f"Error: Command not found - {plugin.command.split()[0]}")
-                except subprocess.CalledProcessError as e:
-                    logger.error(f"Error executing command: {e}")
-                    logger.error(f"Stderr: {e.stderr}")
-                    logger.error(f"Stdout: {e.stdout}")
-                except Exception as e:
-                    logger.error(f"An unexpected error occurred during command execution: {e}")
+    # Check if this is an audio file
+    is_audio = input_file.suffix.lower() in ['.m4a', '.mp3', '.wav', '.ogg']
+    
+    if is_audio:
+        # For audio files, we only run the transcription plugin
+        transcription_plugin = plugins.get('transcription')
+        if not transcription_plugin:
+            logger.error("Error: Transcription plugin not found")
+            sys.exit(1)
+            
+        logger.info("Transcribing audio...")
+        
+        # Execute the transcription command
+        if transcription_plugin.command:
+            try:
+                # Replace FILE placeholder with the actual input file path
+                cmd_to_run = transcription_plugin.command.replace("FILE", str(input_file))
+                logger.info(f"Executing command: {cmd_to_run}")
+                # Run the command, check=True raises an exception on non-zero exit code
+                subprocess.run(cmd_to_run, shell=True, check=True, text=True, capture_output=True)
+                logger.info("Transcription completed successfully.")
+            except FileNotFoundError:
+                logger.error(f"Error: Command not found - {transcription_plugin.command.split()[0]}")
+                sys.exit(1)
+            except subprocess.CalledProcessError as e:
+                logger.error(f"Error executing command: {e}")
+                logger.error(f"Stderr: {e.stderr}")
+                logger.error(f"Stdout: {e.stdout}")
+                sys.exit(1)
+            except Exception as e:
+                logger.error(f"An unexpected error occurred during transcription: {e}")
+                sys.exit(1)
     else:
-        logger.info("No matching plugins found for this transcript")
+        # For text files, proceed with normal plugin processing
+        logger.info("Extracting content...")
+
+        # Read transcript
+        with open(input_file, 'r', encoding='utf-8') as f:
+            transcript_text = f.read()
+
+        # Read summary if it exists
+        summary_file = input_file.parent / f"{input_file.stem}_summary.txt"
+        summary_text = ""
+        if summary_file.exists():
+            with open(summary_file, 'r', encoding='utf-8') as f:
+                summary_text = f.read()
+
+        # Determine which plugins to run
+        active_plugins = determine_active_plugins(transcript_text, plugins)
+        if active_plugins:
+            for plugin_name in active_plugins:
+                plugin = plugins[plugin_name]
+                logger.info(f"Running {plugin_name} plugin...")
+
+                # Check if output file exists
+                filename = input_file.stem
+                output_file = output_dirs[plugin_name] / f"{filename}{plugin.output_extension}"
+
+                if output_file.exists() and not args.force:
+                    logger.info(f"Skipping: {output_file} already exists (use -f to overwrite)")
+                    continue
+
+                additional_content = generate_additional_content(plugin, transcript_text, summary_text)
+
+                # Save to appropriate directory using base filename
+                with open(output_file, 'w', encoding='utf-8') as f:
+                    f.write(additional_content)
+                logger.info(f"Content saved to: {output_file}")
+
+                # Execute command if defined for the plugin
+                if plugin.command:
+                    try:
+                        # Replace FILE placeholder with the actual output file path
+                        cmd_to_run = plugin.command.replace("FILE", str(output_file))
+                        logger.info(f"Executing command: {cmd_to_run}")
+                        # Run the command, check=True raises an exception on non-zero exit code
+                        subprocess.run(cmd_to_run, shell=True, check=True, text=True, capture_output=True)
+                        logger.info("Command executed successfully.")
+                    except FileNotFoundError:
+                        logger.error(f"Error: Command not found - {plugin.command.split()[0]}")
+                    except subprocess.CalledProcessError as e:
+                        logger.error(f"Error executing command: {e}")
+                        logger.error(f"Stderr: {e.stderr}")
+                        logger.error(f"Stdout: {e.stdout}")
+                    except Exception as e:
+                        logger.error(f"An unexpected error occurred during command execution: {e}")
+        else:
+            logger.info("No matching plugins found for this transcript")
 
     logger.info("----------------------------------------")
 

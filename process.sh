@@ -35,9 +35,9 @@ transcript_file="$TRANSCRIPT_DIR/$filename.txt"
 echo "Processing voice memo: $input_file"
 echo "----------------------------------------"
 
-# Step 1: Transcribe
+# Step 1: Transcribe using the transcription plugin
 echo "Step 1: Transcribing audio..."
-./transcribe.sh $force_flag "$input_file"
+python3 src/extract.py $force_flag "$input_file"
 
 # Check if transcription was successful
 if [ ! -f "$transcript_file" ]; then
