@@ -39,6 +39,12 @@ def determine_active_plugins(text: str, plugins: Dict[str, Plugin]) -> List[str]
         logger.debug(f"  Run type: {plugin.run}")
         logger.debug(f"  Keywords: {plugin.keywords}")
         logger.debug(f"  Match type: {plugin.match}")
+        logger.debug(f"  Ignore if: {plugin.ignore_if}")
+
+        # Check if plugin should be ignored
+        if plugin.ignore_if and re.search(r'\b' + plugin.ignore_if + r'\b', text.lower()):
+            logger.debug(f"  Skipped: Found ignore_if text '{plugin.ignore_if}' in transcript")
+            continue
 
         # Always include plugins with run: always
         if plugin.run == "always":

@@ -47,6 +47,7 @@ prompt: |
 | `output_extension` | File extension for the output | `.txt` |
 | `command` | Command to execute after generation | None |
 | `keywords` | Keywords to trigger the plugin when in `matching` mode | Derived from plugin name |
+| `ignore_if` | Text that prevents the plugin from running if found in transcript | None |
 
 ### Keywords
 
@@ -161,12 +162,13 @@ prompt: |
   Summary:
 ```
 
-### Action Item Extractor (action_item.yaml)
+### Action Item Extractor with Ignore Condition (action_item.yaml)
 
 ```yaml
 description: Extract action items and todos from the transcript
 type: or
 run: always
+ignore_if: rambling  # Will not run if transcript contains the word "rambling"
 prompt: |
   You are a task extraction specialist. Your job is to identify actionable items.
   

@@ -16,6 +16,7 @@ class Plugin:
     output_extension: str = field(default=".txt")  # Default to .txt if not specified
     command: Optional[str] = None  # Optional command to run after generation
     keywords: List[str] = field(default_factory=list)  # Keywords for matching
+    ignore_if: Optional[str] = None  # Text that should prevent the plugin from running if found in transcript
 
 class PluginManager:
     def __init__(self, plugin_dir: Path):
@@ -86,7 +87,8 @@ class PluginManager:
                     match=match_value or 'all',  # Default to 'all' if not specified
                     output_extension=data.get('output_extension', '.txt'),  # Default to .txt
                     command=data.get('command'),  # Get the command if present
-                    keywords=keywords  # Add keywords
+                    keywords=keywords,  # Add keywords
+                    ignore_if=data.get('ignore_if')  # Get ignore_if if present
                 )
                 
                 self.plugins[plugin.name] = plugin
