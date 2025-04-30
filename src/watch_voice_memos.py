@@ -56,10 +56,50 @@ def process_voice_memo(file_path: Path, force: bool = False) -> None:
     except Exception as e:
         logger.error(f"Unexpected error processing {file_path.name}: {e}")
 
+class VoiceMemoHandler(FileSystemEventHandler):
+    def __init__(self, force=False):
+        self.force = force
+        self.processed_files = {}  # Track processed files and their modification times
+        self.voice_memos_dir = Path(VOICE_MEMOS_DIR)
+
+    def on_created(self, event):
+        if not event.is_directory and event.src_path.endswith('.m4a'):
+            file_path = Path(event.src_path)
+            self.processed_files[file_path.name] = get_file_modification_time(file_path)
+            logger.debug(f"Added to processed_files: {file_path.name}")
+            process_voice_memo(file_path, force=self.force)
+
+    def on_modified(self, event):
+        if not event.is_directory and event.src_path.endswith('.m4a'):
+            file_path = Path(event.src_path)
+            current_mtime = get_file_modification_time(file_path)
+            if file_path.name not in self.processed_files or self.processed_files[file_path.name] != current_mtime:
+                self.processed_files[file_path.name] = current_mtime
+                logger.debug(f"Updated in processed_files: {file_path.name}")
+                process_voice_memo(file_path, force=self.force)
+
+    def on_deleted(self, event):
+        if not event.is_directory:
+            deleted_file = Path(event.src_path)
+            logger.info(f"File deleted: {deleted_file.name}")
+            
+            # Check if there's a matching m4a file in our processed files
+            matching_m4a_name = f"{deleted_file.stem}.m4a"
+            
+            logger.debug(f"Looking for matching m4a: {matching_m4a_name}")
+            logger.debug(f"Current processed_files: {list(self.processed_files.keys())}")
+            
+            if matching_m4a_name in self.processed_files:
+                # Use VOICE_MEMOS_DIR as the base directory
+                matching_m4a = self.voice_memos_dir / matching_m4a_name
+                logger.info(f"Reprocessing voice memo due to deletion of {deleted_file.name}")
+                process_voice_memo(matching_m4a, force=self.force)
+            else:
+                logger.info(f"Deleted file: {deleted_file.name} (type: {deleted_file.suffix})")
+
 def watch_voice_memos() -> None:
     """Watch the VoiceMemos directory for new or modified .m4a files."""
     voice_memos_dir = Path(VOICE_MEMOS_DIR)
-    processed_files = {}  # Dictionary to store file paths and their last modification times
 
     # Set up argument parser
     parser = argparse.ArgumentParser(description='Watch for voice memos and process them')
@@ -75,37 +115,32 @@ def watch_voice_memos() -> None:
     logger.info("Starting voice memo watcher")
     logger.info(f"Watching directory: {voice_memos_dir.absolute()}")
 
+    # Create event handler and observer
+    event_handler = VoiceMemoHandler(force=args.force)
+    observer = Observer()
+    observer.schedule(event_handler, str(voice_memos_dir), recursive=True)
+    observer.start()
+
     try:
+        # Process existing files
+        for file_path in voice_memos_dir.rglob("*.m4a"):
+            event_handler.processed_files[file_path.name] = get_file_modification_time(file_path)
+            logger.debug(f"Initial processed_files entry: {file_path.name}")
+            process_voice_memo(file_path, force=args.force)
+
+        # Keep the script running
         while True:
-            # Recursively find all .m4a files
-            current_files = set()
-            for file_path in voice_memos_dir.rglob("*.m4a"):
-                current_files.add(str(file_path))
-                try:
-                    current_mtime = os.path.getmtime(file_path)
-
-                    # Check if file is new or modified
-                    if str(file_path) not in processed_files or processed_files[str(file_path)] != current_mtime:
-                        process_voice_memo(file_path, force=args.force)
-                        processed_files[str(file_path)] = current_mtime
-                except FileNotFoundError:
-                    logger.debug(f"File disappeared while processing: {file_path}")
-                except Exception as e:
-                    logger.error(f"Error checking file {file_path}: {e}")
-
-            # Check for deleted files
-            deleted_files = set(processed_files.keys()) - current_files
-            for file_path in deleted_files:
-                logger.info(f"File removed: {Path(file_path).name}")
-                del processed_files[file_path]
-
-            time.sleep(1)  # Wait for 1 second before next check
+            time.sleep(1)
 
     except KeyboardInterrupt:
         logger.info("Watcher stopped by user")
+        observer.stop()
     except Exception as e:
         logger.error(f"Unexpected error in watcher: {e}")
-        raise  # Re-raise the exception after logging
+        observer.stop()
+        raise
+    finally:
+        observer.join()
 
 if __name__ == "__main__":
     try:
