@@ -1,5 +1,6 @@
 description: Analyze the emotional tone and sentiment of the transcript
 run: always  # always, matching
+ignore_if: rambling  # Will not run if transcript contains the word "rambling"
 prompt: |
   Please analyze the emotional tone and sentiment of the following transcript using these specific emotion categories:
 
