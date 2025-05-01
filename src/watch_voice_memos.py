@@ -65,7 +65,11 @@ class VoiceMemoHandler(FileSystemEventHandler):
     def on_created(self, event):
         if not event.is_directory and event.src_path.endswith('.m4a'):
             file_path = Path(event.src_path)
-            self.processed_files[file_path.name] = get_file_modification_time(file_path)
+            # Use the filename as the key but store the full path for processing
+            self.processed_files[file_path.name] = {
+                'mtime': get_file_modification_time(file_path),
+                'path': file_path
+            }
             logger.debug(f"Added to processed_files: {file_path.name}")
             process_voice_memo(file_path, force=self.force)
 
@@ -73,8 +77,11 @@ class VoiceMemoHandler(FileSystemEventHandler):
         if not event.is_directory and event.src_path.endswith('.m4a'):
             file_path = Path(event.src_path)
             current_mtime = get_file_modification_time(file_path)
-            if file_path.name not in self.processed_files or self.processed_files[file_path.name] != current_mtime:
-                self.processed_files[file_path.name] = current_mtime
+            if file_path.name not in self.processed_files or self.processed_files[file_path.name]['mtime'] != current_mtime:
+                self.processed_files[file_path.name] = {
+                    'mtime': current_mtime,
+                    'path': file_path
+                }
                 logger.debug(f"Updated in processed_files: {file_path.name}")
                 process_voice_memo(file_path, force=self.force)
 
@@ -90,8 +97,8 @@ class VoiceMemoHandler(FileSystemEventHandler):
             logger.debug(f"Current processed_files: {list(self.processed_files.keys())}")
             
             if matching_m4a_name in self.processed_files:
-                # Use VOICE_MEMOS_DIR as the base directory
-                matching_m4a = self.voice_memos_dir / matching_m4a_name
+                # Use the stored path for the m4a file
+                matching_m4a = self.processed_files[matching_m4a_name]['path']
                 logger.info(f"Reprocessing voice memo due to deletion of {deleted_file.name}")
                 process_voice_memo(matching_m4a, force=self.force)
             else:
@@ -124,7 +131,10 @@ def watch_voice_memos() -> None:
     try:
         # Process existing files
         for file_path in voice_memos_dir.rglob("*.m4a"):
-            event_handler.processed_files[file_path.name] = get_file_modification_time(file_path)
+            event_handler.processed_files[file_path.name] = {
+                'mtime': get_file_modification_time(file_path),
+                'path': file_path
+            }
             logger.debug(f"Initial processed_files entry: {file_path.name}")
             process_voice_memo(file_path, force=args.force)
 
