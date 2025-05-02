@@ -123,7 +123,7 @@ def watch_voice_memos() -> None:
     event_handler = VoiceMemoHandler(force=args.force)
     observer = Observer()
     # Watch the resolved directory path
-    observer.schedule(event_handler, str(voice_memos_dir.resolve()), recursive=True)
+    observer.schedule(event_handler, str(voice_memos_dir.absolute()), recursive=True)
     observer.start()
 
     try:
