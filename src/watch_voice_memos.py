@@ -123,7 +123,7 @@ def watch_voice_memos() -> None:
     event_handler = VoiceMemoHandler(force=args.force)
     observer = Observer()
     # Watch the resolved directory path
-    observer.schedule(event_handler, str(voice_memos_dir), recursive=True)
+    observer.schedule(event_handler, str(voice_memos_dir.resolve()), recursive=True)
     observer.start()
 
     try:
@@ -132,7 +132,6 @@ def watch_voice_memos() -> None:
             # Use resolved paths for processing
             file_path = file_path.resolve()
             event_handler.processed_files[str(file_path)] = get_file_modification_time(file_path)
-            logger.debug(f"Initial processed_files entry: {str(file_path)}")
             process_voice_memo(file_path, force=args.force)
 
         # Keep the script running
