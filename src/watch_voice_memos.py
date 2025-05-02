@@ -60,32 +60,25 @@ class VoiceMemoHandler(FileSystemEventHandler):
     def __init__(self, force=False):
         self.force = force
         self.processed_files = {}  # Track processed files and their modification times
-        # Resolve the symlink to get the actual directory
-        self.voice_memos_dir = Path(VOICE_MEMOS_DIR).resolve()
+        # Store the resolved base directory
+        self.base_dir = Path(VOICE_MEMOS_DIR).resolve()
 
     def on_created(self, event):
         if not event.is_directory and event.src_path.endswith('.m4a'):
-            # Resolve any symlinks in the path
+            # Use the resolved path for processing
             file_path = Path(event.src_path).resolve()
-            # Use the filename as the key but store the full resolved path for processing
-            self.processed_files[file_path.name] = {
-                'mtime': get_file_modification_time(file_path),
-                'path': file_path
-            }
-            logger.debug(f"Added to processed_files: {file_path.name}")
+            self.processed_files[str(file_path)] = get_file_modification_time(file_path)
+            logger.debug(f"Added to processed_files: {str(file_path)}")
             process_voice_memo(file_path, force=self.force)
 
     def on_modified(self, event):
         if not event.is_directory and event.src_path.endswith('.m4a'):
-            # Resolve any symlinks in the path
+            # Use the resolved path for processing
             file_path = Path(event.src_path).resolve()
             current_mtime = get_file_modification_time(file_path)
-            if file_path.name not in self.processed_files or self.processed_files[file_path.name]['mtime'] != current_mtime:
-                self.processed_files[file_path.name] = {
-                    'mtime': current_mtime,
-                    'path': file_path
-                }
-                logger.debug(f"Updated in processed_files: {file_path.name}")
+            if str(file_path) not in self.processed_files or self.processed_files[str(file_path)] != current_mtime:
+                self.processed_files[str(file_path)] = current_mtime
+                logger.debug(f"Updated in processed_files: {str(file_path)}")
                 process_voice_memo(file_path, force=self.force)
 
     def on_deleted(self, event):
@@ -96,13 +89,12 @@ class VoiceMemoHandler(FileSystemEventHandler):
             
             # Check if there's a matching m4a file in our processed files
             matching_m4a_name = f"{deleted_file.stem}.m4a"
+            matching_m4a = self.base_dir / matching_m4a_name
             
-            logger.debug(f"Looking for matching m4a: {matching_m4a_name}")
+            logger.debug(f"Looking for matching m4a: {str(matching_m4a)}")
             logger.debug(f"Current processed_files: {list(self.processed_files.keys())}")
             
-            if matching_m4a_name in self.processed_files:
-                # Use the stored resolved path for the m4a file
-                matching_m4a = self.processed_files[matching_m4a_name]['path']
+            if str(matching_m4a) in self.processed_files:
                 logger.info(f"Reprocessing voice memo due to deletion of {deleted_file.name}")
                 process_voice_memo(matching_m4a, force=self.force)
             else:
@@ -137,13 +129,10 @@ def watch_voice_memos() -> None:
     try:
         # Process existing files
         for file_path in voice_memos_dir.rglob("*.m4a"):
-            # Resolve any symlinks in the path
+            # Use resolved paths for processing
             file_path = file_path.resolve()
-            event_handler.processed_files[file_path.name] = {
-                'mtime': get_file_modification_time(file_path),
-                'path': file_path
-            }
-            logger.debug(f"Initial processed_files entry: {file_path.name}")
+            event_handler.processed_files[str(file_path)] = get_file_modification_time(file_path)
+            logger.debug(f"Initial processed_files entry: {str(file_path)}")
             process_voice_memo(file_path, force=args.force)
 
         # Keep the script running
