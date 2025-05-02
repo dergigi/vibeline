@@ -60,12 +60,14 @@ class VoiceMemoHandler(FileSystemEventHandler):
     def __init__(self, force=False):
         self.force = force
         self.processed_files = {}  # Track processed files and their modification times
-        self.voice_memos_dir = Path(VOICE_MEMOS_DIR)
+        # Resolve the symlink to get the actual directory
+        self.voice_memos_dir = Path(VOICE_MEMOS_DIR).resolve()
 
     def on_created(self, event):
         if not event.is_directory and event.src_path.endswith('.m4a'):
-            file_path = Path(event.src_path)
-            # Use the filename as the key but store the full path for processing
+            # Resolve any symlinks in the path
+            file_path = Path(event.src_path).resolve()
+            # Use the filename as the key but store the full resolved path for processing
             self.processed_files[file_path.name] = {
                 'mtime': get_file_modification_time(file_path),
                 'path': file_path
@@ -75,7 +77,8 @@ class VoiceMemoHandler(FileSystemEventHandler):
 
     def on_modified(self, event):
         if not event.is_directory and event.src_path.endswith('.m4a'):
-            file_path = Path(event.src_path)
+            # Resolve any symlinks in the path
+            file_path = Path(event.src_path).resolve()
             current_mtime = get_file_modification_time(file_path)
             if file_path.name not in self.processed_files or self.processed_files[file_path.name]['mtime'] != current_mtime:
                 self.processed_files[file_path.name] = {
@@ -87,6 +90,7 @@ class VoiceMemoHandler(FileSystemEventHandler):
 
     def on_deleted(self, event):
         if not event.is_directory:
+            # For deleted files, we need to handle the path differently since the file no longer exists
             deleted_file = Path(event.src_path)
             logger.info(f"File deleted: {deleted_file.name}")
             
@@ -97,7 +101,7 @@ class VoiceMemoHandler(FileSystemEventHandler):
             logger.debug(f"Current processed_files: {list(self.processed_files.keys())}")
             
             if matching_m4a_name in self.processed_files:
-                # Use the stored path for the m4a file
+                # Use the stored resolved path for the m4a file
                 matching_m4a = self.processed_files[matching_m4a_name]['path']
                 logger.info(f"Reprocessing voice memo due to deletion of {deleted_file.name}")
                 process_voice_memo(matching_m4a, force=self.force)
@@ -106,7 +110,8 @@ class VoiceMemoHandler(FileSystemEventHandler):
 
 def watch_voice_memos() -> None:
     """Watch the VoiceMemos directory for new or modified .m4a files."""
-    voice_memos_dir = Path(VOICE_MEMOS_DIR)
+    # Resolve the symlink to get the actual directory
+    voice_memos_dir = Path(VOICE_MEMOS_DIR).resolve()
 
     # Set up argument parser
     parser = argparse.ArgumentParser(description='Watch for voice memos and process them')
@@ -125,12 +130,15 @@ def watch_voice_memos() -> None:
     # Create event handler and observer
     event_handler = VoiceMemoHandler(force=args.force)
     observer = Observer()
+    # Watch the resolved directory path
     observer.schedule(event_handler, str(voice_memos_dir), recursive=True)
     observer.start()
 
     try:
         # Process existing files
         for file_path in voice_memos_dir.rglob("*.m4a"):
+            # Resolve any symlinks in the path
+            file_path = file_path.resolve()
             event_handler.processed_files[file_path.name] = {
                 'mtime': get_file_modification_time(file_path),
                 'path': file_path
