@@ -1,0 +1,21 @@
+# Vocabulary file for transcript corrections
+# Format: incorrect_word -> correct_word
+
+# Nostr-related terms
+Noster -> Nostr
+Nostril -> Nostr
+Nostrum -> Nostr
+Nostre -> Nostr
+Nostra -> Nostr
+
+Pipeline -> vibeline
+vive line -> vibeline
+
+# Technical terms
+API's -> APIs
+SDK's -> SDKs
+Java script -> JavaScript
+Type script -> TypeScript
+Pie thon -> Python
+Rust Lang -> Rust
+Go Lang -> Go

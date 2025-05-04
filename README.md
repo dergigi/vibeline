@@ -11,6 +11,7 @@ The main idea is to let your computer do computer work, while you're out and abo
 ## Features
 
 - 🎙️ Automatic voice memo transcription
+- 🧹 Transcript cleaning with customizable vocabulary
 - 🔌 Flexible plugin system for content extraction
 - 🤖 AI-powered content generation using Ollama
 - 📝 Built-in plugins for:
@@ -47,10 +48,29 @@ This will:
 
 ## How to use
 
+### Basic Usage
+
 - Use whatever you want to record voice notes (I use [Fossify](https://github.com/FossifyOrg/Voice-Recorder))
 - Use whatever you want to sync your files (I use [Syncthing](https://syncthing.net/))
 - Use whatever you want to look at the markdown/output files (I use [Zettel Notes](https://www.zettelnotes.com/))
 - Run the `./watch.sh` script on an idle machine to get the most out of it
+
+### Transcript Cleaning
+
+VibeLine includes a transcript cleaning feature that corrects common transcription errors based on a customizable vocabulary file. This is especially useful for technical terms, names, or domain-specific jargon that speech recognition models often misinterpret.
+
+To use this feature:
+
+1. Edit the `VOCABULARY.txt` file in the root directory to add your custom corrections:
+```
+# Format: incorrect_word -> correct_word
+Noster -> Nostr
+```
+
+2. The transcript cleaner will automatically run as part of the extraction process.
+
+3. You can customize the behavior with these options:
+   - `--no-clean`: Skip the transcript cleaning step entirely
 
 ## Contributors
 
