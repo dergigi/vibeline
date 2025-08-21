@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
-import os
-import re
-import sys
 import argparse
 import logging
-from pathlib import Path
-from typing import List, Dict
+import os
+import re
 from datetime import datetime
+from pathlib import Path
+from typing import List
+
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -40,9 +40,7 @@ def extract_action_items(content: str) -> List[str]:
                 item = line[match.start() :].strip()
                 if item and not item.startswith("#"):  # Skip headers
                     # Remove any trailing "(no deadline or priority mentioned)"
-                    item = re.sub(
-                        r"\s*\(no deadline or priority mentioned\)$", "", item
-                    )
+                    item = re.sub(r"\s*\(no deadline or priority mentioned\)$", "", item)
                     items.append(item)
     return items
 
@@ -76,14 +74,10 @@ def format_action_items(items: List[str], filename: str) -> str:
     return formatted
 
 
-def main():
+def main() -> None:
     # Set up argument parser
-    parser = argparse.ArgumentParser(
-        description="Post-process action items from voice memos."
-    )
-    parser.add_argument(
-        "-f", "--force", action="store_true", help="Force overwrite of existing files"
-    )
+    parser = argparse.ArgumentParser(description="Post-process action items from voice memos.")
+    parser.add_argument("-f", "--force", action="store_true", help="Force overwrite of existing files")
     args = parser.parse_args()
 
     # Set up directory paths

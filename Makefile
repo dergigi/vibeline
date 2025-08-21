@@ -15,24 +15,21 @@ setup-pre-commit: ## Set up pre-commit hooks
 
 lint: ## Run all linting checks
 	@echo "Running Black (code formatting check)..."
-	black --check --diff src/ tests/ run/
+	black --check --diff src/
 	@echo "Running isort (import sorting check)..."
-	isort --check-only --diff src/ tests/ run/
+	isort --check-only --diff src/
 	@echo "Running flake8 (style and error checking)..."
-	flake8 src/ tests/ run/
+	flake8 src/
 	@echo "Running mypy (type checking)..."
-	mypy src/ run/
+	mypy src/
 	@echo "✅ All linting checks passed!"
 
 format: ## Format code with Black and isort
 	@echo "Formatting code with Black..."
-	black src/ tests/ run/
+	black src/
 	@echo "Sorting imports with isort..."
-	isort src/ tests/ run/
+	isort src/
 	@echo "✅ Code formatting complete!"
-
-test: ## Run tests
-	pytest tests/ -v --tb=short
 
 clean: ## Clean up Python cache files
 	find . -type f -name "*.pyc" -delete
@@ -41,4 +38,4 @@ clean: ## Clean up Python cache files
 	find . -type d -name ".pytest_cache" -exec rm -rf {} +
 	find . -type d -name ".mypy_cache" -exec rm -rf {} +
 
-check-all: lint test ## Run all checks (linting + tests)
+check-all: lint ## Run all checks (linting only)

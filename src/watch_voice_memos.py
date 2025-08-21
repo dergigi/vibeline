@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 
-import os
-import time
-import subprocess
 import argparse
 import logging
+import os
+import subprocess
+import time
 from pathlib import Path
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
+
 from dotenv import load_dotenv
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers import Observer
 
 # Load environment variables
 load_dotenv()
@@ -31,7 +32,7 @@ def count_words(text: str) -> int:
     return len(text.split())
 
 
-def get_file_modification_time(file_path):
+def get_file_modification_time(file_path: Path) -> float:
     """Get the last modification time of a file."""
     return os.path.getmtime(file_path)
 
@@ -46,7 +47,7 @@ def process_voice_memo(file_path: Path, force: bool = False) -> None:
         cmd.append(str(file_path))
 
         # Run subprocess without capturing output to show it in real-time
-        result = subprocess.run(cmd, check=True, text=True)
+        subprocess.run(cmd, check=True, text=True)
         logger.info(f"Successfully processed: {file_path.name}")
     except subprocess.CalledProcessError as e:
         logger.error(f"Error processing {file_path.name}: {e}")
@@ -57,13 +58,13 @@ def process_voice_memo(file_path: Path, force: bool = False) -> None:
 
 
 class VoiceMemoHandler(FileSystemEventHandler):
-    def __init__(self, force=False):
+    def __init__(self, force: bool = False) -> None:
         self.force = force
         self.processed_files = {}  # Track processed files and their modification times
         # Store the resolved base directory
         self.base_dir = Path(VOICE_MEMOS_DIR).resolve()
 
-    def on_created(self, event):
+    def on_created(self, event) -> None:
         if not event.is_directory and event.src_path.endswith(".m4a"):
             # Use the resolved path for processing
             file_path = Path(event.src_path).resolve()
@@ -71,20 +72,17 @@ class VoiceMemoHandler(FileSystemEventHandler):
             logger.debug(f"Added to processed_files: {str(file_path)}")
             process_voice_memo(file_path, force=self.force)
 
-    def on_modified(self, event):
+    def on_modified(self, event) -> None:
         if not event.is_directory and event.src_path.endswith(".m4a"):
             # Use the resolved path for processing
             file_path = Path(event.src_path).resolve()
             current_mtime = get_file_modification_time(file_path)
-            if (
-                str(file_path) not in self.processed_files
-                or self.processed_files[str(file_path)] != current_mtime
-            ):
+            if str(file_path) not in self.processed_files or self.processed_files[str(file_path)] != current_mtime:
                 self.processed_files[str(file_path)] = current_mtime
                 logger.debug(f"Updated in processed_files: {str(file_path)}")
                 process_voice_memo(file_path, force=self.force)
 
-    def on_deleted(self, event):
+    def on_deleted(self, event) -> None:
         if not event.is_directory:
             # For deleted files, we need to handle the path differently since the file no longer exists
             deleted_file = Path(event.src_path)
@@ -95,19 +93,13 @@ class VoiceMemoHandler(FileSystemEventHandler):
             matching_m4a = self.base_dir / matching_m4a_name
 
             logger.debug(f"Looking for matching m4a: {str(matching_m4a)}")
-            logger.debug(
-                f"Current processed_files: {list(self.processed_files.keys())}"
-            )
+            logger.debug(f"Current processed_files: {list(self.processed_files.keys())}")
 
             if str(matching_m4a) in self.processed_files:
-                logger.info(
-                    f"Reprocessing voice memo due to deletion of {deleted_file.name}"
-                )
+                logger.info(f"Reprocessing voice memo due to deletion of {deleted_file.name}")
                 process_voice_memo(matching_m4a, force=self.force)
             else:
-                logger.info(
-                    f"Deleted file: {deleted_file.name} (type: {deleted_file.suffix})"
-                )
+                logger.info(f"Deleted file: {deleted_file.name} (type: {deleted_file.suffix})")
 
 
 def watch_voice_memos() -> None:
@@ -116,9 +108,7 @@ def watch_voice_memos() -> None:
     voice_memos_dir = Path(VOICE_MEMOS_DIR).resolve()
 
     # Set up argument parser
-    parser = argparse.ArgumentParser(
-        description="Watch for voice memos and process them"
-    )
+    parser = argparse.ArgumentParser(description="Watch for voice memos and process them")
     parser.add_argument(
         "-f",
         "--force",
@@ -129,9 +119,7 @@ def watch_voice_memos() -> None:
 
     # Verify the VoiceMemos directory exists
     if not voice_memos_dir.exists():
-        logger.error(
-            f"VoiceMemos directory does not exist at: {voice_memos_dir.absolute()}"
-        )
+        logger.error(f"VoiceMemos directory does not exist at: {voice_memos_dir.absolute()}")
         return
 
     logger.info("Starting voice memo watcher")
@@ -149,9 +137,7 @@ def watch_voice_memos() -> None:
         for file_path in voice_memos_dir.rglob("*.m4a"):
             # Use resolved paths for processing
             file_path = file_path.resolve()
-            event_handler.processed_files[str(file_path)] = get_file_modification_time(
-                file_path
-            )
+            event_handler.processed_files[str(file_path)] = get_file_modification_time(file_path)
             process_voice_memo(file_path, force=args.force)
 
         # Keep the script running
