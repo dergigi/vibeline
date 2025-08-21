@@ -53,15 +53,25 @@ def format_action_items(items: List[str], filename: str) -> str:
 
     # Extract date and time from filename (format: YYYYMMDD_HHMMSS.txt)
     date_str = filename.split(".")[0]  # Remove .txt extension
-    year = int(date_str[:4])
-    month = int(date_str[4:6])
-    day = int(date_str[6:8])
-    hour = int(date_str[9:11])
-    minute = int(date_str[11:13])
+    
+    # Validate filename format before parsing
+    if not re.match(r"^\d{8}_\d{6}$", date_str):
+        # If filename doesn't match expected format, use a generic header
+        formatted = f"# Action Items from {filename}\n\n"
+    else:
+        try:
+            year = int(date_str[:4])
+            month = int(date_str[4:6])
+            day = int(date_str[6:8])
+            hour = int(date_str[9:11])
+            minute = int(date_str[11:13])
 
-    # Create datetime object and format it
-    dt = datetime(year, month, day, hour, minute)
-    formatted = f"# {dt.strftime('%a %b %d @ %I:%M %p')}\n\n"
+            # Create datetime object and format it
+            dt = datetime(year, month, day, hour, minute)
+            formatted = f"# {dt.strftime('%a %b %d @ %I:%M %p')}\n\n"
+        except (ValueError, IndexError):
+            # If date parsing fails, use a generic header
+            formatted = f"# Action Items from {filename}\n\n"
 
     for item in items:
         # Ensure each item starts with a capital letter
