@@ -24,7 +24,7 @@ Go Lang -> Go
 BTC pay server -> BTCPay Server
 BTC base over -> BTCPay Server
 Lightning Presence -> Lightning Prisms
-Simple X -> SimpleX
+simple X -> SimpleX
 
 # Sovereign Engineering
 summer engineering -> Sovereign Engineering
