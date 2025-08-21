@@ -29,11 +29,32 @@ Cashew -> Cashu
 
 # Sovereign Engineering
 summer engineering -> Sovereign Engineering
+Captains's -> Captain's
+beef steak -> beefsteak
+
+# SEC (Sovereign Engineering Code) variations
+# Letter 'O' to number '0' substitutions
 SCCO1 -> SEC-01
 SCCO2 -> SEC-02
 SCCO3 -> SEC-03
 SCCO4 -> SEC-04
 SCCO5 -> SEC-05
+
+# Missing hyphen variations
+SEC01 -> SEC-01
+SEC02 -> SEC-02
+SEC03 -> SEC-03
+SEC04 -> SEC-04
+SEC05 -> SEC-05
+
+# Space-separated variations
+SEC 01 -> SEC-01
+SEC 02 -> SEC-02
+SEC 03 -> SEC-03
+SEC 04 -> SEC-04
+SEC 05 -> SEC-05
+
+# SCC (Sovereign Engineering Code) misspellings
 SCC0 -> SEC-01
 SCC01 -> SEC-01
 SCC02 -> SEC-02
@@ -41,23 +62,13 @@ SCC03 -> SEC-03
 SCC04 -> SEC-04
 SCC05 -> SEC-05
 SCC -> SEC
-SEC01 -> SEC-01
-SEC02 -> SEC-02
-SEC03 -> SEC-03
-SEC04 -> SEC-04
-SEC05 -> SEC-05
-Captains's -> Captain's
+
+# SECO variations (letter 'O' instead of 'C')
 SECO1 -> SEC-01
 SECO2 -> SEC-02
 SECO3 -> SEC-03
 SECO4 -> SEC-04
 SECO5 -> SEC-05
-beef steak -> beefsteak
-SEC 01 -> SEC-01
-SEC 02 -> SEC-02
-SEC 03 -> SEC-03
-SEC 04 -> SEC-04
-SEC 05 -> SEC-05
 
 # Names
 Andre -> André
