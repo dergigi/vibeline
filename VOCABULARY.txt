@@ -42,6 +42,11 @@ SEC04 -> SEC-04
 SEC05 -> SEC-05
 Captains's -> Captain's
 beef steak -> beefsteak
+SEC 01 -> SEC-01
+SEC 02 -> SEC-02
+SEC 03 -> SEC-03
+SEC 04 -> SEC-04
+SEC 05 -> SEC-05
 
 # Names
 Andre -> André
