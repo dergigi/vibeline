@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
-from pathlib import Path
-import yaml
-from typing import Dict, Optional, Literal, List
 from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Dict, List, Literal, Optional
+
+import yaml
 
 
 @dataclass
@@ -13,15 +14,11 @@ class Plugin:
     run: Literal["always", "matching"]  # When to run the plugin
     prompt: str
     model: Optional[str] = None
-    match: Literal["any", "all"] = field(
-        default="all"
-    )  # Default to "all" if not specified
+    match: Literal["any", "all"] = field(default="all")  # Default to "all" if not specified
     output_extension: str = field(default=".txt")  # Default to .txt if not specified
     command: Optional[str] = None  # Optional command to run after generation
     keywords: List[str] = field(default_factory=list)  # Keywords for matching
-    ignore_if: Optional[str] = (
-        None  # Text that should prevent the plugin from running if found in transcript
-    )
+    ignore_if: Optional[str] = None  # Text that should prevent the plugin from running if found in transcript
 
 
 class PluginManager:
@@ -46,11 +43,9 @@ class PluginManager:
 
                 # Validate required fields
                 required_fields = ["description", "run", "prompt"]
-                for field in required_fields:
-                    if field not in data:
-                        raise ValueError(
-                            f"Plugin {plugin_file} is missing required field: {field}"
-                        )
+                for required_field in required_fields:
+                    if required_field not in data:
+                        raise ValueError(f"Plugin {plugin_file} is missing required field: {required_field}")
 
                 # Validate run field
                 if data["run"] not in ["always", "matching"]:
@@ -74,9 +69,7 @@ class PluginManager:
                     elif old_type == "and":
                         match_value = "all"
                     else:
-                        raise ValueError(
-                            f"Plugin {plugin_file} has invalid type: {old_type}. Must be 'and' or 'or'"
-                        )
+                        raise ValueError(f"Plugin {plugin_file} has invalid type: {old_type}. Must be 'and' or 'or'")
 
                 # Handle keywords
                 keywords = []
@@ -99,9 +92,7 @@ class PluginManager:
                     prompt=data["prompt"],
                     model=data.get("model"),  # Optional
                     match=match_value or "all",  # Default to 'all' if not specified
-                    output_extension=data.get(
-                        "output_extension", ".txt"
-                    ),  # Default to .txt
+                    output_extension=data.get("output_extension", ".txt"),  # Default to .txt
                     command=data.get("command"),  # Get the command if present
                     keywords=keywords,  # Add keywords
                     ignore_if=data.get("ignore_if"),  # Get ignore_if if present
@@ -117,12 +108,6 @@ class PluginManager:
         """Get all loaded plugins."""
         return self.plugins
 
-    def get_plugins_by_run_type(
-        self, run_type: Literal["always", "matching"]
-    ) -> Dict[str, Plugin]:
+    def get_plugins_by_run_type(self, run_type: Literal["always", "matching"]) -> Dict[str, Plugin]:
         """Get all plugins with a specific run type."""
-        return {
-            name: plugin
-            for name, plugin in self.plugins.items()
-            if plugin.run == run_type
-        }
+        return {name: plugin for name, plugin in self.plugins.items() if plugin.run == run_type}
