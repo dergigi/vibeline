@@ -22,6 +22,7 @@ Pie thon -> Python
 Rust Lang -> Rust
 Go Lang -> Go
 BTC pay server -> BTCPay Server
+BTC base over -> BTCPay Server
 Lightning Presence -> Lightning Prisms
 
 # Sovereign Engineering
