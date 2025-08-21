@@ -33,6 +33,11 @@ SCC03 -> SEC-03
 SCC04 -> SEC-04
 SCC05 -> SEC-05
 SCC -> SEC
+SEC01 -> SEC-01
+SEC02 -> SEC-02
+SEC03 -> SEC-03
+SEC04 -> SEC-04
+SEC05 -> SEC-05
 Captains's -> Captain's
 beef steak -> beefsteak
 
