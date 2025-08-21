@@ -1,5 +1,19 @@
 #!/bin/bash
 
+# Check for ffmpeg
+if ! command -v ffmpeg &> /dev/null; then
+    echo "ffmpeg is not installed. Please install it using:"
+    echo "brew install ffmpeg"
+    exit 1
+fi
+
+# Check for whisper
+if ! command -v whisper &> /dev/null; then
+    echo "whisper is not installed. Please install it using:"
+    echo "brew install openai-whisper"
+    exit 1
+fi
+
 # Check if virtual environment exists
 if [ ! -d "vibenv" ]; then
     echo "Creating virtual environment..."

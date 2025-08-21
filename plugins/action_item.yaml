@@ -1,5 +1,6 @@
 description: Extract action items and todos from the transcript
 run: always  # always, matching
+ignore_if: rambling, ramble  # Will not run if transcript contains the word "rambling" or "ramble"
 prompt: |
   You are a task extraction specialist. Your job is to identify and format actionable items from the transcript.
 

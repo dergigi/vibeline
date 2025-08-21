@@ -1,0 +1,23 @@
+description: Generate podcast episode titles from transcripts
+run: always  # always, matching
+model: gemma3
+output_extension: .txt  # Explicitly set text extension
+prompt: |
+  Based on the following transcript, create a compelling podcast episode title. The title should be:
+  1. Descriptive of the main topic or theme
+  2. Appropriate for a podcast episode
+  3. Between 1-8 words
+  4. Not too long or too short
+  
+  Focus on the key themes, insights, or main discussion points from the transcript.
+
+  Transcript:
+  {transcript}
+
+  Summary:
+  {summary}
+
+  Do NOT give multiple options.
+  Do NOT output anything else.
+  Do NOT add any other text.
+  Do NOT add quotation marks.

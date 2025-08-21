@@ -1,5 +1,7 @@
 description: Generate detailed app idea specifications from transcripts
 run: matching  # always, matching
+match: all
+ignore_if: rambling  # Will not run if transcript contains the word "rambling"
 prompt: |
   Based on the following transcript and its summary, create a detailed app idea specification. The specification should include:
   1. App name and tagline

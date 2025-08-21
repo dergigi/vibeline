@@ -43,9 +43,55 @@ prompt: |
 | Field | Description | Default Value |
 |-------|-------------|---------------|
 | `model` | Specific language model to use | System default |
-| `type` | Comparison type (`and` or `or`) for matching conditions | `and` |
+| `match` | How to match keywords (`any` or `all`) | `all` |
 | `output_extension` | File extension for the output | `.txt` |
 | `command` | Command to execute after generation | None |
+| `keywords` | Keywords to trigger the plugin when in `matching` mode | Derived from plugin name |
+| `ignore_if` | Text that prevents the plugin from running if found in transcript | None |
+
+### Keywords
+
+The `keywords` field is used to determine when a plugin should be triggered in `matching` mode. It can be specified in two ways:
+
+1. As a comma-separated string:
+```yaml
+keywords: blog, post, article
+```
+
+2. As a list:
+```yaml
+keywords:
+  - blog
+  - post
+  - article
+```
+
+If no keywords are specified, they will be automatically derived from the plugin name by splitting on underscores. For example:
+- `blog_post.yaml` → keywords: ["blog", "post"]
+- `app_idea.yaml` → keywords: ["app", "idea"]
+- `therapist.yaml` → keywords: ["therapist"]
+
+### Matching Behavior
+
+When a plugin has `run: matching`, its activation depends on the `match` field:
+
+- `match: any` - The plugin will be triggered if ANY of its keywords are found in the text
+- `match: all` - The plugin will be triggered only if ALL of its keywords are found in the text
+
+For example:
+```yaml
+run: matching
+match: any
+keywords: svg, graphic, logo, illustration
+```
+This plugin will be triggered if any of the words "svg", "graphic", "logo", or "illustration" appear in the text.
+
+```yaml
+run: matching
+match: all
+keywords: action, item
+```
+This plugin will only be triggered if both "action" AND "item" appear in the text.
 
 ## Plugin Types and Run Modes
 
@@ -116,12 +162,13 @@ prompt: |
   Summary:
 ```
 
-### Action Item Extractor (action_item.yaml)
+### Action Item Extractor with Ignore Condition (action_item.yaml)
 
 ```yaml
 description: Extract action items and todos from the transcript
 type: or
 run: always
+ignore_if: rambling  # Will not run if transcript contains the word "rambling"
 prompt: |
   You are a task extraction specialist. Your job is to identify actionable items.
   
@@ -154,18 +201,38 @@ prompt: |
 ### SVG Generator with Custom Extension
 
 ```yaml
-name: svg
 description: Generate SVG files based on user descriptions
-type: and
-run: matching
+type: any  # and, or
+run: matching  # always, matching
+keywords: svg, graphic, logo, illustration
 output_extension: .svg
 prompt: |
-  You are an SVG generation specialist. Create an SVG file that matches the description.
-  
+  You are an SVG generation specialist. Your job is to create SVG files based on user descriptions.
+
   User request:
   {transcript}
-  
-  Please generate a valid SVG file with proper XML formatting.
+
+  Please generate a valid SVG file that matches the user's description. The SVG should:
+  1. Be well-formed and valid XML
+  2. Include proper SVG namespace and viewBox
+  3. Be optimized for web use
+  4. Use appropriate SVG elements and attributes
+  5. Include comments explaining the structure
+
+  Rules:
+  - Output only the SVG code, no markdown or additional text
+  - Use proper XML formatting
+  - Include viewBox attribute
+  - Use semantic element names
+  - Add comments for complex sections
+  - Optimize for performance
+  - The output will be saved as an SVG file, so ensure it's complete and valid
+
+  Format the output as:
+  <?xml version="1.0" encoding="UTF-8"?>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+    <!-- SVG content here -->
+  </svg>
 ```
 
 ### Build Idea Plugin with Command Execution

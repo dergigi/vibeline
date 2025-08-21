@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
+import argparse
+import logging
 import os
 import re
-import argparse
-from pathlib import Path
-from typing import List, Dict
 from datetime import datetime
+from pathlib import Path
+from typing import List
+
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -14,25 +16,34 @@ load_dotenv()
 # Configuration from environment variables
 VOICE_MEMOS_DIR = os.getenv("VOICE_MEMOS_DIR", "VoiceMemos")
 
+# Set up logging
+logger = logging.getLogger(__name__)
+
+
 def extract_action_items(content: str) -> List[str]:
     """Extract action items from content, cleaning up any non-letter characters from the beginning."""
     items = []
-    for line in content.split('\n'):
+    for line in content.split("\n"):
         # Skip empty lines, headers, and lines starting with whitespace
-        if not line.strip() or line.strip().startswith(('Here are', 'Rules were', 'No action items')) or line.startswith((' ', '\t')):
+        if (
+            not line.strip()
+            or line.strip().startswith(("Here are", "Rules were", "No action items"))
+            or line.startswith((" ", "\t"))
+        ):
             continue
 
         # Match lines that start with any list marker (-, *, +)
-        if re.match(r'^\s*[-*+]', line):
+        if re.match(r"^\s*[-*+]", line):
             # Find the first letter in the line
-            match = re.search(r'[a-zA-Z]', line)
+            match = re.search(r"[a-zA-Z]", line)
             if match:
-                item = line[match.start():].strip()
-                if item and not item.startswith('#'):  # Skip headers
+                item = line[match.start() :].strip()
+                if item and not item.startswith("#"):  # Skip headers
                     # Remove any trailing "(no deadline or priority mentioned)"
-                    item = re.sub(r'\s*\(no deadline or priority mentioned\)$', '', item)
+                    item = re.sub(r"\s*\(no deadline or priority mentioned\)$", "", item)
                     items.append(item)
     return items
+
 
 def format_action_items(items: List[str], filename: str) -> str:
     """Format action items in markdown checkbox format with consistent - [ ] prefix.
@@ -41,7 +52,7 @@ def format_action_items(items: List[str], filename: str) -> str:
         return "# No items found\n"
 
     # Extract date and time from filename (format: YYYYMMDD_HHMMSS.txt)
-    date_str = filename.split('.')[0]  # Remove .txt extension
+    date_str = filename.split(".")[0]  # Remove .txt extension
     year = int(date_str[:4])
     month = int(date_str[4:6])
     day = int(date_str[6:8])
@@ -56,16 +67,17 @@ def format_action_items(items: List[str], filename: str) -> str:
         # Ensure each item starts with a capital letter
         item = item[0].upper() + item[1:] if item else item
         # Ensure each item ends with a period
-        if not item.endswith(('.', '!', '?')):
-            item += '.'
+        if not item.endswith((".", "!", "?")):
+            item += "."
         formatted += f"- [ ] {item}\n"
 
     return formatted
 
-def main():
+
+def main() -> None:
     # Set up argument parser
-    parser = argparse.ArgumentParser(description='Post-process action items from voice memos.')
-    parser.add_argument('-f', '--force', action='store_true', help='Force overwrite of existing files')
+    parser = argparse.ArgumentParser(description="Post-process action items from voice memos.")
+    parser.add_argument("-f", "--force", action="store_true", help="Force overwrite of existing files")
     args = parser.parse_args()
 
     # Set up directory paths
@@ -77,21 +89,21 @@ def main():
     todos_dir.mkdir(parents=True, exist_ok=True)
 
     if not action_items_dir.exists():
-        print("No action items directory found")
+        logger.error("No action items directory found")
         return
 
     # Process each action items file
     for action_file in action_items_dir.glob("*.txt"):
-        print(f"Processing {action_file.name}...")
+        logger.info(f"Processing {action_file.name}...")
 
         # Check if output file already exists
         formatted_file = todos_dir / f"{action_file.stem}.md"
         if formatted_file.exists() and not args.force:
-            print(f"  Skipping: {formatted_file} already exists")
+            logger.info(f"Skipping: {formatted_file} already exists")
             continue
 
         # Read the action items
-        with open(action_file, 'r', encoding='utf-8') as f:
+        with open(action_file, "r", encoding="utf-8") as f:
             content = f.read()
 
         # Extract and format action items
@@ -99,16 +111,17 @@ def main():
 
         # Skip if no items found
         if not items:
-            print(f"  No action items found in {action_file.name}")
+            logger.info(f"No action items found in {action_file.name}")
             continue
 
         formatted_content = format_action_items(items, action_file.stem)
 
         # Save formatted content in TODOs directory
-        with open(formatted_file, 'w', encoding='utf-8') as f:
+        with open(formatted_file, "w", encoding="utf-8") as f:
             f.write(formatted_content)
 
-        print(f"  Formatted content saved to: {formatted_file}")
+        logger.info(f"Formatted content saved to: {formatted_file}")
+
 
 if __name__ == "__main__":
     main()

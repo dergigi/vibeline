@@ -1,5 +1,7 @@
 description: Generate draft blog posts from transcripts
 run: matching  # always, matching
+match: all
+ignore_if: rambling  # Will not run if transcript contains the word "rambling"
 output_extension: .md  # Explicitly set markdown extension
 prompt: |
   Based on the following transcript and its summary, create a draft blog post. The draft should include:

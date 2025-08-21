@@ -1,7 +1,8 @@
 description: Generate SVG files based on user descriptions
 model: llama3  # Optional, falls back to OLLAMA_MODEL from .env
-type: and  # and, or
+type: any  # and, or
 run: matching  # always, matching
+keywords: svg, graphic, logo, illustration
 output_extension: .svg
 prompt: |
   You are an SVG generation specialist. Your job is to create SVG files based on user descriptions.
