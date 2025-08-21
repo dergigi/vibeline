@@ -6,9 +6,10 @@ import os
 import subprocess
 import time
 from pathlib import Path
+from typing import Dict
 
 from dotenv import load_dotenv
-from watchdog.events import FileSystemEventHandler
+from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers import Observer
 
 # Load environment variables
@@ -60,32 +61,32 @@ def process_voice_memo(file_path: Path, force: bool = False) -> None:
 class VoiceMemoHandler(FileSystemEventHandler):
     def __init__(self, force: bool = False) -> None:
         self.force = force
-        self.processed_files = {}  # Track processed files and their modification times
+        self.processed_files: Dict[str, float] = {}  # Track processed files and their modification times
         # Store the resolved base directory
         self.base_dir = Path(VOICE_MEMOS_DIR).resolve()
 
-    def on_created(self, event) -> None:
-        if not event.is_directory and event.src_path.endswith(".m4a"):
+    def on_created(self, event: FileSystemEvent) -> None:
+        if not event.is_directory and str(event.src_path).endswith(".m4a"):
             # Use the resolved path for processing
-            file_path = Path(event.src_path).resolve()
+            file_path = Path(str(event.src_path)).resolve()
             self.processed_files[str(file_path)] = get_file_modification_time(file_path)
             logger.debug(f"Added to processed_files: {str(file_path)}")
             process_voice_memo(file_path, force=self.force)
 
-    def on_modified(self, event) -> None:
-        if not event.is_directory and event.src_path.endswith(".m4a"):
+    def on_modified(self, event: FileSystemEvent) -> None:
+        if not event.is_directory and str(event.src_path).endswith(".m4a"):
             # Use the resolved path for processing
-            file_path = Path(event.src_path).resolve()
+            file_path = Path(str(event.src_path)).resolve()
             current_mtime = get_file_modification_time(file_path)
             if str(file_path) not in self.processed_files or self.processed_files[str(file_path)] != current_mtime:
                 self.processed_files[str(file_path)] = current_mtime
                 logger.debug(f"Updated in processed_files: {str(file_path)}")
                 process_voice_memo(file_path, force=self.force)
 
-    def on_deleted(self, event) -> None:
+    def on_deleted(self, event: FileSystemEvent) -> None:
         if not event.is_directory:
             # For deleted files, we need to handle the path differently since the file no longer exists
-            deleted_file = Path(event.src_path)
+            deleted_file = Path(str(event.src_path))
             logger.info(f"File deleted: {deleted_file.name}")
 
             # Check if there's a matching m4a file in our processed files
