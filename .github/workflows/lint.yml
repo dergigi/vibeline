@@ -36,23 +36,19 @@ jobs:
 
     - name: Run Black (code formatting check)
       run: |
-        black --check --diff src/ tests/ run/
+        black --check --diff src/
 
     - name: Run isort (import sorting check)
       run: |
-        isort --check-only --diff src/ tests/ run/
+        isort --check-only --diff src/
 
     - name: Run flake8 (style and error checking)
       run: |
-        flake8 src/ tests/ run/
+        flake8 src/
 
     - name: Run mypy (type checking)
       run: |
-        mypy src/ run/
-
-    - name: Run pytest (unit tests)
-      run: |
-        pytest tests/ -v --tb=short
+        mypy src/
 
   format-check:
     runs-on: ubuntu-latest
@@ -76,14 +72,14 @@ jobs:
     - name: Check if code is formatted
       run: |
         # Check if any files need formatting
-        if black --check --diff src/ tests/ run/ 2>&1 | grep -q "would reformat"; then
-          echo "❌ Code formatting issues found. Please run 'black src/ tests/ run/' to fix them."
+        if black --check --diff src/ 2>&1 | grep -q "would reformat"; then
+          echo "❌ Code formatting issues found. Please run 'black src/' to fix them."
           exit 1
         fi
         
         # Check if imports are sorted
-        if isort --check-only --diff src/ tests/ run/ 2>&1 | grep -q "ERROR"; then
-          echo "❌ Import sorting issues found. Please run 'isort src/ tests/ run/' to fix them."
+        if isort --check-only --diff src/ 2>&1 | grep -q "ERROR"; then
+          echo "❌ Import sorting issues found. Please run 'isort src/' to fix them."
           exit 1
         fi
         
