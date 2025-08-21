@@ -53,7 +53,7 @@ def format_action_items(items: List[str], filename: str) -> str:
 
     # Extract date and time from filename (format: YYYYMMDD_HHMMSS.txt)
     date_str = filename.split(".")[0]  # Remove .txt extension
-    
+
     # Validate filename format before parsing
     if not re.match(r"^\d{8}_\d{6}$", date_str):
         # If filename doesn't match expected format, use a generic header
