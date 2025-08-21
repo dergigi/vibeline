@@ -19,3 +19,12 @@ Type script -> TypeScript
 Pie thon -> Python
 Rust Lang -> Rust
 Go Lang -> Go
+BTC pay server -> BTCPay Server
+
+# Sovereign Engineering
+summer engineering -> Sovereign Engineering
+SCC01 -> SEC-01
+SCC02 -> SEC-02
+SCC03 -> SEC-03
+SCC04 -> SEC-04
+SCC05 -> SEC-05
