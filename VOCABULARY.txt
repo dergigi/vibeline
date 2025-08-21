@@ -7,6 +7,8 @@ Nostril -> Nostr
 Nostrum -> Nostr
 Nostre -> Nostr
 Nostra -> Nostr
+Ninside -> nSite
+NOSR -> NOSTR
 
 Pipeline -> vibeline
 vive line -> vibeline
@@ -20,6 +22,7 @@ Pie thon -> Python
 Rust Lang -> Rust
 Go Lang -> Go
 BTC pay server -> BTCPay Server
+Lightning Presence -> Lightning Prisms
 
 # Sovereign Engineering
 summer engineering -> Sovereign Engineering
@@ -28,3 +31,10 @@ SCC02 -> SEC-02
 SCC03 -> SEC-03
 SCC04 -> SEC-04
 SCC05 -> SEC-05
+SCC -> SEC
+Captains's -> Captain's
+beef steak -> beefsteak
+
+# Names
+Andre -> André
+VHF -> fiatjaf
