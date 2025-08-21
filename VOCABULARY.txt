@@ -56,3 +56,4 @@ SEC 05 -> SEC-05
 # Names
 Andre -> André
 VHF -> fiatjaf
+Kelly -> calle
