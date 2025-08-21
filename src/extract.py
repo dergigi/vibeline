@@ -12,7 +12,8 @@ from typing import Dict, List
 import inflect
 import ollama
 from dotenv import load_dotenv
-from plugin_manager import PluginManager, Plugin
+
+from plugin_manager import Plugin, PluginManager
 from transcript_cleaner import TranscriptCleaner
 
 # Load environment variables
@@ -116,15 +117,15 @@ def ensure_model_exists(model_name: str) -> None:
 
 def main() -> None:
     # Set up argument parser
-    parser = argparse.ArgumentParser(description='Extract content from transcripts using plugins.')
-    parser.add_argument('transcript_file', help='The transcript file to process')
-    parser.add_argument('-f', '--force', action='store_true', help='Force overwrite existing output files')
-    parser.add_argument('--no-clean', action='store_true', help='Skip transcript cleaning step')
+    parser = argparse.ArgumentParser(description="Extract content from transcripts using plugins.")
+    parser.add_argument("transcript_file", help="The transcript file to process")
+    parser.add_argument("-f", "--force", action="store_true", help="Force overwrite existing output files")
+    parser.add_argument("--no-clean", action="store_true", help="Skip transcript cleaning step")
     args = parser.parse_args()
 
     # Ensure the default model exists
     ensure_model_exists(OLLAMA_MODEL)
-    
+
     input_file = Path(args.transcript_file)
     if not input_file.exists():
         logger.error(f"Error: File {input_file} does not exist")
@@ -153,13 +154,13 @@ def main() -> None:
     logger.info("Extracting content...")
 
     # Read transcript
-    with open(input_file, 'r', encoding='utf-8') as f:
+    with open(input_file, "r", encoding="utf-8") as f:
         original_transcript_text = f.read()
-    
+
     # Clean transcript if not disabled
     if not args.no_clean:
         print("Cleaning transcript...")
-        
+
         # Check if vocabulary file exists
         vocabulary_path = Path(VOCABULARY_FILE)
         if not vocabulary_path.exists():
@@ -169,7 +170,7 @@ def main() -> None:
             # Initialize transcript cleaner and clean the transcript
             cleaner = TranscriptCleaner(vocabulary_file=vocabulary_path)
             transcript_text, corrections = cleaner.clean_transcript(original_transcript_text)
-            
+
             # Log corrections
             if corrections:
                 print(f"Made {len(corrections)} corrections to the transcript.")
@@ -179,10 +180,10 @@ def main() -> None:
                     print(f"{i}. Line {correction['line']}:")
                     print(f"   Original: {correction['original']}")
                     print(f"   Corrected: {correction['corrected']}")
-                
+
                 # Save cleaned transcript
                 cleaned_file = input_file.parent / f"{input_file.stem}_cleaned.txt"
-                with open(cleaned_file, 'w', encoding='utf-8') as f:
+                with open(cleaned_file, "w", encoding="utf-8") as f:
                     f.write(transcript_text)
                 print(f"Cleaned transcript saved to: {cleaned_file}")
             else:
