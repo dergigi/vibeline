@@ -181,11 +181,15 @@ def main() -> None:
                     print(f"   Original: {correction['original']}")
                     print(f"   Corrected: {correction['corrected']}")
 
-                # Save cleaned transcript
-                cleaned_file = input_file.parent / f"{input_file.stem}_cleaned.txt"
-                with open(cleaned_file, "w", encoding="utf-8") as f:
+                # Rename original file to .orig and save cleaned version as main file
+                original_backup = input_file.parent / f"{input_file.stem}.txt.orig"
+                input_file.rename(original_backup)
+                print(f"Original transcript saved to: {original_backup}")
+                
+                # Save cleaned transcript as the main file
+                with open(input_file, "w", encoding="utf-8") as f:
                     f.write(transcript_text)
-                print(f"Cleaned transcript saved to: {cleaned_file}")
+                print(f"Cleaned transcript saved as: {input_file}")
             else:
                 print("No corrections needed for this transcript.")
                 transcript_text = original_transcript_text
