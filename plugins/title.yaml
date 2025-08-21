@@ -1,0 +1,20 @@
+description: Generate podcast episode titles from transcripts
+run: always  # always, matching
+output_extension: .txt  # Explicitly set text extension
+prompt: |
+  Based on the following transcript, create a compelling podcast episode title. The title should be:
+  1. Engaging and attention-grabbing
+  2. Descriptive of the main topic or theme
+  3. Appropriate for a podcast episode
+  4. Between 3-8 words
+  5. Not too long or too short
+
+  Focus on the key themes, insights, or main discussion points from the transcript.
+
+  Transcript:
+  {transcript}
+
+  Summary:
+  {summary}
+
+  Podcast Episode Title:
