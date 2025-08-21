@@ -25,6 +25,7 @@ BTC pay server -> BTCPay Server
 BTC base over -> BTCPay Server
 Lightning Presence -> Lightning Prisms
 simple X -> SimpleX
+Cashew -> Cashu
 
 # Sovereign Engineering
 summer engineering -> Sovereign Engineering
