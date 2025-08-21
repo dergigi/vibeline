@@ -55,15 +55,15 @@ SEC 04 -> SEC-04
 SEC 05 -> SEC-05
 
 # SCC (Sovereign Engineering Code) misspellings
-SCC0 -> SEC-01
 SCC01 -> SEC-01
 SCC02 -> SEC-02
 SCC03 -> SEC-03
 SCC04 -> SEC-04
 SCC05 -> SEC-05
+SCC0 -> SEC-01
 SCC -> SEC
 
-# SECO variations (letter 'O' instead of 'C')
+# SECO variations (letter 'O' instead of number '0')
 SECO1 -> SEC-01
 SECO2 -> SEC-02
 SECO3 -> SEC-03
