@@ -29,6 +29,11 @@ Cashew -> Cashu
 
 # Sovereign Engineering
 summer engineering -> Sovereign Engineering
+SCCO1 -> SEC-01
+SCCO2 -> SEC-02
+SCCO3 -> SEC-03
+SCCO4 -> SEC-04
+SCCO5 -> SEC-05
 SCC0 -> SEC-01
 SCC01 -> SEC-01
 SCC02 -> SEC-02
