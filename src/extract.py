@@ -185,7 +185,7 @@ def main() -> None:
                 original_backup = input_file.parent / f"{input_file.stem}.txt.orig"
                 input_file.rename(original_backup)
                 print(f"Original transcript saved to: {original_backup}")
-                
+
                 # Save cleaned transcript as the main file
                 with open(input_file, "w", encoding="utf-8") as f:
                     f.write(transcript_text)
