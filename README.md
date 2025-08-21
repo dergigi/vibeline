@@ -45,6 +45,40 @@ This will:
 - Activate the virtual environment
 - Install all required dependencies
 
+## Development Setup
+
+For contributors, we recommend using the development setup script:
+
+```bash
+./dev-setup.sh
+```
+
+This will:
+- Set up the development environment with all linting tools
+- Format existing code
+- Provide convenient make commands for development
+- Optionally install pre-commit hooks (run `make setup-pre-commit` if desired)
+
+### Available Development Commands
+
+- `make help` - Show all available commands
+- `make lint` - Run all linting checks (Black, isort, flake8, mypy)
+- `make format` - Format code with Black and isort
+- `make test` - Run tests
+- `make check-all` - Run linting and tests
+
+### Code Quality
+
+This project uses several tools to maintain code quality:
+
+- **Black** - Code formatting
+- **isort** - Import sorting
+- **flake8** - Style and error checking
+- **mypy** - Type checking
+- **pre-commit** - Git hooks for automatic checks (optional)
+
+All PRs must pass linting checks before they can be merged. The GitHub Actions workflow will catch any issues, so pre-commit hooks are optional for local development. See `.github/BRANCH_PROTECTION.md` for details on setting up branch protection rules.
+
 ## How to use
 
 - Use whatever you want to record voice notes (I use [Fossify](https://github.com/FossifyOrg/Voice-Recorder))
