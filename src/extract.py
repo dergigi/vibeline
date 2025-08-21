@@ -29,6 +29,7 @@ ollama.host = os.getenv("OLLAMA_HOST", "http://localhost:11434")
 # Set up logging
 logger = logging.getLogger(__name__)
 
+
 def determine_active_plugins(text: str, plugins: Dict[str, Plugin]) -> List[str]:
     """Determine which plugins should be run on this transcript."""
     active_plugins = set()  # Use a set to avoid duplicates
@@ -42,8 +43,12 @@ def determine_active_plugins(text: str, plugins: Dict[str, Plugin]) -> List[str]
         logger.debug(f"  Ignore if: {plugin.ignore_if}")
 
         # Check if plugin should be ignored
-        if plugin.ignore_if and re.search(r'\b' + plugin.ignore_if + r'\b', text.lower()):
-            logger.debug(f"  Skipped: Found ignore_if text '{plugin.ignore_if}' in transcript")
+        if plugin.ignore_if and re.search(
+            r"\b" + plugin.ignore_if + r"\b", text.lower()
+        ):
+            logger.debug(
+                f"  Skipped: Found ignore_if text '{plugin.ignore_if}' in transcript"
+            )
             continue
 
         # Always include plugins with run: always
@@ -60,11 +65,13 @@ def determine_active_plugins(text: str, plugins: Dict[str, Plugin]) -> List[str]
                 logger.debug(f"  Using keywords: {words}")
             else:
                 # Fall back to splitting plugin name if no keywords defined
-                words = plugin_name.split('_')
+                words = plugin_name.split("_")
                 logger.debug(f"  Using plugin name words: {words}")
-                
-            matches = [word for word in words if re.search(r'\b' + word + r'\b', text.lower())]
-            
+
+            matches = [
+                word for word in words if re.search(r"\b" + word + r"\b", text.lower())
+            ]
+
             if plugin.match == "any":
                 if matches:
                     logger.debug(f"  Activated: Yes (matched keywords: {matches})")
@@ -80,20 +87,19 @@ def determine_active_plugins(text: str, plugins: Dict[str, Plugin]) -> List[str]
 
     return list(active_plugins)
 
-def generate_additional_content(plugin: Plugin, transcript_text: str, summary_text: str) -> str:
+
+def generate_additional_content(
+    plugin: Plugin, transcript_text: str, summary_text: str
+) -> str:
     """Generate additional content using the specified plugin."""
     prompt = plugin.prompt.format(transcript=transcript_text, summary=summary_text)
 
     # Use plugin-specific model if specified, otherwise use default
     model = plugin.model or OLLAMA_MODEL
 
-    response = ollama.chat(model=model, messages=[
-        {
-            'role': 'user',
-            'content': prompt
-        }
-    ])
-    return response['message']['content'].strip()
+    response = ollama.chat(model=model, messages=[{"role": "user", "content": prompt}])
+    return response["message"]["content"].strip()
+
 
 def ensure_model_exists(model_name: str) -> None:
     """
@@ -112,11 +118,19 @@ def ensure_model_exists(model_name: str) -> None:
             logger.error(f"Error pulling model {model_name}: {e}")
             sys.exit(1)
 
+
 def main():
     # Set up argument parser
-    parser = argparse.ArgumentParser(description='Extract content from transcripts using plugins.')
-    parser.add_argument('transcript_file', help='The transcript file to process')
-    parser.add_argument('-f', '--force', action='store_true', help='Force overwrite existing output files')
+    parser = argparse.ArgumentParser(
+        description="Extract content from transcripts using plugins."
+    )
+    parser.add_argument("transcript_file", help="The transcript file to process")
+    parser.add_argument(
+        "-f",
+        "--force",
+        action="store_true",
+        help="Force overwrite existing output files",
+    )
     args = parser.parse_args()
 
     # Ensure the default model exists
@@ -150,14 +164,14 @@ def main():
     logger.info("Extracting content...")
 
     # Read transcript
-    with open(input_file, 'r', encoding='utf-8') as f:
+    with open(input_file, "r", encoding="utf-8") as f:
         transcript_text = f.read()
 
     # Read summary if it exists
     summary_file = input_file.parent / f"{input_file.stem}_summary.txt"
     summary_text = ""
     if summary_file.exists():
-        with open(summary_file, 'r', encoding='utf-8') as f:
+        with open(summary_file, "r", encoding="utf-8") as f:
             summary_text = f.read()
 
     # Determine which plugins to run
@@ -169,16 +183,22 @@ def main():
 
             # Check if output file exists
             filename = input_file.stem
-            output_file = output_dirs[plugin_name] / f"{filename}{plugin.output_extension}"
+            output_file = (
+                output_dirs[plugin_name] / f"{filename}{plugin.output_extension}"
+            )
 
             if output_file.exists() and not args.force:
-                logger.info(f"Skipping: {output_file} already exists (use -f to overwrite)")
+                logger.info(
+                    f"Skipping: {output_file} already exists (use -f to overwrite)"
+                )
                 continue
 
-            additional_content = generate_additional_content(plugin, transcript_text, summary_text)
+            additional_content = generate_additional_content(
+                plugin, transcript_text, summary_text
+            )
 
             # Save to appropriate directory using base filename
-            with open(output_file, 'w', encoding='utf-8') as f:
+            with open(output_file, "w", encoding="utf-8") as f:
                 f.write(additional_content)
             logger.info(f"Content saved to: {output_file}")
 
@@ -189,20 +209,31 @@ def main():
                     cmd_to_run = plugin.command.replace("FILE", str(output_file))
                     logger.info(f"Executing command: {cmd_to_run}")
                     # Run the command, check=True raises an exception on non-zero exit code
-                    subprocess.run(cmd_to_run, shell=True, check=True, text=True, capture_output=True)
+                    subprocess.run(
+                        cmd_to_run,
+                        shell=True,
+                        check=True,
+                        text=True,
+                        capture_output=True,
+                    )
                     logger.info("Command executed successfully.")
                 except FileNotFoundError:
-                    logger.error(f"Error: Command not found - {plugin.command.split()[0]}")
+                    logger.error(
+                        f"Error: Command not found - {plugin.command.split()[0]}"
+                    )
                 except subprocess.CalledProcessError as e:
                     logger.error(f"Error executing command: {e}")
                     logger.error(f"Stderr: {e.stderr}")
                     logger.error(f"Stdout: {e.stdout}")
                 except Exception as e:
-                    logger.error(f"An unexpected error occurred during command execution: {e}")
+                    logger.error(
+                        f"An unexpected error occurred during command execution: {e}"
+                    )
     else:
         logger.info("No matching plugins found for this transcript")
 
     logger.info("----------------------------------------")
+
 
 if __name__ == "__main__":
     main()

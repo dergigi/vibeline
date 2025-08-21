@@ -7,6 +7,7 @@ def test_imports():
     """Test that we can import the main modules."""
     try:
         from src import extract, plugin_manager, post_process, watch_voice_memos
+
         assert True
     except ImportError as e:
         pytest.fail(f"Failed to import modules: {e}")
