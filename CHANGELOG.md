@@ -79,7 +79,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove test infrastructure and excessive linting documentation files
 - Disable build_app and svg plugins
 - Remove redundant name field from plugin yamls
-- Remove svg.yaml and keep backup file
+- Remove `svg.yaml` and keep backup file
 
 ## [0.0.2] - 2025-04-08
 
