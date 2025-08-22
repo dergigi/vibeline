@@ -32,6 +32,11 @@ PERSONAL_VOCABULARY_FILE = os.getenv("PERSONAL_VOCABULARY_FILE", "~/.vibeline/vo
 ollama.host = os.getenv("OLLAMA_HOST", "http://localhost:11434")  # type: ignore
 
 # Set up logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
 logger = logging.getLogger(__name__)
 
 
