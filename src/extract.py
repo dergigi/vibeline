@@ -6,7 +6,6 @@ import os
 import re
 import subprocess
 import sys
-from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -358,11 +357,11 @@ def main() -> None:
                         logger.info("Command executed successfully.")
                         if result.stdout:
                             logger.info(f"Command output: {result.stdout.strip()}")
-                            # If this is the blossom plugin, save JSON output to blossoms/ as timestamped file
+                            # If this is the blossom plugin, save JSON output to blossoms/ using original base filename
                             if plugin_name == "blossom":
                                 try:
-                                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                                    json_path = output_dirs[plugin_name] / f"{timestamp}.json"
+                                    base_name = input_file.stem  # matches original audio filename base
+                                    json_path = output_dirs[plugin_name] / f"{base_name}.json"
                                     with open(json_path, "w", encoding="utf-8") as f:
                                         f.write(result.stdout.strip())
                                     logger.info(f"Saved blossom output to: {json_path}")
