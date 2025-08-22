@@ -3,17 +3,20 @@
 ## [Unreleased]
 
 ### Added
-- 
+
+-
 
 ### Changed
-- 
+
+-
 
 ### Fixed
-- 
+
+-
 
 ### Removed
-- 
 
+-
 
 All notable changes to this project will be documented in this file.
 
@@ -23,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.3] - 2025-08-22
 
 ### Added
+
 - Vocabulary corrections for technical terms and names
 - Logging system across Python files
 - Keyword matching with trigger keywords
@@ -38,14 +42,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Versioning and changelog system with semantic versioning management
 
 ### Changed
+
 - Transcript file naming patterns: `.txt` & `.txt.orig` (if cleaned)
-- Upgrade default model to `llama3` 
+- Upgrade default model to `llama3`
 - Suggest `tinyllama` as default model
 - Remove explicit model definitions from plugins, use `OLLAMA_MODEL` from env
 - Make plugin type field optional with default `'and'` and ignore when run is `'always'`
 - Derive plugin names from filename instead of explicit name field
 
 ### Fixed
+
 - Handle symlinks across platforms
 - Use absolute path for directory watching
 - Add error handling for invalid filenames in `post_process.py`
@@ -53,6 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove `ignore_if` from therapist and mood plugins
 
 ### Removed
+
 - Remove test infrastructure and excessive linting documentation files
 - Disable `build_app` and `svg` plugins
 - Remove redundant name field from plugin yamls
