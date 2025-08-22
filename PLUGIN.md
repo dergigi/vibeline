@@ -344,7 +344,7 @@ run: matching
 keywords: ["upload", "blossom", "share", "cloud"]
 match: any
 ignore_if: rambling
-command: "blossom-cli upload -server $BLOSSOM_SERVER -file AUDIO_FILE -privkey $NOSTR_SECRET_KEY"
+command: "nak blossom --server $BLOSSOM_SERVER upload AUDIO_FILE"
 ```
 
 Required environment variables:
@@ -358,7 +358,7 @@ The blossom plugin demonstrates how to create an upload plugin that:
 
 1. **Triggers on specific keywords** - Runs when "upload", "blossom", "share", or "cloud" are mentioned
 2. **Automatically finds the audio file** - Deduces the .m4a file path from the transcript location
-3. **Integrates with external services** - Uses blossom-cli to upload to a Blossom server
+3. **Integrates with external services** - Uses `nak` to upload to a Blossom server
 4. **Handles authentication** - Uses environment variables for sensitive configuration
 
 ```yaml
@@ -371,12 +371,12 @@ ignore_if: rambling
 prompt: |
   Upload triggered for audio file.
   This plugin will upload the audio file to Blossom server.
-command: "blossom-cli upload -server $BLOSSOM_SERVER -file AUDIO_FILE -privkey $BLOSSOM_PRIVKEY"
+command: "nak blossom --server $BLOSSOM_SERVER upload AUDIO_FILE"
 ```
 
 To use this plugin:
 
-1. Install blossom-cli: `go install github.com/girino/blossom-cli@latest`
+1. Install `nak`: `go install github.com/fiatjaf/nak@latest` ([docs](https://github.com/fiatjaf/nak#upload-and-download-files-with-blossom))
 2. Set environment variables:
 
    ```bash
