@@ -10,7 +10,6 @@ const options = {
         "list-marker-space": false, // Allow different list marker spacing
         "ordered-list-marker-suffix": false, // Allow different ordered list suffixes
     },
-    customRules: ["@github/markdownlint-github"],
     markdownItFactory,
     outputFormatters: [
       [ "markdownlint-cli2-formatter-pretty", { "appendLink": true } ]
