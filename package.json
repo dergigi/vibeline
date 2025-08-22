@@ -7,7 +7,7 @@
     "lint:markdown:fix": "markdownlint-cli2 \"**/*.{md,mdx}\" \"!node_modules\" \"!vibenv\" \"!VoiceMemos/**\" --fix"
   },
   "devDependencies": {
-    "@github/markdownlint-github": "^0.8.0",
+    "@github/markdownlint-github": "^0.7.0",
     "markdownlint-cli2": "^0.8.0",
     "markdownlint-cli2-formatter-pretty": "^0.0.8"
   },
