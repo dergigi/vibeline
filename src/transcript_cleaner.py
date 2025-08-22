@@ -8,25 +8,28 @@ from typing import Dict, List, Optional, Tuple
 
 
 class TranscriptCleaner:
-    def __init__(self, vocabulary_file: Optional[Path] = None):
+    def __init__(self, vocabulary_file: Optional[Path] = None, personal_vocabulary_file: Optional[Path] = None):
         """
-        Initialize the transcript cleaner with a vocabulary file.
+        Initialize the transcript cleaner with vocabulary files.
 
         Args:
-            vocabulary_file: Path to the vocabulary file containing corrections
+            vocabulary_file: Path to the base vocabulary file containing corrections
+            personal_vocabulary_file: Path to the personal vocabulary file (optional)
         """
         self.vocabulary_file = vocabulary_file
+        self.personal_vocabulary_file = personal_vocabulary_file
         self.corrections: Dict[str, str] = {}
 
-        # Load vocabulary file if provided
+        # Load vocabulary files if provided
         if vocabulary_file and vocabulary_file.exists():
-            self._load_vocabulary()
+            self._load_vocabulary(vocabulary_file)
+        
+        if personal_vocabulary_file and personal_vocabulary_file.exists():
+            self._load_vocabulary(personal_vocabulary_file)
 
-    def _load_vocabulary(self) -> None:
-        """Load word corrections from the vocabulary file."""
-        if self.vocabulary_file is None:
-            return
-        with open(self.vocabulary_file, "r", encoding="utf-8") as f:
+    def _load_vocabulary(self, vocabulary_file: Path) -> None:
+        """Load word corrections from a vocabulary file."""
+        with open(vocabulary_file, "r", encoding="utf-8") as f:
             for line in f:
                 line = line.strip()
                 if not line or line.startswith("#"):

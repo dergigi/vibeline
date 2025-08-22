@@ -14,10 +14,11 @@ load_dotenv()
 
 def main():
     vocabulary_file = Path(os.getenv("VOCABULARY_FILE", "VOCABULARY.txt"))
+    personal_vocabulary_file = Path(os.getenv("PERSONAL_VOCABULARY_FILE", "~/.vibeline/vocabulary.txt")).expanduser()
     
-    # Check if vocabulary file exists
+    # Check if base vocabulary file exists
     if not vocabulary_file.exists():
-        print(f"Error: Vocabulary file {vocabulary_file} not found.")
+        print(f"Error: Base vocabulary file {vocabulary_file} not found.")
         print("Please create it first or specify a different file with VOCABULARY_FILE environment variable.")
         sys.exit(1)
     
@@ -47,8 +48,11 @@ def main():
         text = " ".join(sys.argv[1:])
         print(f"Cleaning text: {text}")
     
-    # Initialize the transcript cleaner
-    cleaner = TranscriptCleaner(vocabulary_file=vocabulary_file)
+    # Initialize the transcript cleaner with both vocabulary files
+    cleaner = TranscriptCleaner(
+        vocabulary_file=vocabulary_file,
+        personal_vocabulary_file=personal_vocabulary_file if personal_vocabulary_file.exists() else None
+    )
     
     # Clean the transcript
     cleaned_text, corrections = cleaner.clean_transcript(text)

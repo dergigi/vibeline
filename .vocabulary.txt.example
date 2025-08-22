@@ -1,0 +1,25 @@
+# Personal vocabulary file for transcript corrections
+# This file is for your personal corrections and will not be committed to version control
+# 
+# To use this:
+# 1. Create the VibeLine config directory: mkdir -p ~/.vibeline
+# 2. Copy this file: cp .vocabulary.txt.example ~/.vibeline/vocabulary.txt
+# 3. Edit ~/.vibeline/vocabulary.txt to add your own corrections
+
+# Personal names and terms
+John -> Jon
+Sarah -> Sara
+my company -> Acme Corp
+my project -> Project Alpha
+
+# Technical terms specific to your work
+my framework -> React
+my database -> PostgreSQL
+my server -> AWS EC2
+
+# Domain-specific jargon
+industry term -> correct term
+common typo -> correct spelling
+
+# Add your own corrections below:
+# incorrect_word -> correct_word
