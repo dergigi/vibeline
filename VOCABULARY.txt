@@ -27,6 +27,9 @@ Lightning Presence -> Lightning Prisms
 simple X -> SimpleX
 Cashew -> Cashu
 
+# LLMs and stuff
+LLAMs -> LLMs
+
 # Sovereign Engineering
 summer engineering -> Sovereign Engineering
 Captains's -> Captain's
