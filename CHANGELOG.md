@@ -24,17 +24,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Versioning and changelog system with semantic versioning management
-- Docker versioning support with automatic image tag updates
+- Docker versioning support with image tag updates
 - Markdown linting integration with GitHub Actions
-- Comprehensive linting setup with optional pre-commit hooks
+- Linting setup with `make lint`
 - Title plugin for podcast episode title generation
 - Mood plugin for sentiment analysis
 - Build idea plugin with command execution support
 - Command execution support for plugins
-- Comprehensive vocabulary corrections for technical terms and names
-- Improved transcript file naming patterns
-- Consistent logging system across Python files
-- Enhanced keyword matching with trigger keywords
+- Vocabulary corrections for technical terms and names
+- Transcript file naming patterns
+- Logging system across Python files
+- Keyword matching with trigger keywords
 - Touch grass philosophy documentation and image
 
 ### Changed
@@ -64,7 +64,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use absolute path for directory watching
 - Watch resolved directory path for voice memos
 - Restore working path handling for voice memos
-- Handle symlinks consistently across platforms
+- Handle symlinks across platforms
 - Store full paths for voice memo processing
 - Use correct base directory for voice memo processing
 - Add missing os import in post_process
@@ -126,7 +126,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Todo extraction functionality
 - Plugin system for content extraction
 - Summary generation capabilities
-- File watching and automatic processing
+- File watching and processing
 - Action item extraction and formatting
 
 ### Changed
