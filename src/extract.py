@@ -266,17 +266,19 @@ def main() -> None:
             # Execute command if defined for the plugin
             if plugin.command:
                 try:
-                    # Replace FILE placeholder with the actual output file path
-                    cmd_to_run = plugin.command.replace("FILE", str(output_file))
-
-                    # Replace AUDIO_FILE placeholder with the deduced audio file path
-                    if "AUDIO_FILE" in cmd_to_run:
+                    # Replace AUDIO_FILE placeholder first (before FILE to avoid conflicts)
+                    if "AUDIO_FILE" in plugin.command:
                         audio_file_path = deduce_audio_file_path(input_file)
                         if audio_file_path:
-                            cmd_to_run = cmd_to_run.replace("AUDIO_FILE", str(audio_file_path))
+                            cmd_to_run = plugin.command.replace("AUDIO_FILE", str(audio_file_path))
                         else:
                             logger.warning(f"Plugin {plugin_name} requires AUDIO_FILE but audio file not found")
                             continue
+                    else:
+                        cmd_to_run = plugin.command
+                    
+                    # Replace FILE placeholder with the actual output file path
+                    cmd_to_run = cmd_to_run.replace("FILE", str(output_file))
 
                     logger.info(f"Executing command: {cmd_to_run}")
                     # Run the command, check=True raises an exception on non-zero exit code
