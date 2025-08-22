@@ -26,6 +26,7 @@ p = inflect.engine()
 OLLAMA_MODEL = os.getenv("OLLAMA_EXTRACT_MODEL", "llama2")
 VOICE_MEMOS_DIR = os.getenv("VOICE_MEMOS_DIR", "VoiceMemos")
 VOCABULARY_FILE = os.getenv("VOCABULARY_FILE", "VOCABULARY.txt")
+PERSONAL_VOCABULARY_FILE = os.getenv("PERSONAL_VOCABULARY_FILE", "~/.vibeline/vocabulary.txt")
 
 # Set a different host (default is http://localhost:11434)
 ollama.host = os.getenv("OLLAMA_HOST", "http://localhost:11434")  # type: ignore
@@ -161,14 +162,24 @@ def main() -> None:
     if not args.no_clean:
         print("Cleaning transcript...")
 
-        # Check if vocabulary file exists
+        # Check if vocabulary files exist
         vocabulary_path = Path(VOCABULARY_FILE)
+        personal_vocabulary_path = Path(PERSONAL_VOCABULARY_FILE).expanduser()
+
         if not vocabulary_path.exists():
-            print(f"Warning: Vocabulary file {VOCABULARY_FILE} not found. Skipping transcript cleaning.")
+            print(f"Warning: Base vocabulary file {VOCABULARY_FILE} not found. Skipping transcript cleaning.")
             transcript_text = original_transcript_text
         else:
-            # Initialize transcript cleaner and clean the transcript
-            cleaner = TranscriptCleaner(vocabulary_file=vocabulary_path)
+            # Check if personal vocabulary exists
+            personal_vocab_used = personal_vocabulary_path.exists()
+            if personal_vocab_used:
+                print(f"Using personal vocabulary: {personal_vocabulary_path}")
+
+            # Initialize transcript cleaner with both vocabulary files
+            cleaner = TranscriptCleaner(
+                vocabulary_file=vocabulary_path,
+                personal_vocabulary_file=personal_vocabulary_path if personal_vocab_used else None,
+            )
             transcript_text, corrections = cleaner.clean_transcript(original_transcript_text)
 
             # Log corrections

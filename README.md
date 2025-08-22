@@ -133,21 +133,57 @@ All PRs must pass linting checks before they can be merged. The GitHub Actions w
 
 ### Transcript Cleaning
 
-VibeLine includes a transcript cleaning feature that corrects common transcription errors based on a customizable vocabulary file. This is especially useful for technical terms, names, or domain-specific jargon that speech recognition models often misinterpret.
+VibeLine includes a transcript cleaning feature that corrects common transcription errors based on customizable vocabulary files. This is especially useful for technical terms, names, or domain-specific jargon that speech recognition models often misinterpret.
 
-To use this feature:
+#### Base Vocabulary
 
-1. Edit the `VOCABULARY.txt` file in the root directory to add your custom corrections:
+The project includes a base vocabulary file (`VOCABULARY.txt`) with common corrections that are shared across all users. This file is version controlled and should contain general corrections that apply to most users.
 
-```txt
-# Format: incorrect_word -> correct_word
-Noster -> Nostr
-```
+#### Personal Vocabulary
 
-1. The transcript cleaner will automatically run as part of the extraction process.
+You can create your own personal vocabulary file for corrections specific to your work, names, or domain. This file is stored in your home directory and will not be committed to version control.
 
-2. You can customize the behavior with these options:
-   - `--no-clean`: Skip the transcript cleaning step entirely
+**To set up your personal vocabulary:**
+
+1. Create the VibeLine configuration directory:
+
+   ```bash
+   mkdir -p ~/.vibeline
+   ```
+
+2. Create your personal vocabulary file:
+
+   ```bash
+   touch ~/.vibeline/vocabulary.txt
+   ```
+
+3. Edit `~/.vibeline/vocabulary.txt` to add your personal corrections:
+
+   ```txt
+   # Personal names and terms
+   John -> Jon
+   Sarah -> Sara
+   my company -> Acme Corp
+   
+   # Technical terms specific to your work
+   my framework -> React
+   my database -> PostgreSQL
+   ```
+
+4. The system will automatically use both vocabulary files, with personal corrections taking precedence.
+
+#### Configuration
+
+You can customize the vocabulary files using environment variables:
+
+- `VOCABULARY_FILE`: Path to the base vocabulary file (default: `VOCABULARY.txt`)
+- `PERSONAL_VOCABULARY_FILE`: Path to your personal vocabulary file (default: `~/.vibeline/vocabulary.txt`)
+
+#### Usage
+
+The transcript cleaner will automatically run as part of the extraction process. You can customize the behavior with these options:
+
+- `--no-clean`: Skip the transcript cleaning step entirely
 
 ## Contributors
 
