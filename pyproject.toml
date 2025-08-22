@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "vibeline"
-version = "0.1.0"
+version = "0.0.2"
 description = "A powerful voice memo processing system that uses AI to extract meaningful content"
 authors = [{name = "VibeLine Contributors"}]
 readme = "README.md"
