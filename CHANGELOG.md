@@ -71,8 +71,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix parameter order in Plugin instance creation
 - Reorder Plugin dataclass fields to fix TypeError
 - Add 'ramble' to action_item ignore conditions
-- Remove ignore_if from therapist and mood plugins
-- Add ignore_if field to prevent plugin execution based on transcript content
+- Remove `ignore_if` from therapist and mood plugins
+- Add `ignore_if` field to prevent plugin execution based on transcript content
 - Fix linting and type checking issues
 
 ### Removed
