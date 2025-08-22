@@ -87,12 +87,14 @@ def determine_active_plugins(text: str, plugins: Dict[str, Plugin]) -> List[str]
     return list(active_plugins)
 
 
-def generate_additional_content(plugin: Plugin, transcript_text: str, summary_text: str) -> str:
-    """Generate additional content using the specified plugin."""
-    prompt = plugin.prompt.format(transcript=transcript_text, summary=summary_text)
+def generate_additional_content(
+    prompt_template: str, transcript_text: str, summary_text: str, model_override: Optional[str]
+) -> str:
+    """Generate additional content using the given prompt template and optional model override."""
+    prompt = prompt_template.format(transcript=transcript_text, summary=summary_text)
 
     # Use plugin-specific model if specified, otherwise use default
-    model = plugin.model or OLLAMA_MODEL
+    model = model_override or OLLAMA_MODEL
 
     response = ollama.chat(model=model, messages=[{"role": "user", "content": prompt}])
     return str(response["message"]["content"]).strip()
@@ -155,7 +157,7 @@ def expand_environment_variables(command: str) -> str:
     # Replace $VARIABLE_NAME with actual values
     # Use lookahead to ensure we're at a word boundary or end of string
     expanded = re.sub(r"\$([A-Z_][A-Z0-9_]*)(?=\s|$)", replace_var, command)
-    
+
     # Normalize common values (e.g., strip trailing slash from BLOSSOM_SERVER)
     # Do this post-expansion to avoid changing placeholders.
     server = os.getenv("BLOSSOM_SERVER")
@@ -286,7 +288,7 @@ def main() -> None:
         for plugin_name in active_plugins:
             plugin = plugins[plugin_name]
             logger.info(f"Running {plugin_name} plugin...")
-            
+
             # Add extra debug info for blossom plugin
             if plugin_name == "blossom":
                 logger.info(f"Blossom plugin command: {plugin.command}")
@@ -300,12 +302,18 @@ def main() -> None:
                 logger.info(f"Skipping: {output_file} already exists (use -f to overwrite)")
                 continue
 
-            additional_content = generate_additional_content(plugin, transcript_text, summary_text)
+            # Generate content only if plugin has a non-empty prompt
+            if plugin.prompt and plugin.prompt.strip():
+                additional_content = generate_additional_content(
+                    plugin.prompt, transcript_text, summary_text, plugin.model
+                )
 
-            # Save to appropriate directory using base filename
-            with open(output_file, "w", encoding="utf-8") as f:
-                f.write(additional_content)
-            logger.info(f"Content saved to: {output_file}")
+                # Save to appropriate directory using base filename
+                with open(output_file, "w", encoding="utf-8") as f:
+                    f.write(additional_content)
+                logger.info(f"Content saved to: {output_file}")
+            else:
+                logger.info(f"Skipping generation for {plugin_name} (no prompt provided)")
 
             # Execute command if defined for the plugin
             if plugin.command:
@@ -344,7 +352,7 @@ def main() -> None:
                         text=True,
                         capture_output=True,
                     )
-                    
+
                     if result.returncode == 0:
                         logger.info("Command executed successfully.")
                         if result.stdout:
@@ -356,9 +364,7 @@ def main() -> None:
                         if result.stdout:
                             logger.info(f"Command stdout: {result.stdout.strip()}")
                         # Re-raise as CalledProcessError for backward compatibility
-                        raise subprocess.CalledProcessError(
-                            result.returncode, cmd_to_run, result.stdout, result.stderr
-                        )
+                        raise subprocess.CalledProcessError(result.returncode, cmd_to_run, result.stdout, result.stderr)
                 except FileNotFoundError:
                     cmd_name = plugin.command.split()[0]
                     logger.error(f"Error: Command not found - {cmd_name}")
