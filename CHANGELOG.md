@@ -23,59 +23,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.3] - 2025-08-22
 
 ### Added
-- Versioning and changelog system with semantic versioning management
-- Docker versioning support with image tag updates
-- Markdown linting integration with GitHub Actions
-- Linting setup with `make lint`
-- Title plugin for podcast episode title generation
+- Vocabulary corrections for technical terms and names
+- Logging system across Python files
+- Keyword matching with trigger keywords
+- Add `ignore_if` field to prevent plugin execution based on transcript content
+- Add 'ramble' to `action_item` ignore conditions
 - Mood plugin for sentiment analysis
 - Build idea plugin with command execution support
 - Command execution support for plugins
-- Vocabulary corrections for technical terms and names
-- Transcript file naming patterns
-- Logging system across Python files
-- Keyword matching with trigger keywords
 - Touch grass philosophy documentation and image
+- Title plugin for podcast episode title generation
+- Linting setup with `make lint`
+- Markdown linting integration with GitHub Actions
+- Versioning and changelog system with semantic versioning management
 
 ### Changed
-- Upgrade default model to `llama3` for better performance
-- Suggest `tinyllama` as default model for better performance
-- Remove explicit model definitions from plugins, use OLLAMA_MODEL from env
-- Make plugin type field optional with default 'and' and ignore when run is 'always'
+- Transcript file naming patterns: `.txt` & `.txt.orig` (if cleaned)
+- Upgrade default model to `llama3` 
+- Suggest `tinyllama` as default model
+- Remove explicit model definitions from plugins, use `OLLAMA_MODEL` from env
+- Make plugin type field optional with default `'and'` and ignore when run is `'always'`
 - Derive plugin names from filename instead of explicit name field
-- Reorganize and document Sovereign Engineering section in vocabulary
-- Improve SCC section order and fix SECO comment
 
 ### Fixed
-- Fixed markdown linting issues in CI pipeline by removing problematic `@github/markdownlint-github` dependency
-- Resolved module resolution errors in GitHub Actions workflow
-- Simplified markdownlint configuration to use standard rules with custom overrides
-- Add Node.js setup to GitHub Actions lint workflow
-- Resolve all markdown linting issues
-- Add error handling for invalid filenames in post_process.py
-- Fix add missing SCC space-separated corrections
-- Update SimpleX correction to handle lowercase transcription
-- Add types-PyYAML dependency to GitHub Actions
-- Simplify GitHub Actions to use make lint command
-- Update GitHub Actions workflow to remove test directory references
-- Resolve all mypy type checking issues
-- Update dev-setup.sh to remove test and pre-commit references
-- Remove test infrastructure and update linting configuration
-- Use absolute path for directory watching
-- Watch resolved directory path for voice memos
-- Restore working path handling for voice memos
 - Handle symlinks across platforms
-- Store full paths for voice memo processing
-- Use correct base directory for voice memo processing
-- Add missing os import in post_process
-- Add 'ramble' to action_item ignore conditions
+- Use absolute path for directory watching
+- Add error handling for invalid filenames in `post_process.py`
+- Simplify GitHub Actions to use `make lint` command
 - Remove `ignore_if` from therapist and mood plugins
-- Add `ignore_if` field to prevent plugin execution based on transcript content
-- Fix linting and type checking issues
 
 ### Removed
 - Remove test infrastructure and excessive linting documentation files
-- Disable build_app and svg plugins
+- Disable `build_app` and `svg` plugins
 - Remove redundant name field from plugin yamls
 - Remove `svg.yaml` and keep backup file
 
