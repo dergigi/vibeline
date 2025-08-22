@@ -10,7 +10,6 @@ Nostra -> Nostr
 Ninside -> nSite
 NOSR -> NOSTR
 
-Pipeline -> vibeline
 vive line -> vibeline
 
 # Technical terms
@@ -74,7 +73,4 @@ SECO4 -> SEC-04
 SECO5 -> SEC-05
 
 # Names
-Andre -> André
 VHF -> fiatjaf
-Kelly -> calle
-Tania -> Thanja
