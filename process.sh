@@ -47,7 +47,7 @@ fi
 
 # Step 2: Extract content (including summary)
 echo "Step 2: Extracting content..."
-./extract.sh $force_flag "$transcript_file"
+./extract.sh $force_flag "$transcript_file" "$input_file"
 
 # Step 3: Post-process action items
 echo "Step 3: Post-processing action items..."

@@ -313,3 +313,70 @@ When loading plugins, the system validates:
 3. The `run` field is either "always" or "matching"
 
 If validation fails, an error is raised and the plugin is not loaded.
+
+## Audio File Integration
+
+Some plugins may need access to the original audio file (e.g., for uploading). The system supports this through the `AUDIO_FILE` placeholder in plugin commands.
+
+### Using AUDIO_FILE in Commands
+
+When a plugin has a `command` field, you can use `AUDIO_FILE` as a placeholder that will be replaced with the path to the original audio file:
+
+```yaml
+name: upload_plugin
+description: Upload audio file to cloud storage
+run: matching
+keywords: ["upload", "cloud"]
+command: "upload-tool --file AUDIO_FILE --destination cloud"
+```
+
+### Environment Variables for Audio Plugins
+
+For plugins that interact with external services, you can use environment variables in commands:
+
+```yaml
+name: blossom
+description: Upload audio file to Blossom when trigger words are detected
+run: matching
+keywords: ["upload", "blossom", "share", "cloud"]
+match: any
+ignore_if: rambling
+command: "blossom-cli upload -server $BLOSSOM_SERVER -file AUDIO_FILE -privkey $BLOSSOM_PRIVKEY"
+```
+
+Required environment variables:
+- `BLOSSOM_SERVER`: The Blossom server URL
+- `BLOSSOM_PRIVKEY`: Your Nostr private key for authentication
+
+### Example: Blossom Upload Plugin
+
+The blossom plugin demonstrates how to create an upload plugin that:
+
+1. **Triggers on specific keywords** - Runs when "upload", "blossom", "share", or "cloud" are mentioned
+2. **Uses the original audio file** - Accesses the .m4a file via the `AUDIO_FILE` placeholder
+3. **Integrates with external services** - Uses blossom-cli to upload to a Blossom server
+4. **Handles authentication** - Uses environment variables for sensitive configuration
+
+```yaml
+name: blossom
+description: Upload audio file to Blossom when trigger words are detected
+run: matching
+keywords: ["upload", "blossom", "share", "cloud"]
+match: any
+ignore_if: rambling
+prompt: |
+  Upload triggered for audio file.
+  This plugin will upload the audio file to Blossom server.
+command: "blossom-cli upload -server $BLOSSOM_SERVER -file AUDIO_FILE -privkey $BLOSSOM_PRIVKEY"
+```
+
+To use this plugin:
+
+1. Install blossom-cli: `go install github.com/girino/blossom-cli@latest`
+2. Set environment variables:
+   ```bash
+   export BLOSSOM_SERVER="http://your-blossom-server.com"
+   export BLOSSOM_PRIVKEY="nsec1yourprivatekey"
+   ```
+3. Mention trigger words in your voice memo: "I want to upload this to blossom"
+4. The plugin will automatically upload the audio file to your Blossom server

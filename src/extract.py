@@ -122,6 +122,7 @@ def main() -> None:
     parser.add_argument("transcript_file", help="The transcript file to process")
     parser.add_argument("-f", "--force", action="store_true", help="Force overwrite existing output files")
     parser.add_argument("--no-clean", action="store_true", help="Skip transcript cleaning step")
+    parser.add_argument("--audio-file", help="Path to the original audio file (for plugins that need it)")
     args = parser.parse_args()
 
     # Ensure the default model exists
@@ -241,6 +242,14 @@ def main() -> None:
                 try:
                     # Replace FILE placeholder with the actual output file path
                     cmd_to_run = plugin.command.replace("FILE", str(output_file))
+                    
+                    # Replace AUDIO_FILE placeholder with the audio file path if provided
+                    if args.audio_file:
+                        cmd_to_run = cmd_to_run.replace("AUDIO_FILE", str(args.audio_file))
+                    elif "AUDIO_FILE" in cmd_to_run:
+                        logger.warning(f"Plugin {plugin_name} requires AUDIO_FILE but no audio file path provided")
+                        continue
+                    
                     logger.info(f"Executing command: {cmd_to_run}")
                     # Run the command, check=True raises an exception on non-zero exit code
                     subprocess.run(
