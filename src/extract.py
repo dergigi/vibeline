@@ -7,7 +7,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import inflect
 import ollama
@@ -101,22 +101,22 @@ def generate_additional_content(plugin: Plugin, transcript_text: str, summary_te
 def deduce_audio_file_path(transcript_file: Path) -> Optional[Path]:
     """
     Deduce the original audio file path from the transcript file path.
-    
+
     Expected structure:
     - Audio file: VoiceMemos/voice_memo.m4a
     - Transcript file: VoiceMemos/transcripts/voice_memo.txt
-    
+
     Returns the deduced audio file path or None if it doesn't exist.
     """
     # Get the filename without extension
     filename = transcript_file.stem
-    
+
     # Go up one directory (from transcripts/ to VoiceMemos/)
     voice_memos_dir = transcript_file.parent.parent
-    
+
     # Construct the audio file path
     audio_file = voice_memos_dir / f"{filename}.m4a"
-    
+
     # Check if the audio file exists
     if audio_file.exists():
         return audio_file
@@ -268,7 +268,7 @@ def main() -> None:
                 try:
                     # Replace FILE placeholder with the actual output file path
                     cmd_to_run = plugin.command.replace("FILE", str(output_file))
-                    
+
                     # Replace AUDIO_FILE placeholder with the deduced audio file path
                     if "AUDIO_FILE" in cmd_to_run:
                         audio_file_path = deduce_audio_file_path(input_file)
@@ -277,7 +277,7 @@ def main() -> None:
                         else:
                             logger.warning(f"Plugin {plugin_name} requires AUDIO_FILE but audio file not found")
                             continue
-                    
+
                     logger.info(f"Executing command: {cmd_to_run}")
                     # Run the command, check=True raises an exception on non-zero exit code
                     subprocess.run(

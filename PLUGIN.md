@@ -348,6 +348,7 @@ command: "blossom-cli upload -server $BLOSSOM_SERVER -file AUDIO_FILE -privkey $
 ```
 
 Required environment variables:
+
 - `BLOSSOM_SERVER`: The Blossom server URL
 - `NOSTR_NSEC`: Your Nostr private key for authentication
 
@@ -377,9 +378,11 @@ To use this plugin:
 
 1. Install blossom-cli: `go install github.com/girino/blossom-cli@latest`
 2. Set environment variables:
+
    ```bash
    export BLOSSOM_SERVER="http://your-blossom-server.com"
    export NOSTR_NSEC="nsec1yourprivatekey"
    ```
+
 3. Mention trigger words in your voice memo: "I want to upload this to blossom"
 4. The plugin will automatically upload the audio file to your Blossom server
