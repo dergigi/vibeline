@@ -77,3 +77,4 @@ SECO5 -> SEC-05
 Andre -> André
 VHF -> fiatjaf
 Kelly -> calle
+Tania -> Thanja
