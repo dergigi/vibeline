@@ -165,7 +165,7 @@ def main() -> None:
         # Check if vocabulary files exist
         vocabulary_path = Path(VOCABULARY_FILE)
         personal_vocabulary_path = Path(PERSONAL_VOCABULARY_FILE).expanduser()
-        
+
         if not vocabulary_path.exists():
             print(f"Warning: Base vocabulary file {VOCABULARY_FILE} not found. Skipping transcript cleaning.")
             transcript_text = original_transcript_text
@@ -174,11 +174,11 @@ def main() -> None:
             personal_vocab_used = personal_vocabulary_path.exists()
             if personal_vocab_used:
                 print(f"Using personal vocabulary: {personal_vocabulary_path}")
-            
+
             # Initialize transcript cleaner with both vocabulary files
             cleaner = TranscriptCleaner(
                 vocabulary_file=vocabulary_path,
-                personal_vocabulary_file=personal_vocabulary_path if personal_vocab_used else None
+                personal_vocabulary_file=personal_vocabulary_path if personal_vocab_used else None,
             )
             transcript_text, corrections = cleaner.clean_transcript(original_transcript_text)
 

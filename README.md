@@ -146,16 +146,19 @@ You can create your own personal vocabulary file for corrections specific to you
 **To set up your personal vocabulary:**
 
 1. Create the VibeLine configuration directory:
+
    ```bash
    mkdir -p ~/.vibeline
    ```
 
 2. Create your personal vocabulary file:
+
    ```bash
    touch ~/.vibeline/vocabulary.txt
    ```
 
 3. Edit `~/.vibeline/vocabulary.txt` to add your personal corrections:
+
    ```txt
    # Personal names and terms
    John -> Jon

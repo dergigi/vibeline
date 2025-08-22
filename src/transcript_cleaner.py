@@ -23,7 +23,7 @@ class TranscriptCleaner:
         # Load vocabulary files if provided
         if vocabulary_file and vocabulary_file.exists():
             self._load_vocabulary(vocabulary_file)
-        
+
         if personal_vocabulary_file and personal_vocabulary_file.exists():
             self._load_vocabulary(personal_vocabulary_file)
 
