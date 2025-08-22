@@ -344,13 +344,13 @@ run: matching
 keywords: ["upload", "blossom", "share", "cloud"]
 match: any
 ignore_if: rambling
-command: "blossom-cli upload -server $BLOSSOM_SERVER -file AUDIO_FILE -privkey $NOSTR_NSEC"
+command: "blossom-cli upload -server $BLOSSOM_SERVER -file AUDIO_FILE -privkey $NOSTR_SECRET_KEY"
 ```
 
 Required environment variables:
 
 - `BLOSSOM_SERVER`: The Blossom server URL
-- `NOSTR_NSEC`: Your Nostr private key for authentication
+- `NOSTR_SECRET_KEY`: Your Nostr private key for authentication
 
 ### Example: Blossom Upload Plugin
 
@@ -381,7 +381,7 @@ To use this plugin:
 
    ```bash
    export BLOSSOM_SERVER="http://your-blossom-server.com"
-   export NOSTR_NSEC="nsec1yourprivatekey"
+   export NOSTR_SECRET_KEY="nsec1yourprivatekey"
    ```
 
 3. Mention trigger words in your voice memo: "I want to upload this to blossom"

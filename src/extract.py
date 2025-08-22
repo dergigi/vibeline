@@ -132,12 +132,12 @@ def expand_environment_variables(command: str) -> str:
     Expand environment variables in a command string.
 
     Replaces $VARIABLE_NAME with the actual value from environment variables.
-    Sensitive variables like NOSTR_NSEC are handled securely.
+    Sensitive variables like NOSTR_SECRET_KEY are handled securely.
     """
     import re
 
     # List of sensitive variables that should never be logged
-    SENSITIVE_VARS = {"NOSTR_NSEC", "PRIVATE_KEY", "SECRET", "API_KEY", "TOKEN"}
+    SENSITIVE_VARS = {"NOSTR_SECRET_KEY", "PRIVATE_KEY", "SECRET", "API_KEY", "TOKEN"}
 
     def replace_var(match: "re.Match[str]") -> str:
         var_name = match.group(1)
@@ -338,7 +338,7 @@ def main() -> None:
 
                     # Create a safe version of the command for logging (mask sensitive values)
                     safe_cmd = cmd_to_run
-                    for sensitive_var in ["NOSTR_NSEC", "PRIVATE_KEY", "SECRET", "API_KEY", "TOKEN"]:
+                    for sensitive_var in ["NOSTR_SECRET_KEY", "PRIVATE_KEY", "SECRET", "API_KEY", "TOKEN"]:
                         value = os.getenv(sensitive_var)
                         if value:
                             safe_cmd = safe_cmd.replace(value, f"[{sensitive_var}_HIDDEN]")

@@ -4,4 +4,4 @@ run: matching
 keywords: ["upload", "blossom", "share", "cloud"]
 match: any
 ignore_if: rambling
-command: "blossom-cli upload -server $BLOSSOM_SERVER -file AUDIO_FILE -privkey $NOSTR_NSEC"
+command: "blossom-cli upload -server $BLOSSOM_SERVER -file AUDIO_FILE -privkey $NOSTR_SECRET_KEY"
