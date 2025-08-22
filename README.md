@@ -83,6 +83,8 @@ VibeLine uses semantic versioning and maintains a changelog for all releases.
 - `make version-minor` - Bump minor version (0.1.0 → 0.2.0)
 - `make version-major` - Bump major version (0.1.0 → 1.0.0)
 - `make version-show` - Show version management help
+- `make docker-build` - Build Docker image with current version
+- `make docker-push` - Push Docker image to registry
 
 **Manual version bumping:**
 
@@ -96,8 +98,9 @@ The version script will:
 
 1. Update the version in `pyproject.toml`
 2. Update `CHANGELOG.md` with the new version
-3. Create a git tag for the release
-4. Push the tag to the remote repository
+3. Update `docker-compose.yml` to use the new version
+4. Create a git tag for the release
+5. Push the tag to the remote repository
 
 **Changelog Guidelines:**
 

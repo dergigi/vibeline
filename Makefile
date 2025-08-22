@@ -49,7 +49,7 @@ clean: ## Clean up Python cache files
 check-all: lint ## Run all checks (linting only)
 
 # Version management
-.PHONY: version-patch version-minor version-major version-show
+.PHONY: version-patch version-minor version-major version-show docker-build docker-push
 version-patch:
 	@python scripts/version.py patch
 
@@ -61,3 +61,14 @@ version-major:
 
 version-show:
 	@python scripts/version.py --help
+
+# Docker operations
+docker-build: ## Build Docker image with current version
+	$(eval VERSION := $(shell grep '^version = ' pyproject.toml | cut -d'"' -f2))
+	docker build -t ghcr.io/dergigi/vibeline:$(VERSION) .
+	docker tag ghcr.io/dergigi/vibeline:$(VERSION) ghcr.io/dergigi/vibeline:latest
+
+docker-push: ## Push Docker image with current version
+	$(eval VERSION := $(shell grep '^version = ' pyproject.toml | cut -d'"' -f2))
+	docker push ghcr.io/dergigi/vibeline:$(VERSION)
+	docker push ghcr.io/dergigi/vibeline:latest

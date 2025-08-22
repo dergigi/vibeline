@@ -111,6 +111,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
         f.write(initial_content)
 
 
+def update_docker_compose(new_version: str) -> None:
+    """Update docker-compose.yml to use the new version."""
+    docker_compose_path = PROJECT_ROOT / "docker-compose.yml"
+    
+    if not docker_compose_path.exists():
+        print("Warning: docker-compose.yml not found")
+        return
+    
+    with open(docker_compose_path, "r") as f:
+        content = f.read()
+    
+    # Update the commented image line to use the new version
+    content = re.sub(
+        r"# image: ghcr\.io/dergigi/vibeline.*",
+        f"image: ghcr.io/dergigi/vibeline:{new_version}",
+        content
+    )
+    
+    with open(docker_compose_path, "w") as f:
+        f.write(content)
+    
+    print(f"Updated docker-compose.yml to use version {new_version}")
+
+
 def create_git_tag(version: str) -> None:
     """Create and push git tag for the new version."""
     import subprocess
@@ -164,6 +188,8 @@ def main():
         update_changelog(new_version, args.date)
         print("Updated CHANGELOG.md")
         
+        update_docker_compose(new_version)
+        
         # Create git tag
         if not args.no_tag:
             create_git_tag(new_version)
@@ -173,6 +199,9 @@ def main():
         print("1. Review and update the changelog entries")
         print("2. Commit your changes")
         print("3. Push to remote repository")
+        print("4. Build and push Docker image:")
+        print(f"   docker build -t ghcr.io/dergigi/vibeline:{new_version} .")
+        print(f"   docker push ghcr.io/dergigi/vibeline:{new_version}")
         
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
