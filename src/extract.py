@@ -279,6 +279,11 @@ def main() -> None:
         for plugin_name in active_plugins:
             plugin = plugins[plugin_name]
             logger.info(f"Running {plugin_name} plugin...")
+            
+            # Add extra debug info for blossom plugin
+            if plugin_name == "blossom":
+                logger.info(f"Blossom plugin command: {plugin.command}")
+                logger.info(f"Blossom plugin keywords: {plugin.keywords}")
 
             # Check if output file exists
             filename = input_file.stem
@@ -302,6 +307,7 @@ def main() -> None:
                     if "AUDIO_FILE" in plugin.command:
                         audio_file_path = deduce_audio_file_path(input_file)
                         if audio_file_path:
+                            logger.info(f"Plugin {plugin_name}: Using audio file: {audio_file_path}")
                             cmd_to_run = plugin.command.replace("AUDIO_FILE", str(audio_file_path))
                         else:
                             logger.warning(f"Plugin {plugin_name} requires AUDIO_FILE but audio file not found")
@@ -324,14 +330,28 @@ def main() -> None:
 
                     logger.info(f"Executing command: {safe_cmd}")
                     # Run the command, check=True raises an exception on non-zero exit code
-                    subprocess.run(
+                    result = subprocess.run(
                         cmd_to_run,
                         shell=True,
-                        check=True,
+                        check=False,  # Don't raise exception, handle it manually
                         text=True,
                         capture_output=True,
                     )
-                    logger.info("Command executed successfully.")
+                    
+                    if result.returncode == 0:
+                        logger.info("Command executed successfully.")
+                        if result.stdout:
+                            logger.info(f"Command output: {result.stdout.strip()}")
+                    else:
+                        logger.error(f"Command failed with return code: {result.returncode}")
+                        if result.stderr:
+                            logger.error(f"Command stderr: {result.stderr.strip()}")
+                        if result.stdout:
+                            logger.info(f"Command stdout: {result.stdout.strip()}")
+                        # Re-raise as CalledProcessError for backward compatibility
+                        raise subprocess.CalledProcessError(
+                            result.returncode, cmd_to_run, result.stdout, result.stderr
+                        )
                 except FileNotFoundError:
                     cmd_name = plugin.command.split()[0]
                     logger.error(f"Error: Command not found - {cmd_name}")
