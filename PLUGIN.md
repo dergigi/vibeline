@@ -320,7 +320,10 @@ Some plugins may need access to the original audio file (e.g., for uploading). T
 
 ### Using AUDIO_FILE in Commands
 
-When a plugin has a `command` field, you can use `AUDIO_FILE` as a placeholder that will be replaced with the path to the original audio file:
+When a plugin has a `command` field, you can use `AUDIO_FILE` as a placeholder that will be automatically replaced with the path to the original audio file. The system deduces the audio file path from the transcript file path using the standard directory structure:
+
+- Audio file: `VoiceMemos/voice_memo.m4a`
+- Transcript file: `VoiceMemos/transcripts/voice_memo.txt`
 
 ```yaml
 name: upload_plugin
@@ -353,7 +356,7 @@ Required environment variables:
 The blossom plugin demonstrates how to create an upload plugin that:
 
 1. **Triggers on specific keywords** - Runs when "upload", "blossom", "share", or "cloud" are mentioned
-2. **Uses the original audio file** - Accesses the .m4a file via the `AUDIO_FILE` placeholder
+2. **Automatically finds the audio file** - Deduces the .m4a file path from the transcript location
 3. **Integrates with external services** - Uses blossom-cli to upload to a Blossom server
 4. **Handles authentication** - Uses environment variables for sensitive configuration
 
