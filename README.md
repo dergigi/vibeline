@@ -63,7 +63,8 @@ This will:
 ### Available Development Commands
 
 - `make help` - Show all available commands
-- `make lint` - Run all linting checks (Black, isort, flake8, mypy)
+- `make lint` - Run all linting checks (Black, isort, flake8, mypy, markdownlint)
+- `make lint-markdown` - Run markdown linting only
 - `make format` - Format code with Black and isort
 - `make test` - Run tests
 - `make check-all` - Run linting and tests
@@ -105,6 +106,7 @@ This project uses several tools to maintain code quality:
 - **isort** - Import sorting
 - **flake8** - Style and error checking
 - **mypy** - Type checking
+- **markdownlint-github** - Markdown linting using [GitHub's recommended rules](https://github.com/github/markdownlint-github)
 - **pre-commit** - Git hooks for automatic checks (optional)
 
 All PRs must pass linting checks before they can be merged. The GitHub Actions workflow will catch any issues, so pre-commit hooks are optional for local development. See `.github/BRANCH_PROTECTION.md` for details on setting up branch protection rules.

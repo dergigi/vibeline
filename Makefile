@@ -1,4 +1,4 @@
-.PHONY: help install install-dev lint format test clean setup-pre-commit
+.PHONY: help install install-dev lint format test clean setup-pre-commit lint-markdown
 
 help: ## Show this help message
 	@echo "Available commands:"
@@ -9,6 +9,8 @@ install: ## Install production dependencies
 
 install-dev: ## Install development dependencies
 	pip install -e ".[dev]"
+	@echo "Installing Node.js dependencies for markdown linting..."
+	npm install
 
 setup-pre-commit: ## Set up pre-commit hooks
 	pre-commit install
@@ -22,7 +24,13 @@ lint: ## Run all linting checks
 	flake8 src/
 	@echo "Running mypy (type checking)..."
 	mypy src/
+	@echo "Running markdownlint (markdown linting)..."
+	npm run lint:markdown
 	@echo "✅ All linting checks passed!"
+
+lint-markdown: ## Run markdown linting only
+	@echo "Running markdownlint (markdown linting)..."
+	npm run lint:markdown
 
 format: ## Format code with Black and isort
 	@echo "Formatting code with Black..."
