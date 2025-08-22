@@ -1,14 +1,33 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- 
+
+### Changed
+- 
+
+### Fixed
+- 
+
+### Removed
+- 
+
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.0.3] - 2025-08-22
+
+### Fixed
+- Fixed markdown linting issues in CI pipeline by removing problematic `@github/markdownlint-github` dependency
+- Resolved module resolution errors in GitHub Actions workflow
+- Simplified markdownlint configuration to use standard rules with custom overrides
 
 ### Added
-
 - Versioning and changelog system
 - Semantic versioning management script
 - Makefile integration for version commands

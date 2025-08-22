@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "vibeline"
-version = "0.0.2"
+version = "0.0.3"
 description = "A powerful voice memo processing system that uses AI to extract meaningful content"
 authors = [{name = "VibeLine Contributors"}]
 readme = "README.md"
@@ -75,7 +75,7 @@ per-file-ignores = [
 ]
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "0.0.3"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true

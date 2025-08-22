@@ -9,7 +9,7 @@ services:
 
   vibeline:
     build: .
-    # image: ghcr.io/dergigi/vibeline
+    image: ghcr.io/dergigi/vibeline:0.0.3
     restart: unless-stopped
     environment:
       OLLAMA_HOST: http://ollama:11434
