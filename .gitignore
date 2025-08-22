@@ -20,3 +20,9 @@ __pycache__/
 ollama
 open-webui
 syncthing
+
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

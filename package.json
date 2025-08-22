@@ -1,0 +1,16 @@
+{
+  "name": "vibeline",
+  "version": "0.0.2",
+  "description": "Voice memo processing and analysis tool",
+  "scripts": {
+    "lint:markdown": "markdownlint-cli2 \"**/*.{md,mdx}\" \"!node_modules\" \"!vibenv\" \"!VoiceMemos/**\"",
+    "lint:markdown:fix": "markdownlint-cli2 --fix \"**/*.{md,mdx}\" \"!node_modules\" \"!vibenv\" \"!VoiceMemos/**\""
+  },
+  "devDependencies": {
+    "markdownlint-cli2": "^0.8.0",
+    "markdownlint-cli2-formatter-pretty": "^0.0.8"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
