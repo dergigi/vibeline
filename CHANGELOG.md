@@ -13,18 +13,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Semantic versioning management script
 - Makefile integration for version commands
 
-### Changed
-
--
-
-### Fixed
-
--
-
-### Removed
-
--
-
 ## [0.0.2] - 2025-04-08
 
 ### Added
@@ -76,11 +64,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Clarify prompt instructions for summaries
-
-### Fixed
-
--
-
-### Removed
-
--
