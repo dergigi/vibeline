@@ -357,16 +357,6 @@ def main() -> None:
                         logger.info("Command executed successfully.")
                         if result.stdout:
                             logger.info(f"Command output: {result.stdout.strip()}")
-                            # If this is the blossom plugin, save JSON output to blossoms/ using original base filename
-                            if plugin_name == "blossom":
-                                try:
-                                    base_name = input_file.stem  # matches original audio filename base
-                                    json_path = output_dirs[plugin_name] / f"{base_name}.json"
-                                    with open(json_path, "w", encoding="utf-8") as f:
-                                        f.write(result.stdout.strip())
-                                    logger.info(f"Saved blossom output to: {json_path}")
-                                except Exception as write_err:
-                                    logger.error(f"Failed to save blossom output JSON: {write_err}")
                     else:
                         logger.error(f"Command failed with return code: {result.returncode}")
                         if result.stderr:

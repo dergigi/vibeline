@@ -4,4 +4,5 @@ run: matching
 keywords: ["upload", "blossom", "share", "cloud"]
 match: any
 ignore_if: rambling
-command: "nak blossom --server $BLOSSOM_SERVER upload AUDIO_FILE"
+output_extension: ".json"
+command: "nak blossom --server $BLOSSOM_SERVER upload AUDIO_FILE > \"FILE\""
