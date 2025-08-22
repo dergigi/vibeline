@@ -39,3 +39,17 @@ clean: ## Clean up Python cache files
 	find . -type d -name ".mypy_cache" -exec rm -rf {} +
 
 check-all: lint ## Run all checks (linting only)
+
+# Version management
+.PHONY: version-patch version-minor version-major version-show
+version-patch:
+	@python scripts/version.py patch
+
+version-minor:
+	@python scripts/version.py minor
+
+version-major:
+	@python scripts/version.py major
+
+version-show:
+	@python scripts/version.py --help

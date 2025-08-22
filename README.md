@@ -68,6 +68,35 @@ This will:
 - `make test` - Run tests
 - `make check-all` - Run linting and tests
 
+### Version Management
+
+VibeLine uses semantic versioning and maintains a changelog for all releases.
+
+**Available version commands:**
+- `make version-patch` - Bump patch version (0.1.0 → 0.1.1)
+- `make version-minor` - Bump minor version (0.1.0 → 0.2.0)
+- `make version-major` - Bump major version (0.1.0 → 1.0.0)
+- `make version-show` - Show version management help
+
+**Manual version bumping:**
+```bash
+python scripts/version.py patch    # For bug fixes
+python scripts/version.py minor    # For new features
+python scripts/version.py major    # For breaking changes
+```
+
+The version script will:
+1. Update the version in `pyproject.toml`
+2. Update `CHANGELOG.md` with the new version
+3. Create a git tag for the release
+4. Push the tag to the remote repository
+
+**Changelog Guidelines:**
+- Use the [Keep a Changelog](https://keepachangelog.com/) format
+- Categorize changes as Added, Changed, Fixed, or Removed
+- Write clear, concise descriptions
+- Include breaking changes prominently
+
 ### Code Quality
 
 This project uses several tools to maintain code quality:
