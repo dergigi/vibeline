@@ -283,7 +283,10 @@ def main() -> None:
             summary_text = f.read()
 
     # Determine which plugins to run
+    logger.info(f"Checking plugins for transcript: {input_file.name}")
+    logger.info(f"Transcript preview: {transcript_text[:200]}...")
     active_plugins = determine_active_plugins(transcript_text, plugins)
+    logger.info(f"Active plugins: {active_plugins}")
     if active_plugins:
         for plugin_name in active_plugins:
             plugin = plugins[plugin_name]
@@ -376,6 +379,8 @@ def main() -> None:
                     logger.error(f"An unexpected error occurred during command execution: {e}")
     else:
         logger.info("No matching plugins found for this transcript")
+        logger.info(f"Available plugins: {list(plugins.keys())}")
+        logger.info(f"Plugin keywords: {[(name, plugin.keywords) for name, plugin in plugins.items()]}")
 
     logger.info("----------------------------------------")
 
