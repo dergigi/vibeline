@@ -7,4 +7,4 @@ ignore_if: rambling
 prompt: |
   Upload triggered for audio file.
   This plugin will upload the audio file to Blossom server.
-command: "blossom-cli upload -server $BLOSSOM_SERVER -file AUDIO_FILE -privkey $BLOSSOM_PRIVKEY"
+command: "blossom-cli upload -server $BLOSSOM_SERVER -file AUDIO_FILE -privkey $NOSTR_NSEC"
