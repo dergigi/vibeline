@@ -125,6 +125,40 @@ def deduce_audio_file_path(transcript_file: Path) -> Optional[Path]:
         return None
 
 
+def expand_environment_variables(command: str) -> str:
+    """
+    Expand environment variables in a command string.
+    
+    Replaces $VARIABLE_NAME with the actual value from environment variables.
+    Sensitive variables like NOSTR_NSEC are handled securely.
+    """
+    import re
+    
+    # List of sensitive variables that should never be logged
+    SENSITIVE_VARS = {'NOSTR_NSEC', 'PRIVATE_KEY', 'SECRET', 'API_KEY', 'TOKEN'}
+    
+    def replace_var(match):
+        var_name = match.group(1)
+        value = os.getenv(var_name)
+        if value is None:
+            logger.warning(f"Environment variable {var_name} not found")
+            return match.group(0)  # Keep the original $VARIABLE if not found
+        
+        # For sensitive variables, don't log the value
+        if var_name in SENSITIVE_VARS:
+            logger.debug(f"Environment variable {var_name} found (value hidden)")
+        else:
+            logger.debug(f"Environment variable {var_name} = {value}")
+        
+
+        
+        return value
+    
+    # Replace $VARIABLE_NAME with actual values
+    # Use lookahead to ensure we're at a word boundary or end of string
+    return re.sub(r'\$([A-Z_][A-Z0-9_]*)(?=\s|$)', replace_var, command)
+
+
 def ensure_model_exists(model_name: str) -> None:
     """
     Ensure the specified Ollama model is available locally.
@@ -280,7 +314,17 @@ def main() -> None:
                     # Replace FILE placeholder with the actual output file path
                     cmd_to_run = cmd_to_run.replace("FILE", str(output_file))
 
-                    logger.info(f"Executing command: {cmd_to_run}")
+                    # Expand environment variables in the command
+                    cmd_to_run = expand_environment_variables(cmd_to_run)
+
+                    # Create a safe version of the command for logging (mask sensitive values)
+                    safe_cmd = cmd_to_run
+                    for sensitive_var in ['NOSTR_NSEC', 'PRIVATE_KEY', 'SECRET', 'API_KEY', 'TOKEN']:
+                        value = os.getenv(sensitive_var)
+                        if value:
+                            safe_cmd = safe_cmd.replace(value, f"[{sensitive_var}_HIDDEN]")
+
+                    logger.info(f"Executing command: {safe_cmd}")
                     # Run the command, check=True raises an exception on non-zero exit code
                     subprocess.run(
                         cmd_to_run,
