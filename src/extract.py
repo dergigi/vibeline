@@ -6,6 +6,7 @@ import os
 import re
 import subprocess
 import sys
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -357,6 +358,16 @@ def main() -> None:
                         logger.info("Command executed successfully.")
                         if result.stdout:
                             logger.info(f"Command output: {result.stdout.strip()}")
+                            # If this is the blossom plugin, save JSON output to blossoms/ as timestamped file
+                            if plugin_name == "blossom":
+                                try:
+                                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                                    json_path = output_dirs[plugin_name] / f"{timestamp}.json"
+                                    with open(json_path, "w", encoding="utf-8") as f:
+                                        f.write(result.stdout.strip())
+                                    logger.info(f"Saved blossom output to: {json_path}")
+                                except Exception as write_err:
+                                    logger.error(f"Failed to save blossom output JSON: {write_err}")
                     else:
                         logger.error(f"Command failed with return code: {result.returncode}")
                         if result.stderr:
