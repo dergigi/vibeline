@@ -8,22 +8,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
 - Versioning and changelog system
 - Semantic versioning management script
 - Makefile integration for version commands
 
 ### Changed
-- 
+
+-
 
 ### Fixed
-- 
+
+-
 
 ### Removed
-- 
+
+-
 
 ## [0.0.2] - 2025-04-08
 
 ### Added
+
 - Docker compose support
 - Decision plugin to extract decisions from transcripts
 - Idea plugin configuration
@@ -32,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ModelContext Python SDK dependency
 
 ### Changed
+
 - Switch from whisper-ctranslate2 to openai-whisper
 - Update Python version to 3.11.2
 - Change decision plugin output format from JSON to text
@@ -41,6 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove generate_summary function in favor of summary plugin
 
 ### Fixed
+
 - Load .env file in transcribe script
 - Remove space from python-version to fix script
 - Ignore lines with leading whitespace in action item extraction
@@ -51,12 +58,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update action item plugin prompt formatting rules
 
 ### Removed
+
 - SVG plugin
 - .python-version file
 
 ## [0.0.1] - 2025-04-03
 
 ### Added
+
 - Initial release with basic voice memo processing
 - Todo extraction functionality
 - Plugin system for content extraction
@@ -65,10 +74,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Action item extraction and formatting
 
 ### Changed
+
 - Clarify prompt instructions for summaries
 
 ### Fixed
-- 
+
+-
 
 ### Removed
-- 
+
+-

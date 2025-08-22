@@ -7,7 +7,7 @@ The main idea is to let your computer do computer work, while you're out and abo
 ![Touch Grass](touch-grass.png)
 
 > **Note:** VibeLine is a highly opinionated system with specific design choices and workflows. While it offers flexibility through its plugin system, it follows a particular philosophy in how voice memos should be processed and structured. If you're looking for a more generic or customizable solution, this might not be the right tool for you.
- 
+
 ## Features
 
 - 🎙️ Automatic voice memo transcription
@@ -29,19 +29,22 @@ There's also a separate [UI project](https://github.com/dergigi/vibeline-ui) tha
 ## Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/yourusername/vibeline.git
 cd vibeline
 ```
 
-2. Make sure you have Python 3.11.2 installed. The project uses `.python-version` to specify the required Python version.
+1. Make sure you have Python 3.11.2 installed. The project uses `.python-version` to specify the required Python version.
 
-3. Run the setup script:
+2. Run the setup script:
+
 ```bash
 ./setup.sh
 ```
 
 This will:
+
 - Create a virtual environment named `vibenv`
 - Activate the virtual environment
 - Install all required dependencies
@@ -55,6 +58,7 @@ For contributors, we recommend using the development setup script:
 ```
 
 This will:
+
 - Set up the development environment with all linting tools
 - Format existing code
 - Provide convenient make commands for development
@@ -74,12 +78,14 @@ This will:
 VibeLine uses semantic versioning and maintains a changelog for all releases.
 
 **Available version commands:**
+
 - `make version-patch` - Bump patch version (0.1.0 → 0.1.1)
 - `make version-minor` - Bump minor version (0.1.0 → 0.2.0)
 - `make version-major` - Bump major version (0.1.0 → 1.0.0)
 - `make version-show` - Show version management help
 
 **Manual version bumping:**
+
 ```bash
 python scripts/version.py patch    # For bug fixes
 python scripts/version.py minor    # For new features
@@ -87,12 +93,14 @@ python scripts/version.py major    # For breaking changes
 ```
 
 The version script will:
+
 1. Update the version in `pyproject.toml`
 2. Update `CHANGELOG.md` with the new version
 3. Create a git tag for the release
 4. Push the tag to the remote repository
 
 **Changelog Guidelines:**
+
 - Use the [Keep a Changelog](https://keepachangelog.com/) format
 - Categorize changes as Added, Changed, Fixed, or Removed
 - Write clear, concise descriptions
@@ -127,14 +135,15 @@ VibeLine includes a transcript cleaning feature that corrects common transcripti
 To use this feature:
 
 1. Edit the `VOCABULARY.txt` file in the root directory to add your custom corrections:
-```
+
+```txt
 # Format: incorrect_word -> correct_word
 Noster -> Nostr
 ```
 
-2. The transcript cleaner will automatically run as part of the extraction process.
+1. The transcript cleaner will automatically run as part of the extraction process.
 
-3. You can customize the behavior with these options:
+2. You can customize the behavior with these options:
    - `--no-clean`: Skip the transcript cleaning step entirely
 
 ## Contributors

@@ -7,6 +7,7 @@ Steps to glory, aka make this thing awesome forever:
 - [ ] Allow plugins to have an "input", i.e. which dir they should watch
 
 After that:
+
 - [ ] Create an "archive" plugin that moves old stuff to a separate folder
 - [ ] Create even more plugins
 - [ ] Dockerize it for easy deployment
@@ -48,4 +49,4 @@ Old vibe TODO list:
         - vibeline run
         - vibeline watch
         - vibeline process transcript.txt
-        - vibeline transcribe memo.m4a 
+        - vibeline transcribe memo.m4a

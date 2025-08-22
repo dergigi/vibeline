@@ -3,8 +3,13 @@ import configOptions, {init} from "@github/markdownlint-github"
 
 const markdownItFactory = () => markdownIt({ html: true })
 
+const overriddenOptions = init({
+    "no-duplicate-heading": false, // Allow duplicate headings for changelogs
+    "line-length": false, // Disable line length rule
+})
+
 const options = {
-    config: init(),
+    config: overriddenOptions,
     customRules: ["@github/markdownlint-github"],
     markdownItFactory,
     outputFormatters: [

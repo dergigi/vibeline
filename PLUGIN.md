@@ -4,9 +4,10 @@ This document explains the plugin system in Vibeline, how plugins work, and how 
 
 ## Overview
 
-Plugins in Vibeline extend the system's functionality by processing transcripts or other text inputs to generate specific outputs. They are defined in YAML files and managed by the `PluginManager`. 
+Plugins in Vibeline extend the system's functionality by processing transcripts or other text inputs to generate specific outputs. They are defined in YAML files and managed by the `PluginManager`.
 
 Plugins can:
+
 - Extract information (like action items or decisions)
 - Generate content (like blog posts or summaries)
 - Create files with custom extensions
@@ -54,11 +55,13 @@ prompt: |
 The `keywords` field is used to determine when a plugin should be triggered in `matching` mode. It can be specified in two ways:
 
 1. As a comma-separated string:
+
 ```yaml
 keywords: blog, post, article
 ```
 
-2. As a list:
+1. As a list:
+
 ```yaml
 keywords:
   - blog
@@ -67,6 +70,7 @@ keywords:
 ```
 
 If no keywords are specified, they will be automatically derived from the plugin name by splitting on underscores. For example:
+
 - `blog_post.yaml` → keywords: ["blog", "post"]
 - `app_idea.yaml` → keywords: ["app", "idea"]
 - `therapist.yaml` → keywords: ["therapist"]
@@ -79,11 +83,13 @@ When a plugin has `run: matching`, its activation depends on the `match` field:
 - `match: all` - The plugin will be triggered only if ALL of its keywords are found in the text
 
 For example:
+
 ```yaml
 run: matching
 match: any
 keywords: svg, graphic, logo, illustration
 ```
+
 This plugin will be triggered if any of the words "svg", "graphic", "logo", or "illustration" appear in the text.
 
 ```yaml
@@ -91,6 +97,7 @@ run: matching
 match: all
 keywords: action, item
 ```
+
 This plugin will only be triggered if both "action" AND "item" appear in the text.
 
 ## Plugin Types and Run Modes
@@ -124,6 +131,7 @@ The `prompt` field contains the template used for generating content. Prompts ca
 - `{summary}`: A summary of the transcript (if available)
 
 Example:
+
 ```yaml
 prompt: |
   Based on the following transcript, create a blog post.
