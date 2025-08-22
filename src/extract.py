@@ -16,8 +16,8 @@ from dotenv import load_dotenv
 from plugin_manager import Plugin, PluginManager
 from transcript_cleaner import TranscriptCleaner
 
-# Load environment variables
-load_dotenv()
+# Load environment variables (override to ensure latest .env values are used)
+load_dotenv(override=True)
 
 # Initialize inflect engine
 p = inflect.engine()
@@ -154,7 +154,14 @@ def expand_environment_variables(command: str) -> str:
 
     # Replace $VARIABLE_NAME with actual values
     # Use lookahead to ensure we're at a word boundary or end of string
-    return re.sub(r"\$([A-Z_][A-Z0-9_]*)(?=\s|$)", replace_var, command)
+    expanded = re.sub(r"\$([A-Z_][A-Z0-9_]*)(?=\s|$)", replace_var, command)
+    
+    # Normalize common values (e.g., strip trailing slash from BLOSSOM_SERVER)
+    # Do this post-expansion to avoid changing placeholders.
+    server = os.getenv("BLOSSOM_SERVER")
+    if server and server.endswith("/"):
+        expanded = expanded.replace(server, server.rstrip("/"))
+    return expanded
 
 
 def ensure_model_exists(model_name: str) -> None:
