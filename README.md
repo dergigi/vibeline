@@ -49,6 +49,11 @@ This will:
 - Activate the virtual environment
 - Install all required dependencies
 
+### Optional CLI dependencies
+
+- **Blossom upload plugin**: requires the `nak` CLI to be installed and available
+  on your `PATH`. See [fiatjaf/nak](https://github.com/fiatjaf/nak).
+
 ## Development Setup
 
 For contributors, we recommend using the development setup script:
