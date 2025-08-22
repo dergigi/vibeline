@@ -38,8 +38,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Touch grass philosophy documentation and image
 
 ### Changed
-- Upgrade default model to llama3 for better performance
-- Suggest tinyllama as default model for better performance
+- Upgrade default model to `llama3` for better performance
+- Suggest `tinyllama` as default model for better performance
 - Remove explicit model definitions from plugins, use OLLAMA_MODEL from env
 - Make plugin type field optional with default 'and' and ignore when run is 'always'
 - Derive plugin names from filename instead of explicit name field
