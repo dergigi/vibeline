@@ -68,8 +68,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Store full paths for voice memo processing
 - Use correct base directory for voice memo processing
 - Add missing os import in post_process
-- Fix parameter order in Plugin instance creation
-- Reorder Plugin dataclass fields to fix TypeError
 - Add 'ramble' to action_item ignore conditions
 - Remove `ignore_if` from therapist and mood plugins
 - Add `ignore_if` field to prevent plugin execution based on transcript content
