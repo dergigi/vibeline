@@ -30,8 +30,5 @@ command: |
     exit 1
   fi
   
-  # Combine title and upload link
-  echo "$title" > /tmp/yolopost_content.txt
-  echo "$upload_link" >> /tmp/yolopost_content.txt
-  cat /tmp/yolopost_content.txt | nak publish --sec $YOLOPOST_NSEC $RELAYS
-  rm -f /tmp/yolopost_content.txt
+  # Combine title and upload link and publish directly
+  (echo "$title"; echo "$upload_link") | nak publish --sec $YOLOPOST_NSEC $RELAYS
