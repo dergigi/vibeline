@@ -373,7 +373,10 @@ def main() -> None:
                             except Exception as write_err:
                                 logger.error(f"Failed to write command output to {output_file}: {write_err}")
                         else:
-                            logger.info("Command produced no stdout; skipping file write (plugin may have written to FILE directly)")
+                            logger.info(
+                                "Command produced no stdout; skipping file write "
+                                "(plugin may have written to FILE directly)"
+                            )
                     else:
                         logger.error(f"Command failed with return code: {result.returncode}")
                         if result.stderr:

@@ -30,11 +30,8 @@ command: |
     exit 1
   fi
   
-  # Create the content to be saved and published
+  # Create the content to be published
   content="$title"$'\n'"$upload_link"
   
-  # Output to FILE (will be saved to yoloposts folder)
-  echo "$content" > "$FILE"
-  
-  # Also publish to nostr
+  # Publish to nostr; stdout from `nak publish` will be captured by the plugin system
   echo "$content" | nak publish --sec $YOLOPOST_NSEC $RELAYS
