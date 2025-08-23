@@ -1,7 +1,7 @@
 name: yolopost
 description: Post to nostr when trigger words are detected
 run: matching
-keywords: ["good", "morning", "musings", "leave it at that"]
+keywords: ["test", "post", "good", "morning", "if this works", "banana"]
 match: all
 output_extension: ".json"
 command: "echo \"GM\" | nak publish --nsec $YOLOPOST_NSEC"
