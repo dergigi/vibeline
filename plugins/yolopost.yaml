@@ -19,12 +19,19 @@ command: |
     upload_link=$(jq -r '.url // .link // .href // empty' "$blossom_file" 2>/dev/null)
   fi
   
-  # Combine title and upload link
-  if [ -n "$title" ] && [ -n "$upload_link" ]; then
-    echo "$title" > /tmp/yolopost_content.txt
-    echo "$upload_link" >> /tmp/yolopost_content.txt
-    cat /tmp/yolopost_content.txt | nak publish --sec $YOLOPOST_NSEC $RELAYS
-    rm -f /tmp/yolopost_content.txt
-  else
-    echo "Missing title or upload link" | nak publish --sec $YOLOPOST_NSEC $RELAYS
+  # Check if both title and upload link are available
+  if [ -z "$title" ]; then
+    echo "Error: Title file not found or empty: $title_file" >&2
+    exit 1
   fi
+  
+  if [ -z "$upload_link" ]; then
+    echo "Error: Upload link not found in blossom output: $blossom_file" >&2
+    exit 1
+  fi
+  
+  # Combine title and upload link
+  echo "$title" > /tmp/yolopost_content.txt
+  echo "$upload_link" >> /tmp/yolopost_content.txt
+  cat /tmp/yolopost_content.txt | nak publish --sec $YOLOPOST_NSEC $RELAYS
+  rm -f /tmp/yolopost_content.txt
