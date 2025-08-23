@@ -12,11 +12,11 @@ command: |
     title=$(cat "$title_file" | tr -d '\n\r')
   fi
   
-  # Read the upload link from blossom plugin output
+  # Read the upload link from blossom plugin output using jq
   blossom_file="VoiceMemos/transcripts/$(basename AUDIO_FILE .m4a)_blossom.json"
   upload_link=""
   if [ -f "$blossom_file" ]; then
-    upload_link=$(cat "$blossom_file" | grep -o 'https://[^"]*' | head -1)
+    upload_link=$(jq -r '.url // .link // .href // empty' "$blossom_file" 2>/dev/null)
   fi
   
   # Combine title and upload link
