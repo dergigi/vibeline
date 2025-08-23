@@ -4,4 +4,4 @@ run: matching
 keywords: ["test", "post", "good", "morning", "if this works", "banana"]
 match: all
 output_extension: ".json"
-command: "echo \"GM\" | nak publish --nsec $YOLOPOST_NSEC"
+command: "echo \"GM\" | nak publish --sec $YOLOPOST_NSEC"
