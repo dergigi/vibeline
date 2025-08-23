@@ -338,7 +338,7 @@ def main() -> None:
                     else:
                         cmd_to_run = plugin.command
 
-                    # Replace FILE placeholder with the actual output file path
+                    # Replace FILE placeholder with the actual output file path (for backward compatibility)
                     cmd_to_run = cmd_to_run.replace("FILE", str(output_file))
 
                     # Expand environment variables in the command
@@ -364,7 +364,16 @@ def main() -> None:
                     if result.returncode == 0:
                         logger.info("Command executed successfully.")
                         if result.stdout:
-                            logger.info(f"Command output: {result.stdout.strip()}")
+                            logger.debug(f"Raw command stdout length: {len(result.stdout)}")
+                            # Write command stdout to the plugin's output file
+                            try:
+                                with open(output_file, "w", encoding="utf-8") as f_out:
+                                    f_out.write(result.stdout)
+                                logger.info(f"Command output saved to: {output_file}")
+                            except Exception as write_err:
+                                logger.error(f"Failed to write command output to {output_file}: {write_err}")
+                        else:
+                            logger.info("Command produced no stdout; skipping file write (plugin may have written to FILE directly)")
                     else:
                         logger.error(f"Command failed with return code: {result.returncode}")
                         if result.stderr:
