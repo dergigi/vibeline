@@ -1,73 +1,76 @@
 #!/usr/bin/env python3
 
-import sys
 import os
+import sys
 from pathlib import Path
-from dotenv import load_dotenv
 
 # Add the src directory to the Python path
 sys.path.append(str(Path(__file__).parent))
-from src.transcript_cleaner import TranscriptCleaner
+
+from dotenv import load_dotenv  # noqa: E402
+
+from src.transcript_cleaner import TranscriptCleaner  # noqa: E402
 
 # Load environment variables
 load_dotenv()
 
-def main():
+
+def main() -> None:
     vocabulary_file = Path(os.getenv("VOCABULARY_FILE", "VOCABULARY.txt"))
     personal_vocabulary_file = Path(os.getenv("PERSONAL_VOCABULARY_FILE", "~/.vibeline/vocabulary.txt")).expanduser()
-    
+
     # Check if base vocabulary file exists
     if not vocabulary_file.exists():
         print(f"Error: Base vocabulary file {vocabulary_file} not found.")
         print("Please create it first or specify a different file with VOCABULARY_FILE environment variable.")
         sys.exit(1)
-    
+
     # Check command line arguments
     if len(sys.argv) < 2:
         print("Usage: python test_transcript_cleaner.py <text_to_clean>")
         print("   or: python test_transcript_cleaner.py --file <transcript_file>")
         sys.exit(1)
-    
+
     # Get the text to clean
     if sys.argv[1] == "--file":
         if len(sys.argv) < 3:
             print("Error: No file specified after --file")
             sys.exit(1)
-        
+
         file_path = Path(sys.argv[2])
         if not file_path.exists():
             print(f"Error: File {file_path} not found")
             sys.exit(1)
-        
-        with open(file_path, 'r', encoding='utf-8') as f:
+
+        with open(file_path, "r", encoding="utf-8") as f:
             text = f.read()
-        
+
         print(f"Cleaning transcript from file: {file_path}")
     else:
         # Use the command line argument as the text
         text = " ".join(sys.argv[1:])
         print(f"Cleaning text: {text}")
-    
+
     # Initialize the transcript cleaner with both vocabulary files
     cleaner = TranscriptCleaner(
         vocabulary_file=vocabulary_file,
-        personal_vocabulary_file=personal_vocabulary_file if personal_vocabulary_file.exists() else None
+        personal_vocabulary_file=personal_vocabulary_file if personal_vocabulary_file.exists() else None,
     )
-    
+
     # Clean the transcript
     cleaned_text, corrections = cleaner.clean_transcript(text)
-    
+
     # Print the results
     print("\nOriginal text:")
     print("-" * 80)
     print(text)
     print("-" * 80)
-    
+
     print("\nCleaned text:")
     print("-" * 80)
     print(cleaned_text)
     print("-" * 80)
-    
+
     # Print corrections
     if corrections:
         print(f"\nMade {len(corrections)} corrections:")
@@ -77,6 +80,7 @@ def main():
             print(f"   Corrected: {correction['corrected']}")
     else:
         print("\nNo corrections were made.")
+
 
 if __name__ == "__main__":
     main()
