@@ -4,4 +4,27 @@ run: matching
 keywords: ["test", "post", "good", "morning", "showing", "wife"]
 match: all
 output_extension: ".json"
-command: "echo \"GM again\" | nak publish --sec $YOLOPOST_NSEC $RELAYS"
+command: |
+  # Read the title from title plugin output
+  title_file="VoiceMemos/transcripts/$(basename AUDIO_FILE .m4a)_title.txt"
+  title=""
+  if [ -f "$title_file" ]; then
+    title=$(cat "$title_file" | tr -d '\n\r')
+  fi
+  
+  # Read the upload link from blossom plugin output
+  blossom_file="VoiceMemos/transcripts/$(basename AUDIO_FILE .m4a)_blossom.json"
+  upload_link=""
+  if [ -f "$blossom_file" ]; then
+    upload_link=$(cat "$blossom_file" | grep -o 'https://[^"]*' | head -1)
+  fi
+  
+  # Combine title and upload link
+  if [ -n "$title" ] && [ -n "$upload_link" ]; then
+    echo "$title" > /tmp/yolopost_content.txt
+    echo "$upload_link" >> /tmp/yolopost_content.txt
+    cat /tmp/yolopost_content.txt | nak publish --sec $YOLOPOST_NSEC $RELAYS
+    rm -f /tmp/yolopost_content.txt
+  else
+    echo "Missing title or upload link" | nak publish --sec $YOLOPOST_NSEC $RELAYS
+  fi
