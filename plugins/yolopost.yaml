@@ -1,7 +1,7 @@
 name: yolopost
 description: Post to nostr when trigger words are detected
 run: matching
-keywords: ["test", "post", "good", "morning", "showing", "wife"]
+keywords: ["good morning", "test", "blossom upload", "breakfast"]
 match: all
 output_extension: ".json"
 command: |
