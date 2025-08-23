@@ -30,5 +30,11 @@ command: |
     exit 1
   fi
   
-  # Combine title and upload link and publish directly
-  (echo "$title"; echo "$upload_link") | nak publish --sec $YOLOPOST_NSEC $RELAYS
+  # Create the content to be saved and published
+  content="$title"$'\n'"$upload_link"
+  
+  # Output to FILE (will be saved to yoloposts folder)
+  echo "$content" > "$FILE"
+  
+  # Also publish to nostr
+  echo "$content" | nak publish --sec $YOLOPOST_NSEC $RELAYS
