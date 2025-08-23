@@ -13,8 +13,8 @@ import inflect
 import ollama
 from dotenv import load_dotenv
 
-from plugin_manager import Plugin, PluginManager
-from transcript_cleaner import TranscriptCleaner
+from plugin_manager import Plugin, PluginManager  # type: ignore
+from transcript_cleaner import TranscriptCleaner  # type: ignore
 
 # Load environment variables (override to ensure latest .env values are used)
 load_dotenv(override=True)
