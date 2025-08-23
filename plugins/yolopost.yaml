@@ -1,0 +1,7 @@
+name: yolopost
+description: Upload audio file to Blossom when trigger words are detected
+run: matching
+keywords: ["good", "morning", "musings", "leave it at that"]
+match: all
+output_extension: ".json"
+command: "tmp=\"FILE.tmp\"; nak blossom --server $BLOSSOM_SERVER upload AUDIO_FILE > \"$tmp\" && [ -s \"$tmp\" ] && mv \"$tmp\" \"FILE\" || rm -f \"$tmp\""
