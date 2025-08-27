@@ -53,9 +53,21 @@ def determine_active_plugins(text: str, plugins: Dict[str, Plugin]) -> List[str]
         logger.debug(f"  Ignore if: {plugin.ignore_if}")
 
         # Check if plugin should be ignored
-        if plugin.ignore_if and re.search(r"\b" + plugin.ignore_if + r"\b", text.lower()):
-            logger.debug(f"  Skipped: Found ignore_if text '{plugin.ignore_if}' in transcript")
-            continue
+        if plugin.ignore_if:
+            # Handle multi-word ignore_if phrases
+            if ' ' in plugin.ignore_if:
+                # For multi-word phrases, match the entire phrase allowing for whitespace variations
+                escaped_ignore = re.escape(plugin.ignore_if)
+                pattern = r'\b' + escaped_ignore + r'\b'
+                pattern = pattern.replace(r'\ ', r'\s+')
+                if re.search(pattern, text.lower()):
+                    logger.debug(f"  Skipped: Found ignore_if text '{plugin.ignore_if}' in transcript")
+                    continue
+            else:
+                # For single words, use word boundaries as before
+                if re.search(r"\b" + re.escape(plugin.ignore_if) + r"\b", text.lower()):
+                    logger.debug(f"  Skipped: Found ignore_if text '{plugin.ignore_if}' in transcript")
+                    continue
 
         # Always include plugins with run: always
         if plugin.run == "always":
@@ -74,7 +86,23 @@ def determine_active_plugins(text: str, plugins: Dict[str, Plugin]) -> List[str]
                 words = plugin_name.split("_")
                 logger.debug(f"  Using plugin name words: {words}")
 
-            matches = [word for word in words if re.search(r"\b" + word + r"\b", text.lower())]
+            matches = []
+            for word in words:
+                # Check if this is a multi-word phrase (contains spaces)
+                if ' ' in word:
+                    # For multi-word phrases, match the entire phrase allowing for whitespace variations
+                    # This handles cases where words might be split across lines
+                    # Escape the word but handle spaces specially
+                    escaped_word = re.escape(word)
+                    pattern = r'\b' + escaped_word + r'\b'
+                    # Replace escaped spaces with \s+ to allow for any whitespace (including line breaks)
+                    pattern = pattern.replace(r'\ ', r'\s+')
+                    if re.search(pattern, text.lower()):
+                        matches.append(word)
+                else:
+                    # For single words, use word boundaries as before
+                    if re.search(r"\b" + re.escape(word) + r"\b", text.lower()):
+                        matches.append(word)
 
             if plugin.match == "any":
                 if matches:
