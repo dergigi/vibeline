@@ -89,7 +89,8 @@ def determine_active_plugins(text: str, plugins: Dict[str, Plugin]) -> List[str]
                 else:
                     logger.debug(f"  Activated: No (only matched: {matches})")
 
-    return list(active_plugins)
+    # Return plugin names in deterministic alphabetical order
+    return sorted(active_plugins, key=str.lower)
 
 
 def generate_additional_content(
