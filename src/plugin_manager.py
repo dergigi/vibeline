@@ -33,7 +33,8 @@ class PluginManager:
 
     def load_plugins(self) -> None:
         """Load all YAML plugins from the plugin directory."""
-        for plugin_file in self.plugin_dir.glob("*.yaml"):
+        # Ensure deterministic alphabetical loading by filename
+        for plugin_file in sorted(self.plugin_dir.glob("*.yaml"), key=lambda p: p.name.lower()):
             with open(plugin_file, "r", encoding="utf-8") as f:
                 data = yaml.safe_load(f)
 
