@@ -27,3 +27,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 *.swp
+
+# Python build artifacts
+*.egg-info/
+dist/
+build/

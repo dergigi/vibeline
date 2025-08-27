@@ -1,5 +1,0 @@
-extract
-plugin_manager
-post_process
-transcript_cleaner
-watch_voice_memos
