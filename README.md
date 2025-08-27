@@ -136,6 +136,21 @@ All PRs must pass linting checks before they can be merged. The GitHub Actions w
 - Use whatever you want to look at the markdown/output files (I use [Zettel Notes](https://www.zettelnotes.com/))
 - Run the `./watch.sh` script on an idle machine to get the most out of it
 
+### Transcription options
+
+You can control Whisper transcription via environment variables:
+
+- `WHISPER_MODEL`: Choose the Whisper model (e.g., `base`, `small`, `medium`, `large-v3`). Models with the `.en` suffix are English-only (e.g., `base.en`).
+- `FORCE_LANGUAGE`: Force a specific language for transcription. When set, VibeLine will call Whisper with `--language <code>`. For example, to force English:
+
+  ```bash
+  export FORCE_LANGUAGE=en
+  # or per-run
+  FORCE_LANGUAGE=en ./transcribe.sh VoiceMemos/your-file.m4a
+  ```
+
+If `FORCE_LANGUAGE` is unset, Whisper will auto-detect the language.
+
 ### Transcript Cleaning
 
 VibeLine includes a transcript cleaning feature that corrects common transcription errors based on customizable vocabulary files. This is especially useful for technical terms, names, or domain-specific jargon that speech recognition models often misinterpret.
