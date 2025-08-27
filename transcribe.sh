@@ -12,6 +12,12 @@ shift $((OPTIND-1))
 # Load environment variables
 [ -f .env ] && source .env
 
+# Optional language override via environment variable
+language_flag=""
+if [ -n "${FORCE_LANGUAGE:-}" ]; then
+    language_flag=(--language "$FORCE_LANGUAGE")
+fi
+
 # Check if a file argument was provided
 if [ $# -ne 1 ]; then
     echo "Usage: $0 [-f] <audio_file>"
@@ -59,10 +65,10 @@ duration_minutes=$(echo "$duration / 60" | bc -l)
 # Set output format based on duration
 if (( $(echo "$duration_minutes > 21" | bc -l) )); then
     # For files longer than 21 minutes, produce all formats
-    whisper "$input_file" --model $WHISPER_MODEL --output_dir "$TRANSCRIPT_DIR"
+    whisper "$input_file" --model $WHISPER_MODEL --output_dir "$TRANSCRIPT_DIR" ${language_flag[@]}
 else
     # For shorter files, produce only txt format
-    whisper "$input_file" --model $WHISPER_MODEL --output_dir "$TRANSCRIPT_DIR" --output_format txt
+    whisper "$input_file" --model $WHISPER_MODEL --output_dir "$TRANSCRIPT_DIR" --output_format txt ${language_flag[@]}
 fi
 
 # Deactivate the virtual environment
