@@ -16,6 +16,7 @@ shift $((OPTIND-1))
 language_flag=""
 if [ -n "${FORCE_LANGUAGE:-}" ]; then
     language_flag=(--language "$FORCE_LANGUAGE")
+    echo "INFO: FORCE_LANGUAGE=$FORCE_LANGUAGE set, using whisper --language=$FORCE_LANGUAGE"
 fi
 
 # Check if a file argument was provided
