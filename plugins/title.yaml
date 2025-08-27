@@ -10,6 +10,7 @@ prompt: |
   4. Not too long or too short
   
   Focus on the key themes, insights, or main discussion points from the transcript.
+  Keep it as short as possible. Don't use a colon. Make it witty.
 
   Transcript:
   {transcript}
