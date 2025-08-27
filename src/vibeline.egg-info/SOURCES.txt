@@ -4,10 +4,10 @@ pyproject.toml
 src/extract.py
 src/plugin_manager.py
 src/post_process.py
+src/transcript_cleaner.py
 src/watch_voice_memos.py
 src/vibeline.egg-info/PKG-INFO
 src/vibeline.egg-info/SOURCES.txt
 src/vibeline.egg-info/dependency_links.txt
 src/vibeline.egg-info/requires.txt
 src/vibeline.egg-info/top_level.txt
-tests/test_basic.py

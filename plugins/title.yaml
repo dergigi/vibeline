@@ -1,6 +1,6 @@
 description: Generate podcast episode titles from transcripts
 run: always  # always, matching
-model: gemma3
+model: gpt-oss
 output_extension: .txt  # Explicitly set text extension
 prompt: |
   Based on the following transcript, create a compelling podcast episode title. The title should be:
@@ -10,6 +10,7 @@ prompt: |
   4. Not too long or too short
   
   Focus on the key themes, insights, or main discussion points from the transcript.
+  Keep it as short as possible. Don't use a colon. Make it witty.
 
   Transcript:
   {transcript}
