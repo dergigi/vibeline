@@ -1,6 +1,7 @@
 name: shownote
 description: Generate concise podcast show notes from transcripts
-run: always  # always, matching
+run: matching
+keywords: ["good morning", "leave it at that"]
 model: gpt-oss
 output_extension: .md  # Markdown output
 prompt: |
