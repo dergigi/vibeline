@@ -1,0 +1,27 @@
+name: shownote
+description: Generate concise podcast show notes from transcripts
+run: matching
+keywords: ["good morning", "leave it at that"]
+model: gpt-oss
+output_extension: .md  # Markdown output
+prompt: |
+  You are a podcast producer. Create concise, useful show notes based on the transcript.
+
+  Requirements:
+  - Start with a 1-sentence Overview (≤ 35 words).
+  - Add a "Highlights" section with 3–7 single-line bullets capturing key ideas.
+  - If specific resources (books, tools, links, people) are clearly mentioned, include a "Resources" section as bullets; otherwise omit it entirely.
+  - Use clean Markdown with headings: "Overview", "Highlights", and optionally "Resources".
+  - Do not invent facts, links, or timestamps.
+  - Do not include a title.
+  - Do not add any preface or closing text beyond the sections.
+
+  Transcript:
+  {transcript}
+
+  Summary:
+  {summary}
+
+  Output only the show notes in Markdown. Do NOT include any other text.
+
+
