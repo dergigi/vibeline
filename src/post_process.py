@@ -51,24 +51,7 @@ def format_action_items(items: List[str], filename: str) -> str:
     if not items:
         return "# No items found\n"
 
-    # Always compute a date/time based header from the filename when possible
-    date_str = filename.split(".")[0]
-    base_header = ""
-    if re.match(r"^\d{8}_\d{6}$", date_str):
-        try:
-            year = int(date_str[:4])
-            month = int(date_str[4:6])
-            day = int(date_str[6:8])
-            hour = int(date_str[9:11])
-            minute = int(date_str[11:13])
-            dt = datetime(year, month, day, hour, minute)
-            base_header = dt.strftime('%a %b %d @ %I:%M %p')
-        except (ValueError, IndexError):
-            base_header = f"Action Items from {filename}"
-    else:
-        base_header = f"Action Items from {filename}"
-
-    # Optionally append a title if a corresponding title file exists
+    # Prefer a corresponding title file if it exists (VoiceMemos/titles/<filename>.txt)
     title_path = Path(VOICE_MEMOS_DIR) / "titles" / f"{filename}.txt"
     title_text = ""
     if title_path.exists():
@@ -78,10 +61,24 @@ def format_action_items(items: List[str], filename: str) -> str:
         except OSError:
             title_text = ""
 
-    header_line = f"# {base_header}"
     if title_text:
-        header_line += f" — {title_text}"
-    formatted = header_line + "\n\n"
+        formatted = f"# {title_text}\n\n"
+    else:
+        # Fall back to a date/time based header when possible
+        date_str = filename.split(".")[0]
+        if re.match(r"^\d{8}_\d{6}$", date_str):
+            try:
+                year = int(date_str[:4])
+                month = int(date_str[4:6])
+                day = int(date_str[6:8])
+                hour = int(date_str[9:11])
+                minute = int(date_str[11:13])
+                dt = datetime(year, month, day, hour, minute)
+                formatted = f"# {dt.strftime('%a %b %d @ %I:%M %p')}\n\n"
+            except (ValueError, IndexError):
+                formatted = f"# Action Items from {filename}\n\n"
+        else:
+            formatted = f"# Action Items from {filename}\n\n"
 
     for item in items:
         # Ensure each item starts with a capital letter
