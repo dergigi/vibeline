@@ -9,7 +9,6 @@ import re
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Tuple
 
 # Project root directory
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -95,16 +94,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- 
+-
 
 ### Changed
-- 
+-
 
 ### Fixed
-- 
+-
 
 ### Removed
-- 
+-
 
 """
     with open(changelog_path, "w") as f:
