@@ -51,27 +51,41 @@ def format_action_items(items: List[str], filename: str) -> str:
     if not items:
         return "# No items found\n"
 
-    # Extract date and time from filename (format: YYYYMMDD_HHMMSS.txt)
-    date_str = filename.split(".")[0]  # Remove .txt extension
-
-    # Validate filename format before parsing
-    if not re.match(r"^\d{8}_\d{6}$", date_str):
-        # If filename doesn't match expected format, use a generic header
-        formatted = f"# Action Items from {filename}\n\n"
-    else:
+    # Try to use a corresponding title file first (VoiceMemos/titles/<filename>.txt)
+    title_path = Path(VOICE_MEMOS_DIR) / "titles" / f"{filename}.txt"
+    formatted = ""
+    if title_path.exists():
         try:
-            year = int(date_str[:4])
-            month = int(date_str[4:6])
-            day = int(date_str[6:8])
-            hour = int(date_str[9:11])
-            minute = int(date_str[11:13])
+            with open(title_path, "r", encoding="utf-8") as tf:
+                title_text = tf.read().strip()
+                if title_text:
+                    formatted = f"# {title_text}\n\n"
+        except OSError:
+            # If reading the title file fails, fall back to timestamp formatting below
+            formatted = ""
 
-            # Create datetime object and format it
-            dt = datetime(year, month, day, hour, minute)
-            formatted = f"# {dt.strftime('%a %b %d @ %I:%M %p')}\n\n"
-        except (ValueError, IndexError):
-            # If date parsing fails, use a generic header
+    # If no title, fall back to using date and time from filename (format: YYYYMMDD_HHMMSS)
+    if not formatted:
+        date_str = filename.split(".")[0]
+
+        # Validate filename format before parsing
+        if not re.match(r"^\d{8}_\d{6}$", date_str):
+            # If filename doesn't match expected format, use a generic header
             formatted = f"# Action Items from {filename}\n\n"
+        else:
+            try:
+                year = int(date_str[:4])
+                month = int(date_str[4:6])
+                day = int(date_str[6:8])
+                hour = int(date_str[9:11])
+                minute = int(date_str[11:13])
+
+                # Create datetime object and format it
+                dt = datetime(year, month, day, hour, minute)
+                formatted = f"# {dt.strftime('%a %b %d @ %I:%M %p')}\n\n"
+            except (ValueError, IndexError):
+                # If date parsing fails, use a generic header
+                formatted = f"# Action Items from {filename}\n\n"
 
     for item in items:
         # Ensure each item starts with a capital letter
