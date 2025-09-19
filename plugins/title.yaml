@@ -15,9 +15,7 @@ prompt: |
   Transcript:
   {transcript}
 
-  Summary:
-  {summary}
-
+  Again: the podcast title should be short.
   Do NOT give multiple options.
   Do NOT output anything else.
   Do NOT add any other text.
