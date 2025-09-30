@@ -10,9 +10,9 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 import inflect
-import ollama
 from dotenv import load_dotenv
 
+from llm_client import ensure_model_exists, generate_content
 from plugin_manager import Plugin, PluginManager
 from transcript_cleaner import TranscriptCleaner
 
@@ -23,13 +23,10 @@ load_dotenv(override=True)
 p = inflect.engine()
 
 # Configuration from environment variables
-OLLAMA_MODEL = os.getenv("OLLAMA_EXTRACT_MODEL", "llama2")
+DEFAULT_MODEL = os.getenv("DEFAULT_MODEL", os.getenv("OLLAMA_EXTRACT_MODEL", "llama2"))
 VOICE_MEMOS_DIR = os.getenv("VOICE_MEMOS_DIR", "VoiceMemos")
 VOCABULARY_FILE = os.getenv("VOCABULARY_FILE", "VOCABULARY.txt")
 PERSONAL_VOCABULARY_FILE = os.getenv("PERSONAL_VOCABULARY_FILE", "~/.vibeline/vocabulary.txt")
-
-# Set a different host (default is http://localhost:11434)
-ollama.host = os.getenv("OLLAMA_HOST", "http://localhost:11434")  # type: ignore
 
 # Set up logging
 logging.basicConfig(
@@ -128,10 +125,9 @@ def generate_additional_content(
     prompt = prompt_template.format(transcript=transcript_text, summary=summary_text)
 
     # Use plugin-specific model if specified, otherwise use default
-    model = model_override or OLLAMA_MODEL
+    model = model_override or DEFAULT_MODEL
 
-    response = ollama.chat(model=model, messages=[{"role": "user", "content": prompt}])
-    return str(response["message"]["content"]).strip()
+    return generate_content(model=model, messages=[{"role": "user", "content": prompt}])
 
 
 def deduce_audio_file_path(transcript_file: Path) -> Optional[Path]:
@@ -200,24 +196,6 @@ def expand_environment_variables(command: str) -> str:
     return expanded
 
 
-def ensure_model_exists(model_name: str) -> None:
-    """
-    Ensure the specified Ollama model is available locally.
-    If not, pull it before proceeding.
-    """
-    try:
-        # Try to get model info - this will fail if model doesn't exist
-        ollama.show(model=model_name)
-    except Exception:
-        logger.info(f"Model {model_name} not found locally. Pulling model...")
-        try:
-            ollama.pull(model=model_name)
-            logger.info(f"Successfully pulled model {model_name}")
-        except Exception as e:
-            logger.error(f"Error pulling model {model_name}: {e}")
-            sys.exit(1)
-
-
 def main() -> None:
     # Set up argument parser
     parser = argparse.ArgumentParser(description="Extract content from transcripts using plugins.")
@@ -227,7 +205,7 @@ def main() -> None:
     args = parser.parse_args()
 
     # Ensure the default model exists
-    ensure_model_exists(OLLAMA_MODEL)
+    ensure_model_exists(DEFAULT_MODEL)
 
     input_file = Path(args.transcript_file)
     if not input_file.exists():
