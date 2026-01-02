@@ -106,16 +106,16 @@ while IFS= read -r -d '' m4a_file; do
     
     log_verbose "Processing: $filename"
     
-    # Get the file's modification date (YYYY-MM format)
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        # macOS
-        file_year_month=$(stat -f "%Sm" -t "%Y-%m" "$m4a_file")
+    # Extract date from filename (format: YYYYMMDD_HHMMSS.m4a)
+    # The filename IS the recording date, more reliable than file modification time
+    if [[ "$basename_no_ext" =~ ^([0-9]{4})([0-9]{2})([0-9]{2})_ ]]; then
+        file_year_month="${BASH_REMATCH[1]}-${BASH_REMATCH[2]}"
     else
-        # Linux
-        file_year_month=$(date -r "$m4a_file" +%Y-%m)
+        log_warn "  Skipping: Cannot parse date from filename: $filename"
+        continue
     fi
     
-    log_verbose "  File date: $file_year_month"
+    log_verbose "  Recording date: $file_year_month"
     
     # Skip if file is from the current month
     if [ "$file_year_month" = "$CURRENT_YEAR_MONTH" ]; then
