@@ -35,14 +35,12 @@ Below are individual summaries from voice memos recorded throughout the month, l
 
 {summaries}
 
-Please create a cohesive monthly summary that:
-1. Identifies recurring themes, topics, or concerns that appeared multiple times
-2. Groups related memos together by topic/theme
-3. Highlights any notable events, decisions, or milestones
-4. Notes any patterns in mood or focus throughout the month
-5. Provides an overall sense of what the month was about
+Please create a concise monthly summary in exactly 3 paragraphs:
+- First paragraph: The main themes, topics, and recurring concerns of the month
+- Second paragraph: Notable events, decisions, or milestones
+- Third paragraph: Overall mood and sense of what the month was about
 
-Format your response as markdown with clear sections. Be concise but comprehensive. Do not simply list the individual summaries - synthesize them into a meaningful narrative of the month.
+Write in plain prose without markdown, headers, or bullet points. Just three flowing paragraphs that capture the essence of the month.
 
 Monthly Summary:"""
 
