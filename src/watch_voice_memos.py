@@ -64,11 +64,24 @@ class VoiceMemoHandler(FileSystemEventHandler):
         self.processed_files: Dict[str, float] = {}  # Track processed files and their modification times
         # Store the resolved base directory
         self.base_dir = Path(VOICE_MEMOS_DIR).resolve()
+        self.archive_dir = self.base_dir / "archive"
+
+    def is_archive_file(self, file_path: Path) -> bool:
+        """Check if a file is in the archive directory."""
+        try:
+            file_path.relative_to(self.archive_dir)
+            return True
+        except ValueError:
+            return False
 
     def on_created(self, event: FileSystemEvent) -> None:
         if not event.is_directory and str(event.src_path).endswith(".m4a"):
             # Use the resolved path for processing
             file_path = Path(str(event.src_path)).resolve()
+            # Skip archive files
+            if self.is_archive_file(file_path):
+                logger.debug(f"Skipping archive file: {file_path}")
+                return
             self.processed_files[str(file_path)] = get_file_modification_time(file_path)
             logger.debug(f"Added to processed_files: {str(file_path)}")
             process_voice_memo(file_path, force=self.force)
@@ -77,6 +90,10 @@ class VoiceMemoHandler(FileSystemEventHandler):
         if not event.is_directory and str(event.src_path).endswith(".m4a"):
             # Use the resolved path for processing
             file_path = Path(str(event.src_path)).resolve()
+            # Skip archive files
+            if self.is_archive_file(file_path):
+                logger.debug(f"Skipping archive file: {file_path}")
+                return
             current_mtime = get_file_modification_time(file_path)
             if str(file_path) not in self.processed_files or self.processed_files[str(file_path)] != current_mtime:
                 self.processed_files[str(file_path)] = current_mtime
@@ -134,10 +151,14 @@ def watch_voice_memos() -> None:
     observer.start()
 
     try:
-        # Process existing files
+        # Process existing files (excluding archive)
         for file_path in voice_memos_dir.rglob("*.m4a"):
             # Use resolved paths for processing
             file_path = file_path.resolve()
+            # Skip archive files
+            if event_handler.is_archive_file(file_path):
+                logger.debug(f"Skipping archive file: {file_path}")
+                continue
             event_handler.processed_files[str(file_path)] = get_file_modification_time(file_path)
             process_voice_memo(file_path, force=args.force)
 
