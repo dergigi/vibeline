@@ -1,7 +1,5 @@
 name: dm_agent
 description: Send transcript to a matched agent via NIP-17 gift-wrapped DM
-run: matching
-keywords: ["this is for", "send to", "message for", "tell", "hey"]
-match: any
+run: always
 output_extension: ".txt"
 command: "scripts/dm_agent.sh TRANSCRIPT_FILE"
