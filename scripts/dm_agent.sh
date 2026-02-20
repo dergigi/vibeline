@@ -4,6 +4,10 @@
 #
 # Usage: dm_agent.sh <transcript_file>
 #
+# Looks for "Hey <name>" in the transcript, then checks if <name> exists
+# in AGENTS.txt. If found, sends the transcript via NIP-17 gift-wrapped DM.
+# If the name isn't in AGENTS.txt, exits gracefully.
+#
 # Env vars:
 #   NOSTR_SECRET_KEY  — sender's nsec/hex secret key (required)
 #   AGENTS_FILE       — path to AGENTS.txt (default: AGENTS.txt)
@@ -39,11 +43,19 @@ if ! command -v nak &>/dev/null; then
 fi
 
 TRANSCRIPT=$(cat "$TRANSCRIPT_FILE")
-TRANSCRIPT_LOWER=$(echo "$TRANSCRIPT" | tr '[:upper:]' '[:lower:]')
 
-# Scan AGENTS.txt for first matching name
+# Extract the name right after "hey" (case-insensitive)
+HEY_NAME=$(echo "$TRANSCRIPT" | grep -ioP '\bhey\s+\K\w+' | head -1 | tr '[:upper:]' '[:lower:]')
+
+if [[ -z "$HEY_NAME" ]]; then
+    echo "No 'Hey <name>' pattern found in transcript"
+    exit 0
+fi
+
+echo "Found: Hey $HEY_NAME"
+
+# Look up the name in AGENTS.txt
 MATCHED_NPUB=""
-MATCHED_NAME=""
 
 while IFS= read -r line || [[ -n "$line" ]]; do
     # Skip empty lines and comments
@@ -58,20 +70,19 @@ while IFS= read -r line || [[ -n "$line" ]]; do
     IFS='|' read -ra names <<< "$names_part"
     for name in "${names[@]}"; do
         name="$(echo "$name" | xargs | tr '[:upper:]' '[:lower:]')"  # trim + lowercase
-        if echo "$TRANSCRIPT_LOWER" | grep -qiw "$name"; then
+        if [[ "$name" == "$HEY_NAME" ]]; then
             MATCHED_NPUB="$npub_part"
-            MATCHED_NAME="$name"
             break 2
         fi
     done
 done < "$AGENTS_FILE"
 
 if [[ -z "$MATCHED_NPUB" ]]; then
-    echo "No agent match found in transcript"
+    echo "Name '$HEY_NAME' not found in $AGENTS_FILE — skipping"
     exit 0
 fi
 
-echo "Matched agent: $MATCHED_NAME -> $MATCHED_NPUB"
+echo "Matched agent: $HEY_NAME -> $MATCHED_NPUB"
 
 # Decode npub to hex for nak
 RECIPIENT_HEX=$(nak decode "$MATCHED_NPUB" 2>/dev/null | jq -r '.')
@@ -89,4 +100,4 @@ nak event -k 14 -c "$TRANSCRIPT" --tag p="$RECIPIENT_HEX" |
     nak gift wrap --sec "$NOSTR_SECRET_KEY" -p "$MATCHED_NPUB" |
     nak event wss://auth.nostr1.com wss://relay.damus.io wss://nos.lol
 
-echo "NIP-17 DM sent to $MATCHED_NAME ($MATCHED_NPUB)"
+echo "NIP-17 DM sent to $HEY_NAME ($MATCHED_NPUB)"
