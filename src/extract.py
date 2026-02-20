@@ -367,6 +367,9 @@ def main() -> None:
                     else:
                         cmd_to_run = plugin.command
 
+                    # Replace TRANSCRIPT_FILE placeholder with the input transcript path
+                    cmd_to_run = cmd_to_run.replace("TRANSCRIPT_FILE", str(input_file))
+
                     # Replace FILE placeholder with the actual output file path (for backward compatibility)
                     cmd_to_run = cmd_to_run.replace("FILE", str(output_file))
 
