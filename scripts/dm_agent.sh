@@ -5,14 +5,14 @@
 # Usage: dm_agent.sh <transcript_file>
 #
 # Looks for "Hey <name>" in the transcript, then checks if <name> exists
-# in AGENTS.txt. If found, sends the transcript via NIP-17 gift-wrapped DM.
-# If the name isn't in AGENTS.txt, exits gracefully.
+# in CONTACTS.txt. If found, sends the transcript via NIP-17 gift-wrapped DM.
+# If the name isn't in CONTACTS.txt, exits gracefully.
 #
 # Env vars:
 #   NOSTR_SECRET_KEY  — sender's nsec/hex secret key (required)
-#   AGENTS_FILE       — path to AGENTS.txt (default: AGENTS.txt)
+#   CONTACTS_FILE       — path to CONTACTS.txt (default: CONTACTS.txt)
 #
-# AGENTS.txt format (one agent per line):
+# CONTACTS.txt format (one agent per line):
 #   name|alias1|alias2, npub1...
 #
 # Requires: nak (https://github.com/fiatjaf/nak)
@@ -20,15 +20,15 @@
 set -euo pipefail
 
 TRANSCRIPT_FILE="${1:?Usage: dm_agent.sh <transcript_file>}"
-AGENTS_FILE="${AGENTS_FILE:-AGENTS.txt}"
+CONTACTS_FILE="${CONTACTS_FILE:-CONTACTS.txt}"
 
 if [[ ! -f "$TRANSCRIPT_FILE" ]]; then
     echo "Error: Transcript file not found: $TRANSCRIPT_FILE" >&2
     exit 1
 fi
 
-if [[ ! -f "$AGENTS_FILE" ]]; then
-    echo "Error: Agents file not found: $AGENTS_FILE" >&2
+if [[ ! -f "$CONTACTS_FILE" ]]; then
+    echo "Error: Contacts file not found: $CONTACTS_FILE" >&2
     exit 1
 fi
 
@@ -54,7 +54,7 @@ fi
 
 echo "Found: Hey $HEY_NAME"
 
-# Look up the name in AGENTS.txt
+# Look up the name in CONTACTS.txt
 MATCHED_NPUB=""
 
 while IFS= read -r line || [[ -n "$line" ]]; do
@@ -75,10 +75,10 @@ while IFS= read -r line || [[ -n "$line" ]]; do
             break 2
         fi
     done
-done < "$AGENTS_FILE"
+done < "$CONTACTS_FILE"
 
 if [[ -z "$MATCHED_NPUB" ]]; then
-    echo "Name '$HEY_NAME' not found in $AGENTS_FILE — skipping"
+    echo "Name '$HEY_NAME' not found in $CONTACTS_FILE — skipping"
     exit 0
 fi
 

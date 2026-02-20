@@ -1,0 +1,6 @@
+# CONTACTS.txt — Map names/aliases to npubs for NIP-17 DM routing
+# Format: name|alias1|alias2, npub1...
+#
+# Example:
+# vincent|vince, npub1zpavy4p3c30adcyhjg5c457cfuju6h0j6m8pql0p8yhvl4ph2zwq2uexd6
+# alice, npub1alice...
