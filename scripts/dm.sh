@@ -82,10 +82,10 @@ if [[ -z "$MATCHED_NPUB" ]]; then
     exit 0
 fi
 
-echo "Matched agent: $HEY_NAME -> $MATCHED_NPUB" >&2
+echo "Matched contact: $HEY_NAME -> $MATCHED_NPUB" >&2
 
 # Decode npub to hex for nak
-RECIPIENT_HEX=$(nak decode "$MATCHED_NPUB" 2>/dev/null | jq -r '.')
+RECIPIENT_HEX=$(nak decode "$MATCHED_NPUB" 2>/dev/null)
 
 if [[ -z "$RECIPIENT_HEX" || "$RECIPIENT_HEX" == "null" ]]; then
     echo "Error: Failed to decode npub: $MATCHED_NPUB" >&2
