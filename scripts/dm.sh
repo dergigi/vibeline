@@ -11,6 +11,8 @@
 # Env vars:
 #   DM_NSEC        — sender's nsec/hex secret key (required)
 #   CONTACTS_FILE  — path to contacts file (default: ~/.vibeline/contacts.txt)
+#   DM_RELAYS      — space-separated relay URLs for DMs (preferred)
+#   RELAYS         — fallback relay list if DM_RELAYS is unset
 #
 # contacts.txt format (one contact per line):
 #   name|alias1|alias2, npub1...
@@ -21,6 +23,7 @@ set -euo pipefail
 
 TRANSCRIPT_FILE="${1:?Usage: dm.sh <transcript_file>}"
 CONTACTS_FILE="${CONTACTS_FILE:-$HOME/.vibeline/contacts.txt}"
+PUBLISH_RELAYS="${DM_RELAYS:-${RELAYS:-}}"
 
 if [[ ! -f "$TRANSCRIPT_FILE" ]]; then
     echo "Error: Transcript file not found: $TRANSCRIPT_FILE" >&2
@@ -34,6 +37,11 @@ fi
 
 if [[ -z "${DM_NSEC:-}" ]]; then
     echo "Error: DM_NSEC not set" >&2
+    exit 1
+fi
+
+if [[ -z "$PUBLISH_RELAYS" ]]; then
+    echo "Error: DM_RELAYS or RELAYS must be set" >&2
     exit 1
 fi
 
@@ -98,7 +106,7 @@ fi
 # 3. Publish the gift wrap to DM relays
 nak event --sec "$DM_NSEC" -k 14 -c "$TRANSCRIPT" --tag p="$RECIPIENT_HEX" |
     nak gift wrap --sec "$DM_NSEC" -p "$MATCHED_NPUB" |
-    nak event ${RELAYS}
+    nak event ${PUBLISH_RELAYS}
 
 SENDER_NPUB=$(nak key public "$DM_NSEC" 2>/dev/null | nak encode npub 2>/dev/null)
 echo "NIP-17 DM sent from $SENDER_NPUB to $HEY_NAME ($MATCHED_NPUB)" >&2

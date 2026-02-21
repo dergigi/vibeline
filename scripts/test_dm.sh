@@ -55,8 +55,8 @@ trap 'rm -f "$tmp_file"' EXIT
 
 echo "Testing DM to '$TARGET_NAME' using transcript: $tmp_file" >&2
 if [[ "$QUICK_MODE" -eq 1 ]]; then
-    RELAYS="wss://relay.damus.io wss://nos.lol"
-    export RELAYS
-    echo "Quick mode enabled: using RELAYS='$RELAYS'" >&2
+    DM_RELAYS="wss://relay.damus.io wss://nos.lol"
+    export DM_RELAYS
+    echo "Quick mode enabled: using DM_RELAYS='$DM_RELAYS'" >&2
 fi
 "$ROOT_DIR/scripts/dm.sh" "$tmp_file"
