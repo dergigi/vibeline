@@ -11,7 +11,8 @@
 # Env vars:
 #   DM_NSEC        — sender's nsec/hex secret key (required)
 #   CONTACTS_FILE  — path to contacts file (default: ~/.vibeline/contacts.txt)
-#   DM_RELAYS      — space-separated relay URLs for DMs (required)
+#   DM_RELAYS      — space-separated relay URLs for DMs (preferred)
+#   RELAYS         — fallback relay list if DM_RELAYS is unset
 #
 # contacts.txt format (one contact per line):
 #   name|alias1|alias2, npub1...
@@ -22,7 +23,7 @@ set -euo pipefail
 
 TRANSCRIPT_FILE="${1:?Usage: dm.sh <transcript_file>}"
 CONTACTS_FILE="${CONTACTS_FILE:-$HOME/.vibeline/contacts.txt}"
-PUBLISH_RELAYS="${DM_RELAYS:-}"
+PUBLISH_RELAYS="${DM_RELAYS:-${RELAYS:-}}"
 
 if [[ ! -f "$TRANSCRIPT_FILE" ]]; then
     echo "Error: Transcript file not found: $TRANSCRIPT_FILE" >&2
@@ -40,7 +41,7 @@ if [[ -z "${DM_NSEC:-}" ]]; then
 fi
 
 if [[ -z "$PUBLISH_RELAYS" ]]; then
-    echo "Error: DM_RELAYS must be set" >&2
+    echo "Error: DM_RELAYS or RELAYS must be set" >&2
     exit 1
 fi
 
