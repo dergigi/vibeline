@@ -5,14 +5,14 @@
 # Usage: dm.sh <transcript_file>
 #
 # Looks for "Hey <name>" in the transcript, then checks if <name> exists
-# in CONTACTS.txt. If found, sends the transcript via NIP-17 gift-wrapped DM.
-# If the name isn't in CONTACTS.txt, exits gracefully.
+# in contacts.txt. If found, sends the transcript via NIP-17 gift-wrapped DM.
+# If the name isn't in contacts.txt, exits gracefully.
 #
 # Env vars:
-#   DM_NSEC  — sender's nsec/hex secret key (required)
-#   CONTACTS_FILE       — path to CONTACTS.txt (default: CONTACTS.txt)
+#   DM_NSEC        — sender's nsec/hex secret key (required)
+#   CONTACTS_FILE  — path to contacts file (default: ~/.vibeline/contacts.txt)
 #
-# CONTACTS.txt format (one agent per line):
+# contacts.txt format (one contact per line):
 #   name|alias1|alias2, npub1...
 #
 # Requires: nak (https://github.com/fiatjaf/nak)
@@ -20,7 +20,7 @@
 set -euo pipefail
 
 TRANSCRIPT_FILE="${1:?Usage: dm.sh <transcript_file>}"
-CONTACTS_FILE="${CONTACTS_FILE:-CONTACTS.txt}"
+CONTACTS_FILE="${CONTACTS_FILE:-$HOME/.vibeline/contacts.txt}"
 
 if [[ ! -f "$TRANSCRIPT_FILE" ]]; then
     echo "Error: Transcript file not found: $TRANSCRIPT_FILE" >&2
@@ -54,7 +54,7 @@ fi
 
 echo "Found: Hey $HEY_NAME" >&2
 
-# Look up the name in CONTACTS.txt
+# Look up the name in contacts file
 MATCHED_NPUB=""
 
 while IFS= read -r line || [[ -n "$line" ]]; do
