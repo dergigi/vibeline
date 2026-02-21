@@ -221,10 +221,10 @@ Contacts format (one contact per line):
 name|alias1|alias2, npub1...
 ```
 
-For quick end-to-end checks, use:
+For quick manual checks, create a short transcript that starts with `Hey <name>` and run:
 
 ```bash
-scripts/test_dm.sh --quick <name-or-alias> [message]
+scripts/dm.sh /path/to/transcript.txt
 ```
 
 ## Contributors
