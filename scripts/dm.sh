@@ -98,6 +98,6 @@ fi
 # 3. Publish the gift wrap to DM relays
 nak event -k 14 -c "$TRANSCRIPT" --tag p="$RECIPIENT_HEX" |
     nak gift wrap --sec "$DM_NSEC" -p "$MATCHED_NPUB" |
-    nak event ${RELAYS}
+    nak publish ${RELAYS}
 
 echo "NIP-17 DM sent to $HEY_NAME ($MATCHED_NPUB)" >&2
