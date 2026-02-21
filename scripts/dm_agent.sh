@@ -44,8 +44,8 @@ fi
 
 TRANSCRIPT=$(cat "$TRANSCRIPT_FILE")
 
-# Extract the name right after "hey" (case-insensitive)
-HEY_NAME=$(echo "$TRANSCRIPT" | grep -ioP '\bhey\s+\K\w+' | head -1 | tr '[:upper:]' '[:lower:]')
+# Extract the name right after "hey" (case-insensitive, no PCRE for macOS compat)
+HEY_NAME=$(echo "$TRANSCRIPT" | sed -n 's/.*[Hh][Ee][Yy][[:space:]][[:space:]]*\([A-Za-z][A-Za-z]*\).*/\1/p' | head -1 | tr '[:upper:]' '[:lower:]')
 
 if [[ -z "$HEY_NAME" ]]; then
     echo "No 'Hey <name>' pattern found in transcript"
