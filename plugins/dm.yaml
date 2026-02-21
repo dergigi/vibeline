@@ -3,4 +3,4 @@ description: Send transcript to a matched agent via NIP-17 gift-wrapped DM
 run: matching
 keywords: ["hey"]
 output_extension: ".json"
-command: "scripts/dm_agent.sh TRANSCRIPT_FILE"
+command: "scripts/dm.sh TRANSCRIPT_FILE"

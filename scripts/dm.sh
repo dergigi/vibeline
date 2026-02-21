@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #
-# dm_agent.sh — Send a transcript to a matched agent via NIP-17 DM (gift-wrapped)
+# dm.sh — Send a transcript via NIP-17 DM (gift-wrapped) to a matched contact
 #
-# Usage: dm_agent.sh <transcript_file>
+# Usage: dm.sh <transcript_file>
 #
 # Looks for "Hey <name>" in the transcript, then checks if <name> exists
 # in CONTACTS.txt. If found, sends the transcript via NIP-17 gift-wrapped DM.
@@ -19,7 +19,7 @@
 #
 set -euo pipefail
 
-TRANSCRIPT_FILE="${1:?Usage: dm_agent.sh <transcript_file>}"
+TRANSCRIPT_FILE="${1:?Usage: dm.sh <transcript_file>}"
 CONTACTS_FILE="${CONTACTS_FILE:-CONTACTS.txt}"
 
 if [[ ! -f "$TRANSCRIPT_FILE" ]]; then
