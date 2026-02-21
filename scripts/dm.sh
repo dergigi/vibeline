@@ -96,7 +96,7 @@ fi
 # 1. Create kind 14 rumor (DM content) with p-tag for recipient
 # 2. Gift-wrap it (creates kind 13 seal -> kind 1059 gift wrap)
 # 3. Publish the gift wrap to DM relays
-nak event --sec "$DM_NSEC" -c "$TRANSCRIPT" --tag p="$RECIPIENT_HEX" |
+nak event --sec "$DM_NSEC" -k 14 -c "$TRANSCRIPT" --tag p="$RECIPIENT_HEX" |
     nak gift wrap --sec "$DM_NSEC" -p "$MATCHED_NPUB" |
     nak event ${RELAYS}
 
