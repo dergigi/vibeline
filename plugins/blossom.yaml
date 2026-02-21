@@ -4,4 +4,4 @@ run: matching
 keywords: ["good morning", "leave it at that"]
 match: all
 output_extension: ".json"
-command: "tmp=\"FILE.tmp\"; nak blossom --server $BLOSSOM_SERVER upload AUDIO_FILE > \"$tmp\" && [ -s \"$tmp\" ] && mv \"$tmp\" \"FILE\" || rm -f \"$tmp\""
+command: "tmp=\"FILE.tmp\"; nak blossom --server $BLOSSOM_SERVER --sec $BLOSSOM_NSEC upload AUDIO_FILE > \"$tmp\" && [ -s \"$tmp\" ] && mv \"$tmp\" \"FILE\" || rm -f \"$tmp\""

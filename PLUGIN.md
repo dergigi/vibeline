@@ -344,13 +344,13 @@ run: matching
 keywords: ["upload", "blossom", "share", "cloud"]
 match: any
 ignore_if: rambling
-command: "nak blossom --server $BLOSSOM_SERVER upload AUDIO_FILE"
+command: "nak blossom --server $BLOSSOM_SERVER --sec $BLOSSOM_NSEC upload AUDIO_FILE"
 ```
 
 Required environment variables:
 
 - `BLOSSOM_SERVER`: The Blossom server URL
-- `NOSTR_SECRET_KEY`: Your Nostr private key for authentication
+- `BLOSSOM_NSEC`: Your Nostr private key for Blossom authentication
 
 ### Example: Blossom Upload Plugin
 
@@ -371,7 +371,7 @@ ignore_if: rambling
 prompt: |
   Upload triggered for audio file.
   This plugin will upload the audio file to Blossom server.
-command: "nak blossom --server $BLOSSOM_SERVER upload AUDIO_FILE"
+command: "nak blossom --server $BLOSSOM_SERVER --sec $BLOSSOM_NSEC upload AUDIO_FILE"
 ```
 
 To use this plugin:
@@ -381,7 +381,7 @@ To use this plugin:
 
    ```bash
    export BLOSSOM_SERVER="http://your-blossom-server.com"
-   export NOSTR_SECRET_KEY="nsec1yourprivatekey"
+   export BLOSSOM_NSEC="nsec1yourprivatekey"
    ```
 
 3. Mention trigger words in your voice memo: "I want to upload this to blossom"
