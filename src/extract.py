@@ -166,12 +166,12 @@ def expand_environment_variables(command: str) -> str:
     Expand environment variables in a command string.
 
     Replaces $VARIABLE_NAME with the actual value from environment variables.
-    Sensitive variables like NOSTR_SECRET_KEY are handled securely.
+    Sensitive variables like DM_NSEC/BLOSSOM_NSEC are handled securely.
     """
     import re
 
     # List of sensitive variables that should never be logged
-    SENSITIVE_VARS = {"NOSTR_SECRET_KEY", "PRIVATE_KEY", "SECRET", "API_KEY", "TOKEN"}
+    SENSITIVE_VARS = {"DM_NSEC", "BLOSSOM_NSEC", "PRIVATE_KEY", "SECRET", "API_KEY", "TOKEN"}
 
     def replace_var(match: "re.Match[str]") -> str:
         var_name = match.group(1)
@@ -367,6 +367,9 @@ def main() -> None:
                     else:
                         cmd_to_run = plugin.command
 
+                    # Replace TRANSCRIPT_FILE placeholder with the input transcript path
+                    cmd_to_run = cmd_to_run.replace("TRANSCRIPT_FILE", str(input_file))
+
                     # Replace FILE placeholder with the actual output file path (for backward compatibility)
                     cmd_to_run = cmd_to_run.replace("FILE", str(output_file))
 
@@ -375,7 +378,7 @@ def main() -> None:
 
                     # Create a safe version of the command for logging (mask sensitive values)
                     safe_cmd = cmd_to_run
-                    for sensitive_var in ["NOSTR_SECRET_KEY", "PRIVATE_KEY", "SECRET", "API_KEY", "TOKEN"]:
+                    for sensitive_var in ["DM_NSEC", "BLOSSOM_NSEC", "PRIVATE_KEY", "SECRET", "API_KEY", "TOKEN"]:
                         value = os.getenv(sensitive_var)
                         if value:
                             safe_cmd = safe_cmd.replace(value, f"[{sensitive_var}_HIDDEN]")
@@ -392,6 +395,9 @@ def main() -> None:
 
                     if result.returncode == 0:
                         logger.info("Command executed successfully.")
+                        if result.stderr:
+                            for line in result.stderr.strip().splitlines():
+                                logger.info(f"  {line}")
                         if result.stdout:
                             logger.debug(f"Raw command stdout length: {len(result.stdout)}")
                             # Write command stdout to the plugin's output file

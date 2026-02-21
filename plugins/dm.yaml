@@ -1,0 +1,6 @@
+name: dm
+description: Send transcript to a matched contact via NIP-17 gift-wrapped DM
+run: matching
+keywords: ["hey"]
+output_extension: ".json"
+command: "scripts/dm.sh TRANSCRIPT_FILE"

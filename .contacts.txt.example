@@ -1,0 +1,12 @@
+# contacts.txt — Map names/aliases to npubs for NIP-17 DM routing
+# Format: name|alias1|alias2, npub1...
+#
+# Setup:
+# 1. Create the VibeLine config directory: mkdir -p ~/.vibeline
+# 2. Copy this file: cp .contacts.txt.example ~/.vibeline/contacts.txt
+# 3. Edit ~/.vibeline/contacts.txt to add your contacts
+#
+# Example:
+# gigi|dergigi, npub1dergggklka99wwrs92yz8wdjs952h2ux2ha2ed598ngwu9w7a6fsh9xzpc
+# socrates, npub1s0cra5735s8ccw7pfvqtp4see7t7lkfr0gwrfhkhsfakuxkf5ahs83023h
+# plato|platobot, npub1plat0kfywye0zj7d8qmckzkwmscdxh3tyecd3xm6arpd9scx47vs6lg43q

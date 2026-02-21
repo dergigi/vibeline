@@ -53,6 +53,7 @@ This will:
 
 - **Blossom upload plugin**: requires the `nak` CLI to be installed and available
   on your `PATH`. See [fiatjaf/nak](https://github.com/fiatjaf/nak).
+- **NIP-17 DM plugin**: also uses `nak` for gift-wrapped DMs.
 
 ## Development Setup
 
@@ -204,6 +205,27 @@ You can customize the vocabulary files using environment variables:
 The transcript cleaner will automatically run as part of the extraction process. You can customize the behavior with these options:
 
 - `--no-clean`: Skip the transcript cleaning step entirely
+
+### NIP-17 DM Configuration
+
+If you use the DM plugin (`plugins/dm.yaml`), configure these environment variables:
+
+- `DM_NSEC`: Sender private key (`nsec`, `hex`, or `ncryptsec`)
+- `DM_RELAYS`: Space-separated relay list used for DM publishing (recommended)
+- `RELAYS`: Fallback relay list if `DM_RELAYS` is not set
+- `CONTACTS_FILE`: Contacts mapping file (default: `~/.vibeline/contacts.txt`)
+
+Contacts format (one contact per line):
+
+```txt
+name|alias1|alias2, npub1...
+```
+
+For quick manual checks, create a short transcript that starts with `Hey <name>` and run:
+
+```bash
+scripts/dm.sh /path/to/transcript.txt
+```
 
 ## Contributors
 
