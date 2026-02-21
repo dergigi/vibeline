@@ -100,4 +100,5 @@ nak event -k 14 -c "$TRANSCRIPT" --tag p="$RECIPIENT_HEX" |
     nak gift wrap --sec "$DM_NSEC" -p "$MATCHED_NPUB" |
     nak event ${RELAYS}
 
-echo "NIP-17 DM sent to $HEY_NAME ($MATCHED_NPUB)" >&2
+SENDER_NPUB=$(nak key public "$DM_NSEC" 2>/dev/null | nak encode npub 2>/dev/null)
+echo "NIP-17 DM sent from $SENDER_NPUB to $HEY_NAME ($MATCHED_NPUB)" >&2
