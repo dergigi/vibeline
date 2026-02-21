@@ -171,7 +171,7 @@ def expand_environment_variables(command: str) -> str:
     import re
 
     # List of sensitive variables that should never be logged
-    SENSITIVE_VARS = {"DM_SECRET_KEY", "NOSTR_SECRET_KEY", "PRIVATE_KEY", "SECRET", "API_KEY", "TOKEN"}
+    SENSITIVE_VARS = {"DM_NSEC", "NOSTR_SECRET_KEY", "PRIVATE_KEY", "SECRET", "API_KEY", "TOKEN"}
 
     def replace_var(match: "re.Match[str]") -> str:
         var_name = match.group(1)
@@ -378,7 +378,7 @@ def main() -> None:
 
                     # Create a safe version of the command for logging (mask sensitive values)
                     safe_cmd = cmd_to_run
-                    for sensitive_var in ["DM_SECRET_KEY", "NOSTR_SECRET_KEY", "PRIVATE_KEY", "SECRET", "API_KEY", "TOKEN"]:
+                    for sensitive_var in ["DM_NSEC", "NOSTR_SECRET_KEY", "PRIVATE_KEY", "SECRET", "API_KEY", "TOKEN"]:
                         value = os.getenv(sensitive_var)
                         if value:
                             safe_cmd = safe_cmd.replace(value, f"[{sensitive_var}_HIDDEN]")

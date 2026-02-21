@@ -9,7 +9,7 @@
 # If the name isn't in CONTACTS.txt, exits gracefully.
 #
 # Env vars:
-#   DM_SECRET_KEY  — sender's nsec/hex secret key (required)
+#   DM_NSEC  — sender's nsec/hex secret key (required)
 #   CONTACTS_FILE       — path to CONTACTS.txt (default: CONTACTS.txt)
 #
 # CONTACTS.txt format (one agent per line):
@@ -32,8 +32,8 @@ if [[ ! -f "$CONTACTS_FILE" ]]; then
     exit 1
 fi
 
-if [[ -z "${DM_SECRET_KEY:-}" ]]; then
-    echo "Error: DM_SECRET_KEY not set" >&2
+if [[ -z "${DM_NSEC:-}" ]]; then
+    echo "Error: DM_NSEC not set" >&2
     exit 1
 fi
 
@@ -97,7 +97,7 @@ fi
 # 2. Gift-wrap it (creates kind 13 seal -> kind 1059 gift wrap)
 # 3. Publish the gift wrap to DM relays
 nak event -k 14 -c "$TRANSCRIPT" --tag p="$RECIPIENT_HEX" |
-    nak gift wrap --sec "$DM_SECRET_KEY" -p "$MATCHED_NPUB" |
+    nak gift wrap --sec "$DM_NSEC" -p "$MATCHED_NPUB" |
     nak event ${RELAYS}
 
 echo "NIP-17 DM sent to $HEY_NAME ($MATCHED_NPUB)" >&2
