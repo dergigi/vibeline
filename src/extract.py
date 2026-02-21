@@ -395,6 +395,9 @@ def main() -> None:
 
                     if result.returncode == 0:
                         logger.info("Command executed successfully.")
+                        if result.stderr:
+                            for line in result.stderr.strip().splitlines():
+                                logger.info(f"  {line}")
                         if result.stdout:
                             logger.debug(f"Raw command stdout length: {len(result.stdout)}")
                             # Write command stdout to the plugin's output file
