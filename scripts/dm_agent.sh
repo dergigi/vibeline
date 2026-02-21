@@ -48,11 +48,11 @@ TRANSCRIPT=$(cat "$TRANSCRIPT_FILE")
 HEY_NAME=$(echo "$TRANSCRIPT" | sed -n 's/.*[Hh][Ee][Yy][[:space:]][[:space:]]*\([A-Za-z][A-Za-z]*\).*/\1/p' | head -1 | tr '[:upper:]' '[:lower:]')
 
 if [[ -z "$HEY_NAME" ]]; then
-    echo "No 'Hey <name>' pattern found in transcript"
+    echo "No 'Hey <name>' pattern found in transcript" >&2
     exit 0
 fi
 
-echo "Found: Hey $HEY_NAME"
+echo "Found: Hey $HEY_NAME" >&2
 
 # Look up the name in CONTACTS.txt
 MATCHED_NPUB=""
@@ -78,11 +78,11 @@ while IFS= read -r line || [[ -n "$line" ]]; do
 done < "$CONTACTS_FILE"
 
 if [[ -z "$MATCHED_NPUB" ]]; then
-    echo "Name '$HEY_NAME' not found in $CONTACTS_FILE — skipping"
+    echo "Name '$HEY_NAME' not found in $CONTACTS_FILE — skipping" >&2
     exit 0
 fi
 
-echo "Matched agent: $HEY_NAME -> $MATCHED_NPUB"
+echo "Matched agent: $HEY_NAME -> $MATCHED_NPUB" >&2
 
 # Decode npub to hex for nak
 RECIPIENT_HEX=$(nak decode "$MATCHED_NPUB" 2>/dev/null | jq -r '.')
@@ -100,4 +100,4 @@ nak event -k 14 -c "$TRANSCRIPT" --tag p="$RECIPIENT_HEX" |
     nak gift wrap --sec "$NOSTR_SECRET_KEY" -p "$MATCHED_NPUB" |
     nak event wss://auth.nostr1.com wss://relay.damus.io wss://nos.lol
 
-echo "NIP-17 DM sent to $HEY_NAME ($MATCHED_NPUB)"
+echo "NIP-17 DM sent to $HEY_NAME ($MATCHED_NPUB)" >&2
