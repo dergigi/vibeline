@@ -52,8 +52,9 @@ fi
 
 TRANSCRIPT=$(cat "$TRANSCRIPT_FILE")
 
-# Extract the name right after "hey" (case-insensitive, no PCRE for macOS compat)
-HEY_NAME=$(echo "$TRANSCRIPT" | sed -n 's/.*[Hh][Ee][Yy][[:space:]][[:space:]]*\([A-Za-z][A-Za-z]*\).*/\1/p' | head -1 | tr '[:upper:]' '[:lower:]')
+# Extract the name right after a standalone "hey" (case-insensitive, macOS sed compatible).
+# Prepending a space lets us treat start-of-line like any other non-letter boundary.
+HEY_NAME=$(printf ' %s\n' "$TRANSCRIPT" | sed -n 's/.*[^[:alpha:]][Hh][Ee][Yy][[:space:]]*[-,.:;!?]*[[:space:]]*\([A-Za-z][A-Za-z]*\).*/\1/p' | sed -n '1p' | tr '[:upper:]' '[:lower:]')
 
 if [[ -z "$HEY_NAME" ]]; then
     echo "No 'Hey <name>' pattern found in transcript" >&2
