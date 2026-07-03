@@ -28,6 +28,9 @@ yarn-debug.log*
 yarn-error.log*
 *.swp
 
+# Cron logs (keep the dir, ignore the logs)
+logs/*.log
+
 # Python build artifacts
 *.egg-info/
 dist/
