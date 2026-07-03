@@ -2,7 +2,7 @@ name: shownote
 description: Generate concise podcast show notes from transcripts
 run: matching
 keywords: ["good morning", "leave it at that"]
-model: gpt-oss
+model: llama3.2
 output_extension: .md  # Markdown output
 prompt: |
   You are a podcast producer. Create concise, useful show notes based on the transcript.
