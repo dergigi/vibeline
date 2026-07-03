@@ -341,14 +341,19 @@ def main() -> None:
 
             # Generate content only if plugin has a non-empty prompt
             if plugin.prompt and plugin.prompt.strip():
-                additional_content = generate_additional_content(
-                    plugin.prompt, transcript_text, summary_text, plugin.model
-                )
+                try:
+                    additional_content = generate_additional_content(
+                        plugin.prompt, transcript_text, summary_text, plugin.model
+                    )
 
-                # Save to appropriate directory using base filename
-                with open(output_file, "w", encoding="utf-8") as f:
-                    f.write(additional_content)
-                logger.info(f"Content saved to: {output_file}")
+                    # Save to appropriate directory using base filename
+                    with open(output_file, "w", encoding="utf-8") as f:
+                        f.write(additional_content)
+                    logger.info(f"Content saved to: {output_file}")
+                except Exception as gen_err:
+                    # Don't let one failing plugin abort the whole run; skip and continue
+                    logger.error(f"Failed to generate content for {plugin_name} plugin: {gen_err}")
+                    continue
             else:
                 logger.info(f"Skipping generation for {plugin_name} (no prompt provided)")
 
