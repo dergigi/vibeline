@@ -1,6 +1,5 @@
 description: Generate podcast episode titles from transcripts
 run: always  # always, matching
-model: llama3.2
 output_extension: .txt  # Explicitly set text extension
 prompt: |
   Transcript:
