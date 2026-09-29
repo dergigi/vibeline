@@ -20,8 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Security
 
 - Update Markdown tooling and its dependencies to remove reported vulnerabilities; development tooling now requires Node.js 22 or newer.
+- Update UI dependencies and override Next.js's pinned PostCSS with 8.5.28 to address remaining high-severity findings.
 - Upgrade Next.js from 15.2.3 to 15.5.26 and align its ESLint configuration to address reported critical vulnerabilities.
-- Fail UI CI when npm reports critical dependency vulnerabilities.
+- Fail dependency audits in CI on high or critical findings.
 
 ## [0.0.3] - 2025-08-22
 

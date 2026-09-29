@@ -16,7 +16,7 @@ jobs:
           cache: npm
           cache-dependency-path: ui/package-lock.json
       - run: npm run ui:install
-      - run: npm --prefix ui audit --audit-level=critical
+      - run: npm --prefix ui audit --audit-level=high
       - run: npm run ui:check
       - run: npm run ui:build
       - uses: actions/setup-python@v5

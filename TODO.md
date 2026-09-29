@@ -6,7 +6,8 @@ Steps to glory, aka make this thing awesome forever:
 
 - [ ] Package for Homebrew (macOS), AUR (Arch/Omarchy), and Synology Container Manager.
 - [ ] Support independently configured local or remote transcription and Ollama.
-- [ ] Resolve inherited UI dependency audit advisories before release.
+- [x] Resolve high and critical npm audit findings.
+- [ ] Resolve remaining moderate Tiptap advisories.
 - [ ] Apply the [announced Next.js September 30 security update](https://nextjs.org/blog/upcoming-nextjs-security-release-september-2026) when available (planned 15.5.27).
 - [ ] Validate container builds and clean installs on target systems.
 - [ ] Publish the first unified release as 0.1.0 with both images from the same tag.
