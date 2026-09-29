@@ -12,11 +12,11 @@
     "ui:check": "npm --prefix ui run lint:all"
   },
   "devDependencies": {
-    "markdownlint-cli2": "^0.8.0",
+    "markdownlint-cli2": "^0.23.3",
     "markdownlint-cli2-formatter-pretty": "^0.0.8"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22"
   },
   "private": true
 }

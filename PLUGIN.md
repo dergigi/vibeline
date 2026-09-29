@@ -34,7 +34,7 @@ prompt: |
 ### Required Fields
 
 | Field | Description |
-|-------|-------------|
+| ------- | ------------- |
 | `description` | Brief explanation of what the plugin does |
 | `run` | When to run the plugin (`always` or `matching`) |
 | `prompt` | Template used for text generation with placeholders |
@@ -42,7 +42,7 @@ prompt: |
 ### Optional Fields
 
 | Field | Description | Default Value |
-|-------|-------------|---------------|
+| ------- | ------------- | --------------- |
 | `model` | Specific language model to use | System default |
 | `match` | How to match keywords (`any` or `all`) | `all` |
 | `output_extension` | File extension for the output | `.txt` |

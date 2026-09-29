@@ -24,7 +24,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '22'
         cache: 'npm'
 
     - name: Cache pip dependencies
@@ -40,10 +40,12 @@ jobs:
         python -m pip install --upgrade pip
         pip install -e ".[dev]"
         pip install types-PyYAML
-        npm install
+        npm ci
+
+    - name: Audit tooling dependencies
+      run: npm audit --audit-level=high
 
     - name: Run linting checks
       run: |
         make lint
-
 

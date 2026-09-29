@@ -67,7 +67,7 @@ This will:
 
 ## Development Setup
 
-For contributors, we recommend using the development setup script:
+With Node.js 22 or newer installed, run the development setup script:
 
 ```bash
 ./dev-setup.sh
