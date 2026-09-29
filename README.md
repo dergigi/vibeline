@@ -8,6 +8,10 @@ The main idea is to let your computer do computer work, while you're out and abo
 
 > **Note:** VibeLine is a highly opinionated system with specific design choices and workflows. While it offers flexibility through its plugin system, it follows a particular philosophy in how voice memos should be processed and structured. If you're looking for a more generic or customizable solution, this might not be the right tool for you.
 
+## Architecture: the filesystem is the database
+
+**Hard constraint:** Files and directories are the sole source of application state. The pipeline and UI share `VoiceMemos`. No separate database (including SQLite) or state store may be introduced. In-memory caches must be rebuildable from files.
+
 ## Features
 
 - 🎙️ Automatic voice memo transcription
@@ -22,16 +26,22 @@ The main idea is to let your computer do computer work, while you're out and abo
 - 🎯 Smart plugin matching based on transcript content
 - 📁 Organized output directory structure
 
-## UI Project
+## Project Structure
 
-There's also a separate [UI project](https://github.com/dergigi/vibeline-ui) that provides a web interface for VibeLine. It's built with Next.js and provides a more user-friendly way to interact with your voice memos and generated content.
+- `src/`, `plugins/`: processing pipeline and plugins.
+- `ui/`: Next.js web interface; see [UI setup](ui/README.md).
+- `VoiceMemos/`: shared filesystem state for both.
+
+The processor and UI share one version and changelog. From this directory, run `npm run ui:install` and `npm run ui:dev` to start the UI at <http://localhost:555>. The processor runs separately via `./watch.sh`.
+
+`docker compose up --build -d` builds both components from this checkout. Planned distribution targets are Homebrew (macOS), AUR (Arch/Omarchy), and Synology Container Manager, with local or remote processing. These installers are not yet available.
 
 ## Installation
 
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/vibeline.git
+git clone https://github.com/dergigi/vibeline.git
 cd vibeline
 ```
 
@@ -81,7 +91,9 @@ This will:
 
 ### Version Management
 
-VibeLine uses semantic versioning and maintains a changelog for all releases.
+- Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) for commits and squash PR titles: `type(scope): description`. Mark breaking changes with `!` or a `BREAKING CHANGE:` footer.
+- Use [Semantic Versioning](https://semver.org/): patch for fixes, minor for compatible features, major for breaking changes. During `0.x`, use minor bumps for breaking changes. Keep version files and `vX.Y.Z` release tags consistent.
+- Maintain [CHANGELOG.md](CHANGELOG.md) using [Keep a Changelog](https://keepachangelog.com/en/2.0.0/). Add notable changes under `[Unreleased]`; at release, move them into a dated `X.Y.Z` section. Review and commit release files before tagging.
 
 **Available version commands:**
 
@@ -89,29 +101,23 @@ VibeLine uses semantic versioning and maintains a changelog for all releases.
 - `make version-minor` - Bump minor version (0.1.0 → 0.2.0)
 - `make version-major` - Bump major version (0.1.0 → 1.0.0)
 - `make version-show` - Show version management help
-- `make docker-build` - Build Docker image with current version
-- `make docker-push` - Push Docker image to registry
+- `make docker-build` - Build both Docker images with the current version
+- `make docker-push` - Push both Docker images to the registry
 
-**Manual version bumping:**
+**Prepare a release without tagging:**
 
 ```bash
-python scripts/version.py patch    # For bug fixes
-python scripts/version.py minor    # For new features
-python scripts/version.py major    # For breaking changes
+python scripts/version.py patch --no-tag    # For bug fixes
+python scripts/version.py minor --no-tag    # For new features or pre-1.0 breaking changes
+python scripts/version.py major --no-tag    # For breaking changes after 1.0
 ```
 
-The version script will:
-
-1. Update the version in `pyproject.toml`
-2. Update `CHANGELOG.md` with the new version
-3. Update `docker-compose.yml` to use the new version
-4. Create a git tag for the release
-5. Push the tag to the remote repository
+The version script synchronizes `pyproject.toml`, both npm manifests and lockfiles, and both Compose image tags. Review and commit the release files before creating and pushing `vX.Y.Z`; version commands never tag or push automatically. Both images are built from that same tag. When transferring UI image publishing from the old repository, grant this repository Actions access to the existing GHCR `vibeline-ui` package.
 
 **Changelog Guidelines:**
 
-- Use the [Keep a Changelog](https://keepachangelog.com/) format
-- Categorize changes as Added, Changed, Fixed, or Removed
+- Use the [Keep a Changelog](https://keepachangelog.com/en/2.0.0/) format
+- Categorize changes as Added, Changed, Deprecated, Removed, Fixed, or Security; omit empty sections
 - Write clear, concise descriptions
 - Include breaking changes prominently
 

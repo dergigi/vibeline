@@ -2,6 +2,17 @@
 
 Steps to glory, aka make this thing awesome forever:
 
+## Distribution
+
+- [ ] Package for Homebrew (macOS), AUR (Arch/Omarchy), and Synology Container Manager.
+- [ ] Support independently configured local or remote transcription and Ollama.
+- [ ] Resolve inherited UI dependency audit advisories before release.
+- [ ] Apply the [announced Next.js September 30 security update](https://nextjs.org/blog/upcoming-nextjs-security-release-september-2026) when available (planned 15.5.27).
+- [ ] Validate container builds and clean installs on target systems.
+- [ ] Publish the first unified release as 0.1.0 with both images from the same tag.
+
+## Processing
+
 - [ ] Allow plugins to execute stuff using [MCP Tools](https://github.com/patruff/ollama-mcp-bridge)
 - [ ] Convert `transcribe` step into a plugin using a [whisper-ollama](https://ollama.com/search?q=whisper) model
 - [ ] Allow plugins to have an "input", i.e. which dir they should watch

@@ -29,6 +29,9 @@ dev = [
     "pre-commit>=3.3.0",
 ]
 
+[tool.setuptools.packages.find]
+include = ["src*"]
+
 [tool.black]
 line-length = 120
 target-version = ['py311']

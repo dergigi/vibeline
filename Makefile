@@ -63,12 +63,8 @@ version-show:
 	@python scripts/version.py --help
 
 # Docker operations
-docker-build: ## Build Docker image with current version
-	$(eval VERSION := $(shell grep '^version = ' pyproject.toml | cut -d'"' -f2))
-	docker build -t ghcr.io/dergigi/vibeline:$(VERSION) .
-	docker tag ghcr.io/dergigi/vibeline:$(VERSION) ghcr.io/dergigi/vibeline:latest
+docker-build: ## Build processor and UI images with current version
+	docker compose build vibeline vibeline-ui
 
-docker-push: ## Push Docker image with current version
-	$(eval VERSION := $(shell grep '^version = ' pyproject.toml | cut -d'"' -f2))
-	docker push ghcr.io/dergigi/vibeline:$(VERSION)
-	docker push ghcr.io/dergigi/vibeline:latest
+docker-push: ## Push processor and UI images to registry
+	docker compose push vibeline vibeline-ui

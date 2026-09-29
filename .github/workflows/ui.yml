@@ -1,0 +1,26 @@
+name: UI
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+      - run: npm run ui:install
+      - run: npm --prefix ui audit --audit-level=critical
+      - run: npm run ui:check
+      - run: npm run ui:build
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m unittest discover -s tests -p 'test_release.py'
+      - run: python -m unittest discover -s tests -p 'test_ui_smoke.py'

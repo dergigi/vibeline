@@ -5,6 +5,7 @@ Handles version bumping and changelog updates.
 """
 
 import argparse
+import json
 import re
 import sys
 from datetime import datetime
@@ -70,13 +71,16 @@ def update_changelog(new_version: str, release_date: str = None) -> None:
     if release_date is None:
         release_date = datetime.now().strftime("%Y-%m-%d")
 
-    # Replace [Unreleased] with new version
-    new_section = f"## [{new_version}] - {release_date}\n\n"
-    content = re.sub(r"## \[Unreleased\]", new_section, content)
-
-    # Add new [Unreleased] section at the top
-    unreleased_section = "## [Unreleased]\n\n### Added\n- \n\n### Changed\n- \n\n### Fixed\n- \n\n### Removed\n- \n\n"
-    content = content.replace("# Changelog\n", f"# Changelog\n\n{unreleased_section}")
+    # Preserve the preamble and leave a fresh Unreleased section.
+    content, count = re.subn(
+        r"^## \[Unreleased\]$",
+        f"## [Unreleased]\n\n## [{new_version}] - {release_date}",
+        content,
+        count=1,
+        flags=re.MULTILINE,
+    )
+    if count != 1:
+        raise ValueError("CHANGELOG.md must contain an [Unreleased] section")
 
     with open(changelog_path, "w") as f:
         f.write(content)
@@ -88,22 +92,10 @@ def create_initial_changelog(changelog_path: Path) -> None:
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
-
-### Added
--
-
-### Changed
--
-
-### Fixed
--
-
-### Removed
--
 
 """
     with open(changelog_path, "w") as f:
@@ -121,8 +113,11 @@ def update_docker_compose(new_version: str) -> None:
     with open(docker_compose_path, "r") as f:
         content = f.read()
 
-    # Update the commented image line to use the new version
-    content = re.sub(r"# image: ghcr\.io/dergigi/vibeline.*", f"image: ghcr.io/dergigi/vibeline:{new_version}", content)
+    content = re.sub(
+        r"(image: ghcr\.io/dergigi/vibeline(?:-ui)?):[^\s]+",
+        lambda match: f"{match.group(1)}:{new_version}",
+        content,
+    )
 
     with open(docker_compose_path, "w") as f:
         f.write(content)
@@ -130,29 +125,23 @@ def update_docker_compose(new_version: str) -> None:
     print(f"Updated docker-compose.yml to use version {new_version}")
 
 
-def create_git_tag(version: str) -> None:
-    """Create and push git tag for the new version."""
-    import subprocess
-
-    tag_name = f"v{version}"
-
-    # Create tag
-    subprocess.run(["git", "tag", "-a", tag_name, "-m", f"Release {tag_name}"], check=True)
-    print(f"Created git tag: {tag_name}")
-
-    # Push tag
-    try:
-        subprocess.run(["git", "push", "origin", tag_name], check=True)
-        print(f"Pushed tag to remote: {tag_name}")
-    except subprocess.CalledProcessError:
-        print(f"Warning: Could not push tag {tag_name} to remote")
+def update_npm_versions(new_version: str) -> None:
+    """Keep root tooling and UI manifests and lockfiles on the release version."""
+    for directory in [PROJECT_ROOT, PROJECT_ROOT / "ui"]:
+        for filename in ["package.json", "package-lock.json"]:
+            file_path = directory / filename
+            data = json.loads(file_path.read_text())
+            data["version"] = new_version
+            if "packages" in data:
+                data["packages"][""]["version"] = new_version
+            file_path.write_text(json.dumps(data, indent=2) + "\n")
 
 
 def main():
     parser = argparse.ArgumentParser(description="Version management for VibeLine")
     parser.add_argument("bump_type", choices=["major", "minor", "patch"], help="Type of version bump")
     parser.add_argument("--date", help="Release date (YYYY-MM-DD format, defaults to today)")
-    parser.add_argument("--no-tag", action="store_true", help="Skip creating git tag")
+    parser.add_argument("--no-tag", action="store_true", help="Accepted for compatibility; tags are always created manually")
 
     args = parser.parse_args()
 
@@ -174,18 +163,14 @@ def main():
 
         update_docker_compose(new_version)
 
-        # Create git tag
-        if not args.no_tag:
-            create_git_tag(new_version)
+        update_npm_versions(new_version)
 
         print(f"\n✅ Successfully bumped version to {new_version}")
         print("Don't forget to:")
         print("1. Review and update the changelog entries")
         print("2. Commit your changes")
-        print("3. Push to remote repository")
-        print("4. Build and push Docker image:")
-        print(f"   docker build -t ghcr.io/dergigi/vibeline:{new_version} .")
-        print(f"   docker push ghcr.io/dergigi/vibeline:{new_version}")
+        print(f"3. Create tag v{new_version} on the release commit")
+        print("4. Push the commit and tag to publish both images")
 
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)

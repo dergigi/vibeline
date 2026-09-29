@@ -5,3 +5,10 @@ open-webui
 docker-compose.yml
 syncthing
 .cursor
+.git
+.github
+.env*
+node_modules
+ui
+tests
+**/__pycache__

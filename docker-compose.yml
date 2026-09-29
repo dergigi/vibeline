@@ -24,10 +24,14 @@ services:
       - ./VoiceMemos:/app/VoiceMemos
 
   vibeline-ui:
-    image: ghcr.io/dergigi/vibeline-ui
+    build: ./ui
+    image: ghcr.io/dergigi/vibeline-ui:0.0.3
     restart: unless-stopped
     ports:
-      - 3000:3000
+      - "${UI_PORT:-555}:555"
+    environment:
+      PORT: 555
+      VOICE_MEMOS_DIR: /app/VoiceMemos
     volumes:
       - ./VoiceMemos:/app/VoiceMemos
 

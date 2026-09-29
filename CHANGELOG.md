@@ -1,27 +1,26 @@
 # Changelog
 
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/).
+
 ## [Unreleased]
 
 ### Added
 
--
+- Document the filesystem-only architecture constraint and commit, versioning, and changelog conventions.
+- Include the web UI under `ui/`, with shared data paths, build commands, CI, and versioning.
 
 ### Changed
 
--
+- Build both container images from this repository; use port 555 for the UI.
+- Prepare releases without automatically creating or pushing tags.
 
-### Fixed
+### Security
 
--
-
-### Removed
-
--
-
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+- Upgrade Next.js from 15.2.3 to 15.5.26 and align its ESLint configuration to address reported critical vulnerabilities.
+- Fail UI CI when npm reports critical dependency vulnerabilities.
 
 ## [0.0.3] - 2025-08-22
 

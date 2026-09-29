@@ -1,10 +1,15 @@
 {
   "name": "vibeline",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Voice memo processing and analysis tool",
   "scripts": {
-    "lint:markdown": "markdownlint-cli2 \"**/*.{md,mdx}\" \"!node_modules\" \"!vibenv\" \"!VoiceMemos/**\"",
-    "lint:markdown:fix": "markdownlint-cli2 --fix \"**/*.{md,mdx}\" \"!node_modules\" \"!vibenv\" \"!VoiceMemos/**\""
+    "lint:markdown": "markdownlint-cli2 \"**/*.{md,mdx}\" \"!node_modules\" \"!vibenv\" \"!VoiceMemos/**\" \"!ui/node_modules/**\" \"!ui/.next/**\"",
+    "lint:markdown:fix": "markdownlint-cli2 --fix \"**/*.{md,mdx}\" \"!node_modules\" \"!vibenv\" \"!VoiceMemos/**\" \"!ui/node_modules/**\" \"!ui/.next/**\"",
+    "ui:install": "npm --prefix ui ci",
+    "ui:dev": "npm --prefix ui run dev",
+    "ui:build": "npm --prefix ui run build",
+    "ui:start": "npm --prefix ui start",
+    "ui:check": "npm --prefix ui run lint:all"
   },
   "devDependencies": {
     "markdownlint-cli2": "^0.8.0",
@@ -12,5 +17,6 @@
   },
   "engines": {
     "node": ">=18.0.0"
-  }
+  },
+  "private": true
 }
