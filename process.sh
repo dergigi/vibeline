@@ -38,11 +38,20 @@ echo "----------------------------------------"
 # Step 1: Transcribe
 echo "Step 1: Transcribing audio..."
 ./transcribe.sh $force_flag "$input_file"
+transcribe_status=$?
+if [ "$transcribe_status" -eq 2 ]; then
+    echo "Audio is not ready, skipping"
+    exit 0
+fi
+if [ "$transcribe_status" -ne 0 ]; then
+    echo "Error: Transcription failed"
+    exit "$transcribe_status"
+fi
 
 # Check if transcription was successful
-if [ ! -f "$transcript_file" ]; then
-    echo "Error: Transcription failed"
-    exit 1
+if [ ! -s "$transcript_file" ]; then
+    echo "Transcript is empty, skipping plugins"
+    exit 0
 fi
 
 # Step 2: Extract content (including summary)

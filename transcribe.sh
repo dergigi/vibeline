@@ -34,6 +34,24 @@ if [ ! -f "$input_file" ]; then
     exit 1
 fi
 
+# SyncThing can expose a voice memo before the audio bytes arrive.
+# Exit 2 so callers wait and try again instead of running Whisper.
+if [ ! -s "$input_file" ]; then
+    echo "Audio is empty, skipping: $input_file"
+    exit 2
+fi
+
+duration=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$input_file" 2>/dev/null || true)
+if [ -z "$duration" ] || [ "$duration" = "N/A" ]; then
+    echo "Audio has no duration yet, skipping: $input_file"
+    exit 2
+fi
+has_audio=$(printf '%s > 0\n' "$duration" | bc -l)
+if [ "$has_audio" != "1" ]; then
+    echo "Audio has no duration yet, skipping: $input_file"
+    exit 2
+fi
+
 # Set the directory paths
 VOICE_MEMOS_DIR="${VOICE_MEMOS_DIR:-VoiceMemos}"
 TRANSCRIPT_DIR="$VOICE_MEMOS_DIR/transcripts"
@@ -46,7 +64,7 @@ filename=$(basename "$input_file" .m4a)
 transcript_file="$TRANSCRIPT_DIR/$filename.txt"
 
 # Check if transcript already exists
-if [ -f "$transcript_file" ] && [ -z "$force_flag" ]; then
+if [ -f "$transcript_file" ] && [ -s "$transcript_file" ] && [ -z "$force_flag" ]; then
     echo "Transcript already exists: $transcript_file (use -f to overwrite)"
     exit 0
 fi

@@ -316,6 +316,11 @@ def main() -> None:
         with open(summary_file, "r", encoding="utf-8") as f:
             summary_text = f.read()
 
+    if not transcript_text.strip():
+        logger.info("Transcript is empty, skipping plugins")
+        logger.info("----------------------------------------")
+        return
+
     # Determine which plugins to run
     logger.info(f"Checking plugins for transcript: {input_file.name}")
     logger.info(f"Transcript preview: {transcript_text[:200]}...")

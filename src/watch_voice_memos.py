@@ -4,9 +4,10 @@ import argparse
 import logging
 import os
 import subprocess
+import threading
 import time
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Optional, Tuple
 
 from dotenv import load_dotenv
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
@@ -27,15 +28,56 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+# Wait until SyncThing has stopped writing before transcribing.
+STABLE_SECONDS = 10
+FileSignature = Tuple[float, int]
+
 
 def count_words(text: str) -> int:
     """Count the number of words in a text string."""
     return len(text.split())
 
 
-def get_file_modification_time(file_path: Path) -> float:
-    """Get the last modification time of a file."""
-    return os.path.getmtime(file_path)
+def file_signature(file_path: Path) -> Optional[FileSignature]:
+    """Return mtime and size, or None if the file is gone."""
+    try:
+        stat = file_path.stat()
+    except OSError:
+        return None
+    return (stat.st_mtime, stat.st_size)
+
+
+def audio_duration_seconds(file_path: Path) -> Optional[float]:
+    """Return the audio duration when the file has playable audio."""
+    signature = file_signature(file_path)
+    if signature is None or signature[1] == 0:
+        return None
+    result = subprocess.run(
+        [
+            "ffprobe",
+            "-v",
+            "error",
+            "-show_entries",
+            "format=duration",
+            "-of",
+            "default=noprint_wrappers=1:nokey=1",
+            str(file_path),
+        ],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        return None
+    raw = result.stdout.strip()
+    if not raw or raw.upper() == "N/A":
+        return None
+    try:
+        duration = float(raw)
+    except ValueError:
+        return None
+    if duration <= 0:
+        return None
+    return duration
 
 
 def process_voice_memo(file_path: Path, force: bool = False) -> None:
@@ -61,7 +103,9 @@ def process_voice_memo(file_path: Path, force: bool = False) -> None:
 class VoiceMemoHandler(FileSystemEventHandler):
     def __init__(self, force: bool = False) -> None:
         self.force = force
-        self.processed_files: Dict[str, float] = {}  # Track processed files and their modification times
+        self.processed_files: Dict[str, FileSignature] = {}
+        self.pending_since: Dict[str, float] = {}
+        self.lock = threading.Lock()
         # Store the resolved base directory
         self.base_dir = Path(VOICE_MEMOS_DIR).resolve()
         self.archive_dir = self.base_dir / "archive"
@@ -74,31 +118,50 @@ class VoiceMemoHandler(FileSystemEventHandler):
         except ValueError:
             return False
 
+    def note_audio(self, file_path: Path) -> None:
+        """Remember that an audio file changed and should be checked once it settles."""
+        if self.is_archive_file(file_path):
+            logger.debug(f"Skipping archive file: {file_path}")
+            return
+        with self.lock:
+            self.pending_since[str(file_path)] = time.monotonic()
+
+    def process_if_ready(self, file_path: Path) -> None:
+        """Transcribe a file once it has playable audio and this version was not processed yet."""
+        if self.is_archive_file(file_path):
+            return
+        signature = file_signature(file_path)
+        if signature is None:
+            return
+        key = str(file_path)
+        if self.processed_files.get(key) == signature:
+            return
+        if audio_duration_seconds(file_path) is None:
+            logger.info(f"Skipping {file_path.name}: audio is still syncing or empty")
+            self.processed_files[key] = signature
+            return
+        self.processed_files[key] = signature
+        process_voice_memo(file_path, force=self.force)
+
+    def drain_ready(self) -> None:
+        """Process files that have not changed for STABLE_SECONDS."""
+        now = time.monotonic()
+        with self.lock:
+            ready = [path for path, seen_at in self.pending_since.items() if now - seen_at >= STABLE_SECONDS]
+            for path in ready:
+                del self.pending_since[path]
+        for path in ready:
+            self.process_if_ready(Path(path))
+
     def on_created(self, event: FileSystemEvent) -> None:
         if not event.is_directory and str(event.src_path).endswith(".m4a"):
-            # Use the resolved path for processing
             file_path = Path(str(event.src_path)).resolve()
-            # Skip archive files
-            if self.is_archive_file(file_path):
-                logger.debug(f"Skipping archive file: {file_path}")
-                return
-            self.processed_files[str(file_path)] = get_file_modification_time(file_path)
-            logger.debug(f"Added to processed_files: {str(file_path)}")
-            process_voice_memo(file_path, force=self.force)
+            self.note_audio(file_path)
 
     def on_modified(self, event: FileSystemEvent) -> None:
         if not event.is_directory and str(event.src_path).endswith(".m4a"):
-            # Use the resolved path for processing
             file_path = Path(str(event.src_path)).resolve()
-            # Skip archive files
-            if self.is_archive_file(file_path):
-                logger.debug(f"Skipping archive file: {file_path}")
-                return
-            current_mtime = get_file_modification_time(file_path)
-            if str(file_path) not in self.processed_files or self.processed_files[str(file_path)] != current_mtime:
-                self.processed_files[str(file_path)] = current_mtime
-                logger.debug(f"Updated in processed_files: {str(file_path)}")
-                process_voice_memo(file_path, force=self.force)
+            self.note_audio(file_path)
 
     def on_deleted(self, event: FileSystemEvent) -> None:
         if not event.is_directory:
@@ -115,7 +178,8 @@ class VoiceMemoHandler(FileSystemEventHandler):
 
             if str(matching_m4a) in self.processed_files:
                 logger.info(f"Reprocessing voice memo due to deletion of {deleted_file.name}")
-                process_voice_memo(matching_m4a, force=self.force)
+                self.processed_files.pop(str(matching_m4a), None)
+                self.note_audio(matching_m4a)
             else:
                 logger.info(f"Deleted file: {deleted_file.name} (type: {deleted_file.suffix})")
 
@@ -151,19 +215,24 @@ def watch_voice_memos() -> None:
     observer.start()
 
     try:
-        # Process existing files (excluding archive)
+        # Process existing files that have already finished syncing.
         for file_path in voice_memos_dir.rglob("*.m4a"):
-            # Use resolved paths for processing
             file_path = file_path.resolve()
-            # Skip archive files
             if event_handler.is_archive_file(file_path):
                 logger.debug(f"Skipping archive file: {file_path}")
                 continue
-            event_handler.processed_files[str(file_path)] = get_file_modification_time(file_path)
-            process_voice_memo(file_path, force=args.force)
+            try:
+                age = time.time() - file_path.stat().st_mtime
+            except OSError:
+                continue
+            if age >= STABLE_SECONDS:
+                event_handler.process_if_ready(file_path)
+            else:
+                event_handler.note_audio(file_path)
 
         # Keep the script running
         while True:
+            event_handler.drain_ready()
             time.sleep(1)
 
     except KeyboardInterrupt:

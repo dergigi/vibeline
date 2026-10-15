@@ -29,9 +29,16 @@ export async function GET(
       return new NextResponse('Forbidden', { status: 403 });
     }
 
-    // Get file stats for proper headers
-    const stats = statSync(filePath);
-    const fileSize = stats.size;
+    // Get file stats for proper headers. A missing or still-syncing file is a 404.
+    let fileSize = 0;
+    try {
+      fileSize = statSync(filePath).size;
+    } catch {
+      return new NextResponse('Not Found', { status: 404 });
+    }
+    if (fileSize <= 0) {
+      return new NextResponse('Not Found', { status: 404 });
+    }
     
     // Check for range requests (for seeking support)
     const range = request.headers.get('range');
@@ -40,6 +47,19 @@ export async function GET(
       const parts = range.replace(/bytes=/, '').split('-');
       const start = parseInt(parts[0], 10);
       const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+      if (
+        Number.isNaN(start) ||
+        Number.isNaN(end) ||
+        start < 0 ||
+        end < start ||
+        start >= fileSize ||
+        end >= fileSize
+      ) {
+        return new NextResponse('Range Not Satisfiable', {
+          status: 416,
+          headers: { 'Content-Range': `bytes */${fileSize}` },
+        });
+      }
       const chunksize = (end - start) + 1;
       
       const file = createReadStream(filePath, { start, end });
